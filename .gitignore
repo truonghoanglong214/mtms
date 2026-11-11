@@ -1,0 +1,44 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+**/secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Java / Maven
+**/target/
+**/.mvn/wrapper/maven-wrapper.jar
+*.class
+*.log
+
+# Frontend / Node
+**/node_modules/
+**/dist/
+**/.vite/
+**/coverage/
+*.tsbuildinfo
+
+# Local tools / IDE
+.idea/
+*.iml
+.vscode/settings.json
+.DS_Store
+Thumbs.db
+__pycache__/
+.pytest_cache/
+
+# Runtime data, credentials, user-generated uploads
+*.sqlite
+*.sqlite3
+**/uploads/
+**/backups/
+**/tmp/
+**/runtime-data/
+*.dump
+*.bak
+
+# Keep examples/configuration and documentation under version control.

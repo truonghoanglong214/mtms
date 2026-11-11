@@ -1,0 +1,20 @@
+﻿Task ID,Original Depends On,Working v1.1 Depends On,Added,Rationale,Decision Status,Classification
+P0-REV-03,P0-REV-02,P0-REV-02; P0-ORG-05; P0-SEC-03,P0-ORG-05; P0-SEC-03,Need branch-scoped authorization and anti-duplicate writes for revenue confirmation.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-REV-05,P0-FIN-02,P0-FIN-02; P0-REV-03; P0-SEC-03,P0-REV-03; P0-SEC-03,"Revenue posting must depend on confirmed reporting and idempotency, not only finance ledger.",APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-FIN-02,P0-FIN-01,P0-FIN-01; P0-ORG-05; P0-SEC-03,P0-ORG-05; P0-SEC-03,Money ledger requires server-side authorization and unique source posting.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-FIN-03,P0-FIN-02,P0-FIN-02; P0-ORG-05,P0-ORG-05,Expense operations must validate scoped permissions.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-HR-03,P0-HR-01,P0-HR-01; P0-ORG-05,P0-ORG-05,Approved payable time must honor branch-scoped permissions.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-HR-05,P0-HR-02,P0-HR-02; P0-HR-03,P0-HR-03,Calculation cannot proceed without approved payable hours.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-HR-06,P0-HR-05,P0-HR-05; P0-SEC-02,P0-SEC-02,Approval revisions require audit events.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-HR-07,P0-HR-06,P0-HR-06; P0-FIN-02,P0-FIN-02,Payroll payment must flow through cash/bank posting.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-INV-02,P0-SEC-04,P0-SEC-04; P0-INV-01,P0-INV-01,Opening inventory must use validated item/base units.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-INV-04,P0-INV-03,P0-INV-03; P0-SEC-03,P0-SEC-03,Posting WAC must be idempotent and safe under retries.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-INV-05,P0-INV-04,P0-INV-04; P0-SEC-03,P0-SEC-03,Manual issue requires idempotency in addition to inventory posting.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-CAP-02,P0-CAP-01,P0-CAP-01; P0-FIN-02,P0-FIN-02,Actual capital cash contribution must link separately to money ledger.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-CLS-01,P0-REV-06,P0-REV-06; P0-REV-05; P0-HR-06; P0-FIN-06; P0-INV-07,P0-REV-05; P0-HR-06; P0-FIN-06; P0-INV-07,"Close prerequisites require confirmed revenue, payroll, reconciled cash and COGS.",APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-CLS-02,P0-INV-07,P0-INV-07; P0-REV-05; P0-FIN-03; P0-HR-06; P0-FIN-07,P0-REV-05; P0-FIN-03; P0-HR-06; P0-FIN-07,"P&L query draws from revenue, expenses, payroll accrual, tax and COGS.",APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-CLS-03,P0-CLS-02,P0-CLS-02; P0-CLS-01; P0-SEC-02,P0-CLS-01; P0-SEC-02,Immutable close snapshot requires prerequisite validation and audit trail.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P0-CLS-05,P0-CLS-04,P0-CLS-04; P0-SEC-05; P0-ORG-05; P0-SEC-03,P0-SEC-05; P0-ORG-05; P0-SEC-03,"MVP gate must verify CI/restore, permissions and idempotency.",APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P1-MOV-08,P1-MOV-06,P1-MOV-06; P1-MOV-07,P1-MOV-07,Returns must handle both borrow-out and borrow-in valuation rules.,APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P1-CAP-07,P1-CAP-06,P1-CAP-06; P1-CAP-05; P1-CAP-08; P1-CAP-02,P1-CAP-05; P1-CAP-08; P1-CAP-02,"Payment requires approved cash/liability gate, retained lots and delegation.",APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL
+P1-CLS-03,P1-CAP-09,P1-CAP-09; P1-CLS-02; P1-MOV-09; P1-HR-07; P1-FIN-02,P1-CLS-02; P1-MOV-09; P1-HR-07; P1-FIN-02,"V1 release rehearsal must include reopen, loans, payroll and consolidation controls.",APPLIED IN WORKING COPY — G0 REVIEW,TECHNICAL PROPOSAL

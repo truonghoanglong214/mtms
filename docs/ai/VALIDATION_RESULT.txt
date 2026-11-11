@@ -1,0 +1,75 @@
+PASS: root AGENTS.md
+PASS: G0 remains gated
+PASS: NO POS safeguard
+PASS: six agents
+PASS: eight skills
+PASS: nine rules
+PASS: frontmatter .agents/agents/mtms-architect.md
+PASS: agent metadata mtms-architect.md
+PASS: agent skill refs mtms-architect.md
+PASS: frontmatter .agents/agents/mtms-backend-engineer.md
+PASS: agent metadata mtms-backend-engineer.md
+PASS: agent skill refs mtms-backend-engineer.md
+PASS: frontmatter .agents/agents/mtms-business-analyst.md
+PASS: agent metadata mtms-business-analyst.md
+PASS: agent skill refs mtms-business-analyst.md
+PASS: frontmatter .agents/agents/mtms-frontend-engineer.md
+PASS: agent metadata mtms-frontend-engineer.md
+PASS: agent skill refs mtms-frontend-engineer.md
+PASS: frontmatter .agents/agents/mtms-qa-reviewer.md
+PASS: agent metadata mtms-qa-reviewer.md
+PASS: agent skill refs mtms-qa-reviewer.md
+PASS: frontmatter .agents/agents/mtms-tech-lead.md
+PASS: agent metadata mtms-tech-lead.md
+PASS: agent skill refs mtms-tech-lead.md
+PASS: frontmatter .agents/skills/mtms-api-contract/SKILL.md
+PASS: skill metadata mtms-api-contract
+PASS: frontmatter .agents/skills/mtms-architecture-review/SKILL.md
+PASS: skill metadata mtms-architecture-review
+PASS: frontmatter .agents/skills/mtms-postgresql-flyway/SKILL.md
+PASS: skill metadata mtms-postgresql-flyway
+PASS: frontmatter .agents/skills/mtms-react-frontend/SKILL.md
+PASS: skill metadata mtms-react-frontend
+PASS: frontmatter .agents/skills/mtms-requirements-traceability/SKILL.md
+PASS: skill metadata mtms-requirements-traceability
+PASS: frontmatter .agents/skills/mtms-spring-boot-backend/SKILL.md
+PASS: skill metadata mtms-spring-boot-backend
+PASS: frontmatter .agents/skills/mtms-task-orchestration/SKILL.md
+PASS: skill metadata mtms-task-orchestration
+PASS: frontmatter .agents/skills/mtms-test-review/SKILL.md
+PASS: skill metadata mtms-test-review
+PASS: frontmatter .agents/rules/00-product-boundary.md
+PASS: rule trigger 00-product-boundary.md
+PASS: frontmatter .agents/rules/01-financial-data-safety.md
+PASS: rule trigger 01-financial-data-safety.md
+PASS: frontmatter .agents/rules/02-execution-gates.md
+PASS: rule trigger 02-execution-gates.md
+PASS: frontmatter .agents/rules/03-branch-authorization.md
+PASS: rule trigger 03-branch-authorization.md
+PASS: frontmatter .agents/rules/04-accounting-postings.md
+PASS: rule trigger 04-accounting-postings.md
+PASS: frontmatter .agents/rules/05-stock-moving-wac.md
+PASS: rule trigger 05-stock-moving-wac.md
+PASS: frontmatter .agents/rules/06-frontend-quality.md
+PASS: rule trigger 06-frontend-quality.md
+PASS: frontmatter .agents/rules/07-backend-quality.md
+PASS: rule trigger 07-backend-quality.md
+PASS: frontmatter .agents/rules/08-sensitive-data.md
+PASS: rule trigger 08-sensitive-data.md
+PASS: source unchanged docs/business/MTMS_Business_Spec_Roadmap_v1_0.docx
+PASS: source unchanged docs/business/MTMS_Implementation_Handbook_v1_0.md
+PASS: source unchanged docs/architecture/MTMS_ERD_Architecture_Mermaid_v1_0.md
+PASS: source unchanged docs/architecture/MTMS_PostgreSQL_Schema_Starter_v1_0.sql
+PASS: source unchanged docs/reference/MTMS_Development_Tracker_v1_0.xlsx
+PASS: required docs/planning/MTMS_Development_Tracker.xlsx
+PASS: required docs/planning/CURRENT_STATE.md
+PASS: required docs/ai/START_HERE.md
+PASS: required docs/ai/HOW_TO_ADD_FILES.md
+PASS: required docs/ai/prompts/01_READ_ONLY_SMOKE_TEST.md
+PASS: required backend/README.md
+PASS: required frontend/README.md
+PASS: required database/migrations/README.md
+PASS: valid xlsx archive docs/reference/MTMS_Development_Tracker_v1_0.xlsx
+PASS: valid xlsx archive docs/planning/MTMS_Development_Tracker.xlsx
+
+SUMMARY: PASS
