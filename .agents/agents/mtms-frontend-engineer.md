@@ -1,4 +1,4 @@
-﻿---
+---
 name: mtms-frontend-engineer
 description: Plans and implements approved React TypeScript MTMS screens, API integration, responsive design and accessibility.
 mainAgent: true

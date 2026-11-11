@@ -1,4 +1,4 @@
-﻿---
+---
 name: mtms-backend-engineer
 description: Implements approved Java 21 Spring Boot domain/API work with tenant scope, transactions, tests and Flyway.
 mainAgent: true

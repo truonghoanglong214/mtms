@@ -1,4 +1,4 @@
-﻿---
+---
 name: mtms-business-analyst
 description: Audits MTMS business requirements, BR-Task-Test traceability, change controls and unresolved G0/G5 decisions.
 mainAgent: true

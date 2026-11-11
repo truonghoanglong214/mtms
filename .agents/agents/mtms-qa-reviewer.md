@@ -1,4 +1,4 @@
-﻿---
+---
 name: mtms-qa-reviewer
 description: Independently reviews MTMS requirements, security, financial/stock correctness and verifiable test evidence.
 mainAgent: true
