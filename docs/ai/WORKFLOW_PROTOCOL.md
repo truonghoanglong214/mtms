@@ -4,9 +4,31 @@ Tài liệu này quy định chuẩn mực tiếp nhận, phân loại và tri�
 
 ---
 
-## 1. Nguyên tắc Phân loại Yêu cầu (Request Triage)
+## 1. Vòng lặp Đối thoại 2 Chiều (Bi-Directional Feedback Loop)
 
-Mỗi khi nhận yêu cầu từ User, **TechLead (`mtms-tech-lead`)** là đầu mối duy nhất tiếp nhận và bắt buộc phải phân loại thành một trong hai nhánh:
+Khi User yêu cầu phân tích một luồng nghiệp vụ hoặc tính năng mới, quy trình diễn ra theo đúng chu trình khép kín:
+
+```text
+[1. User yêu cầu nghiệp vụ]
+          ↓
+[2. TechLead tiếp nhận & phỏng vấn sơ bộ 2-3 câu]
+          ↓
+[3. TechLead chạy lệnh gọi BA:]
+    herdr agent prompt mtms-business-analyst "Phân tích và đưa ra các phương án..." --wait
+          ↓
+[4. BA phân tích sâu, so sánh Trade-off & xuất các Phương án (Option 1, Option 2)]
+          ↓
+[5. TechLead thu thập kết quả từ BA, tóm tắt súc tích & TRÌNH CHO USER CHỐT]
+    "Thưa User, BA đã phân tích xong. Dưới đây là 2 phương án tối ưu: ... Bạn chốt phương án nào?"
+          ↓
+[6. User phản hồi quyết định chốt]
+          ↓
+[7. TechLead chuyển kết quả chốt cho Architect lên Contract & giao Dev triển khai]
+```
+
+---
+
+## 2. Nguyên tắc Phân loại Yêu cầu (Request Triage)
 
 ### Nhánh A: Kỹ thuật thuần túy (Fast-Track / Technical Patch)
 * **Tiêu chí:**
@@ -25,31 +47,17 @@ Mỗi khi nhận yêu cầu từ User, **TechLead (`mtms-tech-lead`)** là đầ
 ---
 
 ### Nhánh B: Thay đổi luồng / Tính năng mới (Full-SDLC Track)
-* **Tiêu chí:**
-  - Thêm tính năng mới, tạo màn hình nghiệp vụ mới.
-  - Thay đổi luồng xử lý (ví dụ: luồng duyệt chi phí, luồng ghi nhận doanh thu).
-  - Thay đổi công thức tính toán tài chính, chiết khấu, kho (WAC) hoặc phân quyền.
+* **Tiêu chí:** Thêm tính năng mới, đổi luồng xử lý, đổi công thức tính tiền/kho/phân quyền.
 * **Quy trình xử lý 5 bước chuẩn chỉ:**
-
-```text
-[User Yêu Cầu]
-      ↓
-[1. TechLead Clarification Gate] (Đặt 2-3 câu hỏi cốt lõi để chốt phạm vi)
-      ↓
-[2. BA Deep Analysis Gate] (Phân tích edge-cases, so sánh phương án, chốt Acceptance Criteria)
-      ↓
-[3. Architect Contract Gate] (Chốt DB Schema, API DTO, Module boundary)
-      ↓
-[4. TechLead Task Breakdown] (Phân rã sub-tasks, gán model tier, chỉ định target_files)
-      ↓
-[5. Devs Implementation] (Backend & Frontend code đúng theo AC)
-      ↓
-[6. QA Independent Verification] (Đối chiếu AC, chạy test thực tế trên terminal)
-```
+  1. **TechLead Clarification Gate:** Hỏi User 2-3 câu làm rõ ý đồ.
+  2. **BA Analysis & Options:** BA phân tích trade-off, đưa ra Phương án 1, 2 kèm ưu nhược điểm.
+  3. **User Sign-Off Gate:** TechLead trình bày các phương án để User chính thức chốt.
+  4. **Architect Contract Gate:** Architect chốt DB Schema & API DTO theo phương án User đã chọn.
+  5. **Devs & QA Gate:** TechLead chia task theo model tier, Dev code, QA nghiệm thu độc lập.
 
 ---
 
-## 2. Khung câu hỏi phỏng vấn của TechLead (Clarification Framework)
+## 3. Khung câu hỏi phỏng vấn của TechLead (Clarification Framework)
 
 Khi yêu cầu thuộc **Nhánh B**, TechLead **CHƯA ĐƯỢC GIAO VIỆC NGAY** mà phải gửi lại User 2 - 3 câu hỏi thuộc khung câu hỏi sau để làm rõ ý đồ đại khái:
 
@@ -60,46 +68,41 @@ Khi yêu cầu thuộc **Nhánh B**, TechLead **CHƯA ĐƯỢC GIAO VIỆC NGAY*
 3. **Về tính tương thích dữ liệu cũ (Backward Compatibility):**
    > *"Dữ liệu/đơn hàng đã phát sinh trước thời điểm này có cần chạy script chuyển đổi theo luồng mới hay giữ nguyên trạng?"*
 
-Sau khi User phản hồi, TechLead mới đóng gói toàn bộ bối cảnh và chuyển cho BA.
-
 ---
 
-## 3. Tiêu chuẩn bàn giao giữa các vai trò (Handover Standards)
+## 4. Tiêu chuẩn bàn giao giữa các vai trò (Handover Standards)
 
-### A. Từ BA sang TechLead & Dev (Acceptance Criteria - AC)
-BA bắt buộc phải xuất Acceptance Criteria theo định dạng **Gherkin (Given - When - Then)**:
-```markdown
-### Kịch bản: [Tên kịch bản]
-- **GIVEN (Điều kiện ban đầu):** Chi nhánh X có tồn kho sản phẩm Y là 10.
-- **WHEN (Hành động kích hoạt):** Người dùng yêu cầu xuất kho số lượng 12.
-- **THEN (Kết quả mong đợi):** Hệ thống từ chối xuất, trả về lỗi INSUFFICIENT_STOCK và không ghi nhận phiếu xuất.
-```
+### A. Từ BA sang TechLead & User (Options & Acceptance Criteria)
+BA bắt buộc phải xuất:
+1. **Bảng so sánh phương án (Trade-off Matrix):**
+   - Phương án A (Ưu/Nhược điểm).
+   - Phương án B (Ưu/Nhược điểm).
+   - Khuyến nghị tối ưu của BA.
+2. **Acceptance Criteria (Gherkin):** Given - When - Then cho từng kịch bản.
 
 ### B. Từ Architect sang Dev (Technical Contract)
-Architect chuẩn hóa giao diện kỹ thuật trước khi Dev viết code:
-- Endpoint: `POST /api/v1/inventory/transfers`
+Architect chuẩn hóa giao diện kỹ thuật:
+- Endpoint: `POST /api/v1/...`
 - Request / Response DTO schema (TypeScript interface hoặc Java Record).
 - Danh sách migration table / columns cần thêm (nếu có).
 
 ### C. Từ TechLead sang Dev (Task Ticket)
-TechLead cung cấp thông tin nhiệm vụ rõ ràng:
 - **Task ID:** `TASK-xxx`
 - **Model Tier:** `high_tier_model` (Pro/Sonnet) hoặc `low_tier_model` (Flash/4o-mini).
 - **Target Files:** Danh sách file cụ thể được phép sửa.
-- **Reference Spec:** Link đến tài liệu AC của BA.
+- **Reference Spec:** Link đến tài liệu AC của BA và Contract của Architect.
 
 ### D. Từ QA sang TechLead & User (Verification Report)
-QA Reviewer chỉ nghiệm thu khi có bằng chứng chạy lệnh thực tế:
-- **Command:** `mvn test` hoặc `npm test` hoặc `pytest`.
-- **Status:** PASS / FAIL (kèm log lỗi nếu có).
-- **Defects:** Danh sách lỗi phân theo mức độ (Blocker, Critical, Major, Minor).
+- **Command:** Lệnh chạy test thực tế trên terminal.
+- **Status:** PASS / FAIL (kèm log lỗi).
+- **Defects:** Danh sách lỗi phân loại nghiêm trọng.
 
 ---
 
-## 4. Nguyên tắc Vàng: Không vượt quyền (Anti-Scope-Creep)
+## 5. Nguyên tắc Vàng: Không vượt quyền (Anti-Scope-Creep)
 
-1. **Dev:** Chỉ code theo AC của BA và Schema của Architect. Thấy nghiệp vụ bất hợp lý -> **báo cáo lại**, tuyệt đối không tự sửa cách tính. Không tự đóng vai QA.
-2. **BA:** Tập trung nghiệp vụ và AC. Không thiết kế schema DB, không viết code.
-3. **Architect:** Thiết kế kiến trúc kỹ thuật. Không tự ý thay đổi quyết định nghiệp vụ của BA.
+1. **Dev:** Chỉ code theo AC của BA và Schema của Architect. Thấy nghiệp vụ bất hợp lý -> báo cáo lại, không tự ý sửa. Không tự đóng vai QA.
+2. **BA:** Tập trung nghiệp vụ, trade-off và AC. Không thiết kế schema DB, không viết code.
+3. **Architect:** Thiết kế kiến trúc kỹ thuật. Không tự ý thay đổi quyết định nghiệp vụ của BA và User.
 4. **QA:** Độc lập kiểm thử. Không tự sửa code ứng dụng của Dev.
-5. **TechLead:** Điều phối và gán model tier. Không tự ý code thay Dev, không tự duyệt release khi chưa có kết quả QA.
+5. **TechLead:** Điều phối, gán model tier, đóng vai trò cầu nối báo cáo các phương án của BA cho User chốt. Không tự ý code thay Dev, không tự ý duyệt phương án nghiệp vụ thay User.
