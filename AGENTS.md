@@ -1,6 +1,6 @@
 # MTMS — Project instructions for AI agents
 
-**Current status: G0 NOT SIGNED.** This workspace is ready for AI configuration review; it is **not** a running Spring Boot/React application. Do not begin application feature code, database migrations, deployment, or tracker status changes until G0 is explicitly approved and the specific task plan is authorized.
+**Current status: G0 SIGNED on 2026-11-13 (was G0 NOT SIGNED).** Phase 0 Foundation work may proceed only through an explicitly approved task plan, scoped target files, dependency checks, tests, independent QA and owner acceptance. G0 approval does not authorize unrelated tasks, deployment, real financial operations or Tracker completion claims.
 
 ## Authoritative documents, in order
 1. `docs/business/MTMS_Business_Spec_Roadmap_v1_0.docx` — authoritative approved business baseline, except issues explicitly marked POLICY_VERIFY.
