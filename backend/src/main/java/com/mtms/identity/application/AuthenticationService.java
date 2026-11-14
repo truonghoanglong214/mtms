@@ -3,12 +3,15 @@ package com.mtms.identity.application;
 import com.mtms.identity.application.dto.AuthResponse;
 import com.mtms.identity.application.dto.LoginCommand;
 import com.mtms.identity.application.dto.RefreshTokenCommand;
+import com.mtms.identity.application.dto.ScopedRoleGrantDto;
 import com.mtms.identity.application.dto.TokenRefreshResponse;
 import com.mtms.identity.application.dto.UserDto;
 import com.mtms.identity.application.exception.AccountSuspendedException;
 import com.mtms.identity.application.exception.AuthenticationFailedException;
 import com.mtms.identity.domain.User;
 import com.mtms.identity.domain.UserStatus;
+import com.mtms.identity.infrastructure.persistence.ScopedRoleGrantJpaEntity;
+import com.mtms.identity.infrastructure.persistence.ScopedRoleGrantJpaRepository;
 import com.mtms.identity.infrastructure.persistence.UserJpaEntity;
 import com.mtms.identity.infrastructure.persistence.UserJpaRepository;
 import com.mtms.identity.infrastructure.security.JwtTokenService;
@@ -18,6 +21,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,15 +34,26 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenService jwtTokenService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final ScopedRoleGrantJpaRepository grantRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public AuthenticationService(UserJpaRepository userRepository,
+                                 PasswordEncoder passwordEncoder,
+                                 JwtTokenService jwtTokenService,
+                                 TokenBlacklistService tokenBlacklistService,
+                                 ScopedRoleGrantJpaRepository grantRepository) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenService = jwtTokenService;
+        this.tokenBlacklistService = tokenBlacklistService;
+        this.grantRepository = grantRepository;
+    }
 
     public AuthenticationService(UserJpaRepository userRepository,
                                  PasswordEncoder passwordEncoder,
                                  JwtTokenService jwtTokenService,
                                  TokenBlacklistService tokenBlacklistService) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTokenService = jwtTokenService;
-        this.tokenBlacklistService = tokenBlacklistService;
+        this(userRepository, passwordEncoder, jwtTokenService, tokenBlacklistService, null);
     }
 
     public AuthResponse login(LoginCommand cmd) {
@@ -67,12 +83,14 @@ public class AuthenticationService {
         String accessToken = jwtTokenService.generateAccessToken(user.getId(), user.getLoginIdentifier());
         String refreshToken = jwtTokenService.generateRefreshToken(user.getId());
 
+        List<ScopedRoleGrantDto> grants = resolveActiveGrants(user.getId());
         UserDto userDto = new UserDto(
                 user.getId(),
                 user.getLoginIdentifier(),
                 user.getDisplayName(),
                 user.getStatus(),
-                user.getCreatedAt()
+                user.getCreatedAt(),
+                grants
         );
 
         return AuthResponse.of(accessToken, refreshToken, 3600, userDto);
@@ -121,15 +139,28 @@ public class AuthenticationService {
         }
     }
 
+    private List<ScopedRoleGrantDto> resolveActiveGrants(UUID userId) {
+        if (grantRepository == null || userId == null) {
+            return List.of();
+        }
+        return grantRepository.findActiveGrantsByUserId(userId, LocalDate.now())
+                .stream()
+                .map(ScopedRoleGrantJpaEntity::toDomain)
+                .map(ScopedRoleGrantDto::fromDomain)
+                .toList();
+    }
+
     @Transactional(readOnly = true)
     public UserDto getUserProfile(UUID userId) {
+        List<ScopedRoleGrantDto> grants = resolveActiveGrants(userId);
         return userRepository.findById(userId)
                 .map(entity -> new UserDto(
                         entity.getId(),
                         entity.getLoginIdentifier(),
                         entity.getDisplayName(),
                         entity.getStatus(),
-                        entity.getCreatedAt()
+                        entity.getCreatedAt(),
+                        grants
                 ))
                 .orElseThrow(() -> new AuthenticationFailedException("User not found"));
     }
