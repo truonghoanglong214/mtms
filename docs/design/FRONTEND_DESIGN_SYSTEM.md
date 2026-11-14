@@ -1,77 +1,82 @@
 # MTMS — Quy chuẩn Thiết kế Giao diện Frontend (Design System & UI Guidelines)
+## Chuỗi Cửa Hàng: Lục Trà Tinh Hoa
 
-> **Mục đích tài liệu:** Đây là tài liệu quy chuẩn duy nhất (Single Source of Truth) định hình toàn bộ ngôn ngữ thiết kế, bảng màu, typography, bố cục, hiệu ứng chuyển động và trải nghiệm người dùng (UX) của dự án **MTMS Frontend**.  
+> **Mục đích tài liệu:** Đây là tài liệu quy chuẩn duy nhất (**Single Source of Truth**) định hình toàn bộ ngôn ngữ thiết kế, bảng màu, typography, bố cục, hiệu ứng chuyển động và trải nghiệm người dùng (UX) của dự án **MTMS Frontend** dành riêng cho chuỗi **Lục Trà Tinh Hoa**.  
 > Mọi màn hình hiện tại và các tính năng phát triển trong tương lai bắt buộc phải tuân thủ nghiêm ngặt quy chuẩn trong tài liệu này.
 
 ---
 
 ## 1. Triết lý Thiết kế & Định vị Thương hiệu
 
-- **Loại hình sản phẩm (Kind of Business):** Hệ thống Quản trị Vận hành & Kế toán Quản trị Đa chi nhánh Chuỗi Trà Sữa (**MTMS — Milk Tea Management System**).
-- **Ranh giới sản phẩm bất biến (Hard Boundary):**
-  - **NO POS:** Tuyệt đối không tạo giao diện bán hàng / order đồ uống tại quầy cho thu ngân.
-  - **DOANH THU TỔNG HỢP NGÀY:** Doanh thu được chốt theo ca/ngày; doanh thu NET từ app giao hàng (ShopeeFood, Grab) tách biệt với tiền mặt thực thu và tiền ngân hàng.
-  - **HẠCH TOÁN CHI NHÁNH ĐỘC LẬP:** Mỗi chi nhánh có quỹ tiền mặt, tài khoản ngân hàng, kho nguyên vật liệu và bảng lương riêng biệt.
-  - **P&L TẠM TÍNH:** Báo cáo P&L Phase 0 luôn bắt buộc hiển thị nhãn **`TẠM TÍNH / PROVISIONAL`**.
-- **Phong cách thị giác (Aesthetic Vibe):** **Modern Editorial (Linear / Supabase high-end SaaS)**.
-  - Tông màu Slate / Zinc trung tính, đường viền 1px siêu mảnh, sắc cạnh và tinh tế.
-  - Không sử dụng gradient lòe loẹt hoặc layout thẻ 3 cột cẩu thả ("AI slop").
-  - Mọi chi tiết đều có mục đích rõ ràng, tạo cảm giác một phần mềm quản trị tài chính chuyên nghiệp, đáng tin cậy và cao cấp.
-- **Giọng văn & Ngôn ngữ (Tone & Voice):**
-  - Gọn gàng, chuẩn xác, không dùng từ ngữ quảng cáo hoa mỹ.
-  - Sử dụng thuật ngữ nghiệp vụ F&B và Kế toán Việt Nam rõ ràng: *Doanh thu ròng, Tồn kho bình quân (WAC), Giờ công được duyệt, Lợi nhuận tạm tính, Sổ quỹ, Phiếu chi*.
+- **Khách hàng & Bối cảnh Thương hiệu:** Chuỗi trà sữa & trà trái cây **Lục Trà Tinh Hoa** (hệ thống chi nhánh tại TP. Hồ Chí Minh: 768 Nguyễn Văn Quá - Quận 12, Nguyễn Gia Trí - Bình Thạnh, Cao Thắng - Quận 10, Lê Văn Lương - Quận 7, v.v.).
+- **Loại hình phần mềm (Site Kind & Page Type):** Hệ thống Quản trị Vận hành & Kế toán Quản trị Đa chi nhánh (**MTMS — Internal Multi-shop Operations & Financial Management**).
+- **Ranh giới sản phẩm bất biến (Hard Boundaries):**
+  - **NO POS:** Tuyệt đối không tạo màn hình bán lẻ / order đồ uống tại quầy cho thu ngân.
+  - **DOANH THU TỔNG HỢP NGÀY:** Doanh thu được chốt theo ca/ngày; doanh thu NET từ ứng dụng giao hàng (ShopeeFood, GrabFood, BeFood) tách biệt hoàn toàn với tiền mặt thực thu và tiền ngân hàng.
+  - **HẠCH TOÁN CHI NHÁNH ĐỘC LẬP:** Mỗi chi nhánh có quỹ tiền mặt, tài khoản ngân hàng, kho nguyên vật liệu và bảng lương riêng biệt; phân quyền nghiêm ngặt theo chi nhánh (Branch Scope).
+  - **P&L TẠM TÍNH:** Báo cáo P&L Phase 0 luôn bắt buộc hiển thị nhãn **`TẠM TÍNH / PROVISIONAL`**. Không thực hiện chia lợi nhuận thực tế cho nhà đầu tư trước cổng G5.
+
+### 1.1 Bộ Quy tắc Chống Thiết kế Giả tạo (Anti-Slop Guidelines theo `design-taste-frontend`)
+1. **Hình ảnh thực tế dẫn dắt (Photographs Lead):**
+   - Loại bỏ hoàn toàn hình minh họa 3D generic, tranh vẽ vector AI hoặc ảnh stock vô danh.
+   - Toàn bộ visual đại diện thương hiệu phải sử dụng ảnh thực tế của **Lục Trà Tinh Hoa** (quầy pha chế, lá trà tươi, các dòng thức uống đặc trưng, không gian quán).
+2. **Cấm tiêu đề 2 vế văn vẻ / gượng ép (Banned Two-fragment Headings):**
+   - Tuyệt đối KHÔNG dùng các câu khẩu hiệu kiểu AI marketing như: *"Chính xác từng con số. Minh bạch từng cốc trà"* hay *"Hương vị tinh hoa. Quản trị vững vàng"*.
+   - Tiêu đề phải thuần túy chức năng và nghề nghiệp: *"Lục Trà Tinh Hoa — Hệ thống Quản trị Vận hành & Kế toán Quản trị Đa chi nhánh"*.
+3. **Cấm dải 3 card tính năng generic (Banned AI 3-Card Feature Strip):**
+   - Không xếp 3 ô tính năng vô bổ với icon xanh lá đóng hộp `p-2 rounded-lg bg-emerald-500/10 text-emerald-400` trên trang đăng nhập.
+   - Thay bằng ảnh thực tế độ phân giải cao, logo thương hiệu chuẩn mực và các chỉ số vận hành thực tế.
+4. **Cấm hiệu ứng nền lòe loẹt:**
+   - Không dùng khối cầu phát sáng `bg-emerald-500/20 blur-3xl` hoặc pattern chấm lưới `radial-gradient [background-size:24px_24px]`.
+   - Bề mặt phẳng, màu sắc trung tính cao cấp (Warm Stone / Dark Slate), viền siêu mảnh 1px (`border-border`).
 
 ---
 
 ## 2. Bảng Màu & Tokens (Color Palette)
 
-### 2.1 Màu nhận diện thương hiệu (Brand Accent)
-- **Primary (Forest Emerald):** Xanh ngọc lục bảo / xanh rêu lá trà sẫm đại diện cho tinh hoa nguyên liệu trà, đồng thời mang lại sự vững chãi, tin cậy về tài chính.
+### 2.1 Màu nhận diện thương hiệu Lục Trà Tinh Hoa (Brand Accent)
+- **Primary (Lục Trà - Fresh Tea Green & Deep Tea Foliage):**
+  - Sắc xanh lá trà tự nhiên của thương hiệu Lục Trà Tinh Hoa, kết hợp sắc xanh rêu sẫm mang tính bảo mật và tài chính.
   - `primary-dark`: `#064e3b` (Emerald 900 — Nền tối, hover sâu)
   - `primary`: `#059669` (Emerald 600 — Nút chính, chỉ báo active)
-  - `primary-light`: `#10b981` (Emerald 500 — Accent, highlight)
-  - `primary-subtle`: `rgba(16, 185, 129, 0.08)` (Nền chip, badge active, hover tab)
+  - `primary-light`: `#10b981` (Emerald 500 — Accent, highlight trạng thái)
+  - `primary-subtle`: `rgba(5, 150, 105, 0.08)` (Nền chip, badge active, hover tab)
+- **Secondary (Caramel Ô Long & Trà Ủ Đậm Vị):**
+  - Màu hổ phách caramel `#92400e` (Amber 800) dùng làm điểm nhấn ấm áp, phân định khu vực dữ liệu ca trà và kho nguyên vật liệu.
 
-### 2.2 Màu nền & Trung tính (Slate & Zinc Hierarchy)
-- **Background:** `#090d16` (Dark Slate sẫm) / `#f8fafc` (Light Clean Canvas)
-- **Card / Surface:** `#0f172a` (Dark Slate 900) / `#ffffff` (Light Card Surface)
-- **Popover / Dropdown:** `#1e293b` (Slate 800) / `#ffffff`
-- **Border:** `#334155` (Slate 700 / Dark border 1px) / `#e2e8f0` (Slate 200 / Light border 1px)
-- **Muted Border:** `#1e293b` / `#f1f5f9` (Đường phân cách danh mục con)
+### 2.2 Màu nền & Trung tính (Warm Stone & Neutral Hierarchy)
+- **Background (Canvas):** `#faf8f5` (Light Stone ấm tự nhiên) / `#090d16` (Dark Charcoal cao cấp)
+- **Card / Surface:** `#ffffff` (Light Card) / `#0f172a` (Dark Slate Surface)
+- **Border:** `#e7e5e4` (Stone 200 — 1px siêu mảnh) / `#334155` (Dark Slate 700)
+- **Foreground Text:** `#1c1917` (Stone 900 — Chữ đậm nét, độ tương phản chuẩn WCAG AA) / `#f8fafc` (Dark Text)
+- **Muted Text:** `#78716c` (Stone 500 — Chú thích, nhãn phụ) / `#94a3b8` (Dark Muted)
 
 ### 2.3 Màu ngữ nghĩa Tài chính & Trạng thái (Financial Semantics)
-- **Tạm tính / Provisional (Cảnh báo bắt buộc):** Màu hổ phách ấm (`#f59e0b` / Amber 500) kết hợp icon `ShieldAlert`.
-- **Dương tiền / Doanh thu / Hoàn thành:** Emerald (`#10b981`).
+- **Tạm tính / Provisional (Bắt buộc theo chuẩn MTMS):** Màu hổ phách ấm (`#f59e0b` / Amber 500) kết hợp badge cảnh báo rõ ràng.
+- **Dương tiền / Doanh thu đạt / Hoàn thành:** Emerald (`#10b981`).
 - **Âm tiền / Chi phí / Lỗi / Hủy:** Rose / Red (`#f43f5e`).
-- **Đang xử lý / Chờ duyệt (Pending):** Sky Blue (`#0ea5e9`).
-- **Khóa sổ / Lưu trữ (Closed / Archived):** Slate Slate (`#64748b`).
+- **Đang xử lý / Chờ phê duyệt:** Sky Blue (`#0ea5e9`).
+- **Khóa sổ kỳ / Đã lưu trữ:** Slate Slate (`#64748b`).
 
 ---
 
-## 3. Typography (Kiểu chữ & Căn chỉnh Số liệu)
+## 3. Typography & Chuẩn mực Hiển thị Số liệu Tài chính
 
-- **Font chữ chính:** `Inter`, `Plus Jakarta Sans`, `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`.
-- **Quy tắc hiển thị Số tiền & Số lượng (Bắt buộc):**
-  - Mọi con số tài chính (Doanh thu, Chi phí, Tồn kho, Lương, Số dư ngân hàng) **BẮT BUỘC** sử dụng font monospace căn đều ký tự (`font-mono tabular-nums`).
-  - Định dạng tiền tệ: Phân cách hàng nghìn bằng dấu chấm hoặc phẩy đồng nhất, luôn kèm đơn vị `₫` hoặc `VND` (e.g. `12.500.000 ₫`).
-  - Số liệu trong bảng: **Luôn căn phải (Right-aligned)** để dễ so sánh độ lớn con số.
-- **Thang kích thước chữ (Type Scale):**
-  - `Display / Hero Title`: 28px - 32px · Bold (Trang đăng nhập, báo cáo tổng thể)
-  - `Page Heading`: 20px - 22px · Bold / SemiBold
-  - `Section Title`: 15px - 16px · SemiBold
-  - `Body / Normal`: 13px - 14px · Regular
-  - `Caption / Subtext`: 11px - 12px · Medium (Màu `text-muted-foreground`)
-  - `Micro Tag`: 10px · SemiBold · Uppercase
+- **Font chữ giao diện chính:** `Inter`, `Plus Jakarta Sans`, system-ui.
+- **Quy tắc hiển thị Số tiền & Số lượng (BẮT BUỘC):**
+  - Mọi con số tài chính (Doanh thu ngày, Doanh thu NET app, Chi phí lương, Tồn kho WAC, Số dư ngân hàng) **BẮT BUỘC** sử dụng font monospace căn đều ký tự (`font-mono tabular-nums`).
+  - **Căn phải (Right-aligned):** Mọi cột số liệu trong bảng phải căn lề phải để người xem dễ so sánh quy mô số học.
+  - **Định dạng tiền tệ chuẩn Việt Nam:** Phân cách hàng nghìn bằng dấu chấm `.`, kèm hậu tố `₫` (ví dụ: `18.450.000 ₫`). Không viết số thô `18450000`.
 
 ---
 
-## 4. Mật độ Thông tin & Bố cục (Layout & Density)
+## 4. Mật độ Dữ liệu & Bố cục Giao diện (Layout & Density)
 
-- **Visual Density:** **High-Density (Compact Data-First)**.
-  - Tối ưu cho người làm việc hàng ngày: Kế toán, Quản lý chi nhánh, Chủ chuỗi cần xem tối đa dữ liệu trên một màn hình mà không phải cuộn chuột quá nhiều.
-  - Chiều cao dòng trong Table: `36px - 40px` (không để dòng table cao 60px gây lãng phí không gian).
-  - Khoảng cách padding trong thẻ dữ liệu: `p-4 sm:p-5`.
-- **Bố cục Responsive 4 Breakpoints:**
+- **Mật độ: High-Density (Compact Data-First):**
+  - Tối ưu cho công việc hàng ngày của Kế toán chuỗi, Quản lý chi nhánh và Chủ cơ sở Lục Trà Tinh Hoa.
+  - Chiều cao dòng trong Table: `36px - 40px` (không lãng phí không gian).
+  - Padding nội bộ thẻ card: `p-4 sm:p-5`.
+- **Hỗ trợ Responsive 4 Breakpoints:**
   1. **Desktop lớn (≥ 1440px):** Layout toàn màn hình, Sidebar cố định `256px`, hiển thị đầy đủ bảng phân tích số liệu nhiều cột.
   2. **Laptop tiêu chuẩn (1024px - 1439px):** Sidebar cố định gọn gàng, nội dung căn giữa với max-width `1280px`.
   3. **Tablet (768px - 1023px):** Header thu gọn, Sidebar chuyển sang slide-over drawer khi bấm nút Menu.
@@ -81,59 +86,71 @@
 
 ---
 
-## 5. Quy chuẩn Bố cục Trang Đăng nhập (Split-screen 50/50)
+## 5. Quy chuẩn Bố cục Trang Đăng nhập (Full-bleed Photographic Canvas)
 
-Trang Đăng nhập là "mặt tiền" của hệ thống, loại bỏ kiểu form nằm trơ trọi giữa trang:
-- **Cột Trái (50% — Visual Brand & Operational Philosophy):**
-  - Nền sẫm cao cấp với hình ảnh nghệ thuật về lá trà / quy trình pha chế tinh xảo / không gian quán.
-  - Logo MTMS dập nổi sắc nét.
-  - Tuyên ngôn giá trị: *"Quản trị tài chính chính xác, hạch toán minh bạch cho từng cốc trà."*
-  - Badge cam kết: *Bảo mật đa chi nhánh · Kiểm soát dòng tiền thời gian thực · NO POS*.
-- **Cột Phải (50% — Authentication Form):**
-  - Thiết kế tối giản, tinh khiết, viền 1px sắc sảo.
-  - Input nổi bật trạng thái focus ring emerald.
-  - Nút chuyển đổi ẩn/hiện mật khẩu.
-  - Phím Enter kích hoạt đăng nhập tức thì.
-  - Thông báo lỗi hiển thị dạng alert banner êm ái, trích xuất rõ lỗi từ backend RFC 7807 (401 sai pass, 403 khóa tài khoản, 400 validation).
+Trang Đăng nhập là "mặt tiền" của hệ thống MTMS, thể hiện sự chỉn chu, chuyên nghiệp và nhận diện thực tế của chuỗi **Lục Trà Tinh Hoa** (được người dùng chốt phương án Canvas toàn cảnh):
+- **Lớp nền Full-bleed (Toàn màn hình):**
+  - Ảnh thực tế quầy pha chế & vận hành thực tế của Lục Trà Tinh Hoa (`store-counter-thumb.webp` chi nhánh Nguyễn Văn Quá).
+  - Lớp phủ gradient chuyển sắc tối (`from-stone-950 via-stone-950/70 to-stone-950/60 backdrop-blur-[2px]`) bảo đảm độ tương phản văn bản đạt chuẩn WCAG AA.
+- **Thanh tiêu đề thương hiệu (Top Bar):**
+  - Huy hiệu tròn Logo chính thức của Lục Trà Tinh Hoa (`brand-logo-thumb.webp`).
+  - Tên thương hiệu: **Lục Trà Tinh Hoa**, nhãn phiên bản **MTMS v1.1**.
+  - Thanh chỉ báo mạng lưới 4 chi nhánh: *768 Nguyễn Văn Quá (Q12) · Nguyễn Gia Trí · Cao Thắng · Lê Văn Lương*.
+- **Thẻ Đăng nhập nổi trung tâm (Floating Authentication Card):**
+  - Thiết kế nổi trung tâm dạng kính mờ cao cấp (`bg-stone-900/90 border border-stone-800/90 shadow-2xl backdrop-blur-xl rounded-2xl p-8 max-w-md`).
+  - Badge chức năng: `KẾ TOÁN QUẢN TRỊ NỘI BỘ`.
+  - Input tài khoản & mật khẩu viền sắc cạnh (`border-stone-700/80 bg-stone-950/80 text-white`), focus ring xanh Lục Trà (`ring-emerald-500/50`).
+  - Phím ẩn/hiện mật khẩu, phím `Enter` kích hoạt đăng nhập tức thì.
+  - Thông báo lỗi trích xuất trực tiếp từ RFC 7807 Problem Detail (lỗi 401 tài khoản/mật khẩu sai, 403 khóa tài khoản, 400 validation).
+  - Nút bấm `Đăng nhập` với vi hiệu ứng phản hồi nhấp chuột của `motion/react` (`whileHover={{ scale: 1.01 }}`, `whileTap={{ scale: 0.985 }}`).
+- **Thanh chân trang (Footer Bar):**
+  - Bản quyền & Ranh giới bất biến: *Hạch toán độc lập theo chi nhánh · Doanh thu tổng hợp ngày · NO POS*.
 
 ---
 
-## 6. Hiệu ứng Chuyển động (Motion & Micro-interactions)
+## 6. Hiệu ứng Chuyển động (Motion & Micro-interactions theo `motion`)
 
-Áp dụng thư viện `motion/react` theo chuẩn:
-- **Nguyên tắc "Quiet & Snappy":** Hiệu ứng nhanh, dứt khoát, không làm chậm nhịp thao tác của người dùng.
+- **Triết lý "Quiet & Snappy":** Hiệu ứng nhanh, dứt khoát, phục vụ công việc, không gây xao nhãng.
   - Thời gian chuyển động (Duration): `150ms - 250ms`.
-  - Đường cong chuyển động (Easing): Spring với `damping: 25`, `stiffness: 250` hoặc `easeOut`.
-- **Micro-interactions bắt buộc:**
-  - **Button Hover:** Nút nhấc nhẹ `scale: 1.01`, khi click bấm xuống `scale: 0.98`.
-  - **Card Hover:** Các card chức năng hoặc bảng biểu nhấc nhẹ 1-2px, viền sáng nhẹ.
-  - **Drawer Mobile:** Slide-in từ cạnh trái với lò xo mượt, nền mờ backdrop blur dần trong 200ms.
-  - **Dropdown & Popover:** Phóng to nhẹ từ 95% lên 100% kèm fade-in trong 150ms.
+  - Easing: Spring với `damping: 25`, `stiffness: 250` hoặc `easeOut`.
+- **Các tương tác vi mô chuẩn:**
+  - **Button Hover & Tap:** `whileHover={{ scale: 1.01 }}` và `whileTap={{ scale: 0.98 }}`.
+  - **Form Validation Alert:** Trượt nhẹ từ trên xuống (`initial={{ opacity: 0, y: -8 }}` `animate={{ opacity: 1, y: 0 }}`).
+  - **Drawer Navigation (Mobile):** Trượt từ trái qua phải kèm lớp phủ mờ trong 200ms.
 - **Quy tắc chống giật (Anti-Jank):**
-  - Không bao giờ animate thuộc tính `width`, `height`, `top`, `left` gây reflow layout.
-  - Chỉ animate `transform (x, y, scale)` và `opacity` (tận dụng GPU tăng tốc 60fps).
+  - Tuyệt đối không animate các thuộc tính gây layout reflow (`width`, `height`, `margin`, `top`, `left`).
+  - Chỉ animate `transform (x, y, scale)` và `opacity` để GPU tăng tốc 60fps mượt mà.
 
 ---
 
-## 7. Quy chuẩn Hiệu năng & Kiến trúc Code (Vercel React Best Practices)
+## 7. Hiệu năng & Kiến trúc Mã nguồn (theo `vercel-react-best-practices`)
 
-- **Tránh Waterfall Requests:**
-  - Mọi request độc lập (ví dụ: thông tin user profile + danh sách chi nhánh) phải được fetch song song bằng `Promise.all` hoặc React Query song song.
-- **Code-Splitting qua React.lazy:**
-  - Tất cả các trang chức năng ngoài trang chủ (`MonthlyRevenuePage`, `WorkforceExpensePage`, `InventoryPage`, `FinancePage`, `ClosingPage`, `ReportingPage`) phải được lazy load để giữ bundle ban đầu dưới 180kB.
-- **Atomic State với Zustand:**
-  - Phân tách rõ ràng giữa Session state (Token, User) và UI state (Branch filter, Sidebar toggle).
-  - Dùng selector cụ thể: `useAuthStore(state => state.user)` thay vì subscribe toàn bộ store để tránh re-render vô ích.
-- **Quản lý Token an toàn:**
-  - Token tự động đính kèm qua Axios Interceptor.
-  - Bắt lỗi 401 tự động xếp hàng gọi `/api/v1/auth/refresh` và retry request gốc trong suốt, không làm gián đoạn người dùng.
+- **Triệt tiêu Waterfall Requests:** Tải song song danh sách chi nhánh và thông tin tài khoản qua `Promise.all` hoặc React Query song song.
+- **Code-Splitting qua React.lazy:** Toàn bộ các route tính năng (`/revenue`, `/workforce`, `/finance`, `/inventory`, `/closing`, `/reporting`) được lazy-load để giữ bundle trang đăng nhập ban đầu dưới 180kB.
+- **Atomic State với Zustand:** Dùng selector chuyên biệt `useAuthStore(s => s.user)` thay vì subscribe cả store, tránh re-render thừa.
+- **Quản lý Token an toàn:** Lưu trữ Access Token trong memory/store, Refresh Token trong cookie httpOnly hoặc cơ chế xoay vòng bảo mật; bắt 401 tự động refresh trong suốt.
 
 ---
 
-## 8. Quy chuẩn Trải nghiệm Người dùng & Accessibility (Web Design Guidelines)
+## 8. Trải nghiệm & Tiếp cận (theo `web-design-guidelines`)
 
-- **Hỗ trợ bàn phím đầy đủ:** Phím `Tab` duyệt theo thứ tự logic, `Enter` submit form, `Esc` đóng modal / drawer / dropdown.
-- **Trạng thái trực quan (Visual Feedback):**
-  - Mọi nút bấm khi đang gọi API phải có spinner xoay và vô hiệu hóa (`disabled`) để chống double-click.
-  - Thông báo lỗi form phải chỉ rõ trường nào lỗi (ví dụ: viền đỏ kèm icon cảnh báo và thông điệp cụ thể dưới trường nhập liệu).
-- **Tương phản chuẩn WCAG AA:** Văn bản trên nền tối hay sáng đều phải đảm bảo tỷ lệ tương phản tối thiểu 4.5:1.
+- **Hỗ trợ bàn phím đầy đủ:** `Tab` chuyển trường tuần tự, `Enter` submit, `Escape` đóng modal.
+- **Tương phản màu:** Đạt chuẩn tối thiểu WCAG AA (tỷ lệ tương phản ≥ 4.5:1 đối với văn bản thông thường, ≥ 3:1 đối với chữ lớn).
+- **Phản hồi trạng thái nút:** Luôn hiển thị biểu tượng đang tải (spinner xoay) và khóa nút (`disabled`) khi đang gửi yêu cầu mạng để ngăn chặn nhấn đúp (double submit).
+
+---
+
+## 9. Danh mục Tài nguyên Hình ảnh Thực tế (Asset Registry)
+
+Toàn bộ hình ảnh thực tế của Lục Trà Tinh Hoa đã được lưu trữ sẵn trong thư mục `frontend/public/assets/luc-tra-tinh-hoa/`:
+
+| Tên file | Định dạng / Kích thước | Mục đích sử dụng |
+|---|---|---|
+| `brand-logo-thumb.webp` | WebP · 26 KB (280x280) | Logo nhận diện thương hiệu Lục Trà Tinh Hoa (Header, Login, Sidebar) |
+| `store-counter-thumb.webp` | WebP · 199 KB | Ảnh thực tế quầy pha chế & vận hành cửa hàng (Hero Cột Trái trang Đăng nhập) |
+| `tea-craft-thumb.webp` | WebP · 169 KB | Cận cảnh quy trình ủ trà và lá trà nguyên bản (Hero phụ / Section Giới thiệu) |
+| `product-luc-tra-thumb.webp` | WebP · 325 KB | Ảnh chụp ly Lục Trà Tinh Hoa đặc trưng kèm lá trà tươi và đá tuyết |
+| `product-thai-tea-thumb.webp` | WebP · 305 KB | Ảnh chụp món Cacao sữa Thái / Trà sữa Thái best-seller |
+| `product-oolong-thumb.webp` | WebP · 394 KB | Ảnh chụp sản phẩm trà Ô long thanh nhiệt |
+| `hero-banner.webp` | WebP · 885 KB | Banner ngang không gian cửa hàng (dùng cho báo cáo hoặc trang chủ) |
+| `brand-logo.png` | PNG · 3.6 MB (2500x2500) | File gốc chất lượng cao phục vụ xuất bản in ấn hoặc favicon |

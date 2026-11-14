@@ -49,6 +49,7 @@ out/
 
 # AI Agent runtimes, sessions & local state
 # (Keep agent definition files tracked)
+.taste-skill/
 .codex/*
 !.codex/agents/
 .codex/agents/*
