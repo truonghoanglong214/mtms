@@ -4,65 +4,85 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Tea House Premium - Light Theme */
+    --background: 43 33% 95%;         /* #F7F3EC - Warm Cream */
+    --foreground: 27 16% 18%;         /* #352D26 - Espresso Charcoal */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 38 100% 99%;              /* #FFFCF8 - Warm Off-white */
+    --card-foreground: 27 16% 18%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 38 100% 99%;
+    --popover-foreground: 27 16% 18%;
 
-    --primary: 152 76% 36%;
-    --primary-foreground: 355.7 100% 97.3%;
+    --sidebar: 142 19% 23%;           /* #304638 - Deep Forest Green */
+    --sidebar-foreground: 43 33% 95%; /* #F7F3EC */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 16 46% 51%;            /* #B96849 - Terracotta Accent */
+    --primary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --secondary: 105 16% 54%;         /* #819B78 - Sage Green */
+    --secondary-foreground: 27 16% 18%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 36 21% 90%;              /* #EFE9DF */
+    --muted-foreground: 32 11% 42%;   /* #786C60 - Warm Taupe */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 105 16% 92%;            /* #EDF2EC */
+    --accent-foreground: 142 19% 23%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 152 76% 36%;
+    --destructive: 2 49% 48%;         /* #B7423E - Terracotta Crimson */
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --warning: 35 76% 38%;            /* #A96A17 - Honey Amber */
+    --warning-foreground: 0 0% 100%;
+
+    --success: 144 49% 31%;           /* #287548 - Forest Emerald */
+    --success-foreground: 0 0% 100%;
+
+    --border: 34 23% 87%;             /* #E5DED4 - Warm Stone Border */
+    --input: 34 23% 87%;
+    --ring: 16 46% 51%;               /* #B96849 - Terracotta Focus Ring */
+
+    --radius: 0.875rem;               /* 14px */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Tea House Premium - Dark Theme */
+    --background: 137 13% 14%;        /* #202923 - Tea Charcoal */
+    --foreground: 44 26% 93%;         /* #F3F0E8 - Rice Paper */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 139 12% 19%;              /* #2B362F - Muted Olive Charcoal */
+    --card-foreground: 44 26% 93%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 139 12% 19%;
+    --popover-foreground: 44 26% 93%;
 
-    --primary: 152 76% 45%;
-    --primary-foreground: 144.9 80.4% 10%;
+    --sidebar: 145 17% 12%;           /* #17241D - Obsidian Pine */
+    --sidebar-foreground: 44 26% 93%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --primary: 18 52% 62%;            /* #D18A6A - Warm Terracotta Highlight */
+    --primary-foreground: 137 13% 14%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --secondary: 105 16% 45%;         /* #6B8363 */
+    --secondary-foreground: 44 26% 93%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --muted: 138 12% 23%;             /* #333F37 */
+    --muted-foreground: 100 8% 79%;   /* #C8CEC4 - Sage Ash */
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 138 12% 23%;
+    --accent-foreground: 44 26% 93%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 152 76% 45%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 137 13% 14%;
+
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --border: 131 9% 32%;             /* #4B584D - Muted Pine Border */
+    --input: 131 9% 32%;
+    --ring: 18 52% 62%;
   }
 }
 
@@ -71,6 +91,6 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-terracotta/20 selection:text-terracotta;
   }
 }
