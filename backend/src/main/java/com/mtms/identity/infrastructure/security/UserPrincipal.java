@@ -6,6 +6,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,17 +17,30 @@ public class UserPrincipal implements UserDetails {
     private final String passwordHash;
     private final String displayName;
     private final UserStatus status;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public UserPrincipal(UUID id,
                          String loginIdentifier,
                          String passwordHash,
                          String displayName,
                          UserStatus status) {
+        this(id, loginIdentifier, passwordHash, displayName, status, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+    }
+
+    public UserPrincipal(UUID id,
+                         String loginIdentifier,
+                         String passwordHash,
+                         String displayName,
+                         UserStatus status,
+                         Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.loginIdentifier = loginIdentifier;
         this.passwordHash = passwordHash;
         this.displayName = displayName;
         this.status = status;
+        this.authorities = (authorities != null && !authorities.isEmpty())
+                ? Collections.unmodifiableCollection(authorities)
+                : List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     public UUID getId() {
@@ -43,7 +57,12 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return authorities;
+    }
+
+    public boolean hasAuthority(String authorityName) {
+        if (authorityName == null || authorities == null) return false;
+        return authorities.stream().anyMatch(a -> authorityName.equals(a.getAuthority()));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.mtms.identity.infrastructure.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mtms.identity.infrastructure.persistence.ScopedRoleGrantJpaRepository;
 import com.mtms.identity.infrastructure.persistence.UserJpaRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -24,6 +26,7 @@ import java.time.Instant;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final ObjectMapper objectMapper;
@@ -41,8 +44,9 @@ public class SecurityConfig {
     public JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtTokenService jwtTokenService,
             TokenBlacklistService tokenBlacklistService,
-            UserJpaRepository userRepository) {
-        return new JwtAuthenticationFilter(jwtTokenService, tokenBlacklistService, userRepository);
+            UserJpaRepository userRepository,
+            ScopedRoleGrantJpaRepository grantRepository) {
+        return new JwtAuthenticationFilter(jwtTokenService, tokenBlacklistService, userRepository, grantRepository);
     }
 
     @Bean
@@ -71,6 +75,20 @@ public class SecurityConfig {
                             );
                             problemDetail.setType(URI.create("urn:mtms:error:unauthorized"));
                             problemDetail.setTitle("Unauthorized");
+                            problemDetail.setProperty("timestamp", Instant.now());
+
+                            response.getWriter().write(objectMapper.writeValueAsString(problemDetail));
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+                            ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                                    HttpStatus.FORBIDDEN,
+                                    "Access to the requested resource is forbidden"
+                            );
+                            problemDetail.setType(URI.create("urn:mtms:error:forbidden"));
+                            problemDetail.setTitle("Forbidden");
                             problemDetail.setProperty("timestamp", Instant.now());
 
                             response.getWriter().write(objectMapper.writeValueAsString(problemDetail));
