@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
-  Coffee,
   ShieldAlert,
   Menu,
   LogOut,
@@ -89,25 +88,27 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
   }
 
   return (
-    <header className="h-16 border-b bg-card/95 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 sticky top-0 z-20">
+    <header className="h-[68px] border-b border-[#E5DED4] bg-[#FFFCF8]/95 backdrop-blur-sm flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 select-none">
       {/* Left side: Mobile Toggle + Brand Logo */}
       <div className="flex items-center space-x-3">
         <button
           type="button"
           onClick={onToggleMobileSidebar}
-          className="lg:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring"
+          className="lg:hidden p-2 rounded-lg text-[#786C60] hover:text-[#352D26] hover:bg-[#F7F3EC] focus:outline-none focus:ring-2 focus:ring-[#B96849]"
           aria-label="Mở menu điều hướng"
         >
           <Menu className="h-5 w-5" />
         </button>
 
         <div className="flex items-center space-x-2.5">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/20">
-            <Coffee className="h-4.5 w-4.5" />
-          </div>
+          <img
+            src="/assets/luc-tra-tinh-hoa/brand-logo-thumb.webp"
+            alt="Logo"
+            className="w-8 h-8 rounded-full object-cover ring-1 ring-[#819B78]/40 shadow-sm"
+          />
           <div className="hidden sm:block">
-            <span className="font-bold text-base tracking-tight text-foreground">
-              MTMS Operations
+            <span className="font-bold text-base tracking-tight text-[#352D26]">
+              Lục Trà Tinh Hoa
             </span>
           </div>
         </div>
@@ -117,28 +118,28 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
           <button
             type="button"
             onClick={() => setIsBranchMenuOpen(!isBranchMenuOpen)}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-background hover:bg-accent text-xs font-medium text-foreground transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#E5DED4] bg-white hover:bg-[#F7F3EC] text-xs font-semibold text-[#352D26] transition-colors shadow-2xs"
           >
-            <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
-            <span className="max-w-[140px] sm:max-w-[200px] truncate">
+            <Building2 className="h-3.5 w-3.5 text-[#786C60]" />
+            <span className="max-w-[140px] sm:max-w-[220px] truncate">
               {activeBranchName || 'Tất cả chi nhánh'}
             </span>
-            <ChevronDown className="h-3 w-3 text-muted-foreground ml-0.5" />
+            <ChevronDown className="h-3 w-3 text-[#786C60] ml-0.5" />
           </button>
 
           {isBranchMenuOpen && (
-            <div className="absolute left-0 mt-1.5 w-60 rounded-xl border border-border bg-popover p-1.5 shadow-lg z-50 text-xs">
-              <div className="px-2 py-1.5 font-semibold text-muted-foreground border-b border-border/60 mb-1">
+            <div className="absolute left-0 mt-1.5 w-64 rounded-2xl border border-[#E5DED4] bg-[#FFFCF8] p-1.5 shadow-xl z-50 text-xs">
+              <div className="px-3 py-2 font-semibold text-[#786C60] border-b border-[#E5DED4] mb-1">
                 Chọn chi nhánh làm việc
               </div>
               <button
                 type="button"
                 onClick={() => handleSelectBranch(null)}
-                className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-accent text-left font-medium transition-colors"
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#F7F3EC] text-left font-medium transition-colors text-[#352D26]"
               >
                 <span>Tất cả chi nhánh (Consolidated)</span>
                 {activeBranchId === null && (
-                  <Check className="h-3.5 w-3.5 text-primary" />
+                  <Check className="h-3.5 w-3.5 text-[#B96849]" />
                 )}
               </button>
 
@@ -147,17 +148,17 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
                   key={b.id}
                   type="button"
                   onClick={() => handleSelectBranch(b)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-accent text-left font-medium transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-[#F7F3EC] text-left font-medium transition-colors text-[#352D26]"
                 >
                   <span className="truncate">{b.code} - {b.name}</span>
                   {activeBranchId === b.id && (
-                    <Check className="h-3.5 w-3.5 text-primary" />
+                    <Check className="h-3.5 w-3.5 text-[#B96849]" />
                   )}
                 </button>
               ))}
 
               {branches.length === 0 && (
-                <div className="px-2.5 py-2 text-muted-foreground text-[11px] italic">
+                <div className="px-3 py-2 text-[#786C60] text-[11px] italic">
                   Chưa có chi nhánh nào được kích hoạt
                 </div>
               )}
@@ -171,7 +172,7 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
         {/* Provisional Guard Badge */}
         <Badge
           variant="provisional"
-          className="flex items-center gap-1.5 py-1 px-2.5 text-[11px] font-semibold tracking-wide"
+          className="flex items-center gap-1.5 py-1 px-3 text-[11px] font-semibold tracking-wide rounded-full"
         >
           <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
           <span>TẠM TÍNH / PROVISIONAL</span>
@@ -182,32 +183,32 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
           <button
             type="button"
             onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            className="flex items-center space-x-2 p-1.5 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+            className="flex items-center space-x-2 p-1.5 rounded-xl hover:bg-[#F7F3EC] transition-colors focus:outline-none focus:ring-2 focus:ring-[#B96849]"
             aria-label="Menu tài khoản"
           >
-            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-xs flex items-center justify-center ring-1 ring-primary/20">
+            <div className="w-8 h-8 rounded-full bg-[#304638] text-white font-bold text-xs flex items-center justify-center ring-1 ring-[#819B78]/40 shadow-xs">
               {user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}
             </div>
             <div className="hidden md:flex flex-col text-left">
-              <span className="text-xs font-semibold text-foreground leading-tight">
+              <span className="text-xs font-semibold text-[#352D26] leading-tight">
                 {user?.displayName || 'Người dùng'}
               </span>
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-[10px] text-[#786C60]">
                 @{user?.loginIdentifier || 'account'}
               </span>
             </div>
-            <ChevronDown className="h-3 w-3 text-muted-foreground hidden md:block" />
+            <ChevronDown className="h-3 w-3 text-[#786C60] hidden md:block" />
           </button>
 
           {isUserMenuOpen && (
-            <div className="absolute right-0 mt-1.5 w-56 rounded-xl border border-border bg-popover p-1.5 shadow-lg z-50 text-xs">
-              <div className="px-3 py-2 border-b border-border/60 mb-1">
-                <p className="font-semibold text-foreground">{user?.displayName}</p>
-                <p className="text-[11px] text-muted-foreground truncate">
+            <div className="absolute right-0 mt-1.5 w-60 rounded-2xl border border-[#E5DED4] bg-[#FFFCF8] p-2 shadow-xl z-50 text-xs">
+              <div className="px-3 py-2 border-b border-[#E5DED4] mb-1">
+                <p className="font-semibold text-[#352D26]">{user?.displayName}</p>
+                <p className="text-[11px] text-[#786C60] truncate">
                   @{user?.loginIdentifier}
                 </p>
-                <div className="mt-1">
-                  <Badge variant="outline" className="text-[10px] py-0 px-1.5">
+                <div className="mt-1.5">
+                  <Badge variant="outline" className="text-[10px] py-0 px-2 rounded-full border-[#E5DED4] text-[#786C60]">
                     Trạng thái: {user?.status || 'ACTIVE'}
                   </Badge>
                 </div>
@@ -216,7 +217,7 @@ export function Header({ onToggleMobileSidebar }: HeaderProps) {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full flex items-center space-x-2 px-3 py-2 text-destructive hover:bg-destructive/10 rounded-lg font-medium transition-colors"
+                className="w-full flex items-center space-x-2 px-3 py-2 text-[#B7423E] hover:bg-red-50 rounded-xl font-medium transition-colors"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 <span>Đăng xuất phiên làm việc</span>

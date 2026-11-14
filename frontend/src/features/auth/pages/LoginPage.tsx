@@ -8,7 +8,8 @@ import {
   Eye,
   EyeOff,
   Building2,
-  ShieldCheck
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -78,77 +79,138 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col justify-between overflow-hidden bg-stone-950 text-stone-100 selection:bg-emerald-600/30">
+    <div className="min-h-screen flex w-full bg-[#F7F3EC] text-[#352D26] selection:bg-[#B96849]/20 selection:text-[#B96849]">
       {/* ======================================================== */}
-      {/* 1. LỚP NỀN FULL-BLEED: ẢNH THỰC TẾ LỤC TRÀ TINH HOA      */}
+      {/* CỘT TRÁI (46% - 48%): Forest-green Brand Panel          */}
       {/* ======================================================== */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src="/assets/luc-tra-tinh-hoa/store-counter-thumb.webp"
-          alt="Không gian quầy pha chế Lục Trà Tinh Hoa"
-          className="w-full h-full object-cover object-center filter brightness-[0.45] contrast-[1.08] scale-100 transition-transform duration-1000 ease-out hover:scale-[1.02]"
-        />
-        {/* Lớp phủ chuyển màu trung tính sẫm tối ưu tương phản chuẩn WCAG AA */}
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/70 to-stone-950/60 backdrop-blur-[2px]" />
-      </div>
+      <div className="hidden lg:flex lg:w-[46%] xl:w-[44%] relative flex-col justify-between p-12 xl:p-16 bg-[#304638] text-[#F7F3EC] overflow-hidden border-r border-[#304638]/40">
+        {/* Họa tiết vector lá trà & đường nét tối giản (Minimal tea graphics) */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.07]">
+          <svg className="w-full h-full" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 200 C 100 100, 200 300, 400 200" stroke="#F7F3EC" strokeWidth="1.5" />
+            <path d="M0 260 C 150 160, 250 360, 400 260" stroke="#F7F3EC" strokeWidth="1.5" />
+            <path d="M50 0 C 150 150, 150 250, 50 400" stroke="#F7F3EC" strokeWidth="1.5" />
+            <circle cx="320" cy="80" r="48" stroke="#F7F3EC" strokeWidth="1.5" />
+          </svg>
+        </div>
 
-      {/* ======================================================== */}
-      {/* 2. TOP BAR: THƯƠNG HIỆU & MẠNG LƯỚI CHI NHÁNH            */}
-      {/* ======================================================== */}
-      <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center space-x-3.5">
+        {/* Top Header: Logo chính thức Lục Trà Tinh Hoa & Tên hệ thống */}
+        <div className="relative z-10 flex items-center space-x-3.5">
           <img
             src="/assets/luc-tra-tinh-hoa/brand-logo-thumb.webp"
             alt="Logo Lục Trà Tinh Hoa"
-            className="w-11 h-11 rounded-full object-cover ring-2 ring-emerald-500/40 shadow-lg bg-stone-900"
+            className="w-12 h-12 rounded-full object-cover ring-2 ring-[#819B78]/40 shadow-md bg-[#25372C]"
           />
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-lg tracking-tight text-white">
+              <span className="font-bold text-lg tracking-tight text-white font-sans">
                 Lục Trà Tinh Hoa
               </span>
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-emerald-950 text-emerald-400 border border-emerald-800/60">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono tracking-wider uppercase bg-[#202E25] text-[#819B78] border border-[#819B78]/30">
                 MTMS v1.1
               </span>
             </div>
-            <span className="text-[11px] block text-stone-300 font-medium">
+            <span className="text-[11px] block text-[#C8CEC4] font-medium">
               Hệ thống Quản trị Vận hành & Dòng tiền Đa chi nhánh
             </span>
           </div>
         </div>
 
-        {/* Mạng lưới chi nhánh (Ẩn trên mobile nhỏ) */}
-        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-stone-900/80 border border-stone-800/80 text-xs text-stone-300 backdrop-blur-md">
-          <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="font-mono text-[11px] text-stone-300">
-            Nguyễn Văn Quá · Nguyễn Gia Trí · Cao Thắng · Lê Văn Lương
-          </span>
-        </div>
-      </header>
-
-      {/* ======================================================== */}
-      {/* 3. CENTER: FLOATING AUTHENTICATION CARD                 */}
-      {/* ======================================================== */}
-      <main className="relative z-10 w-full max-w-md mx-auto my-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="rounded-2xl bg-stone-900/90 border border-stone-800/90 p-8 shadow-2xl backdrop-blur-xl space-y-6"
-        >
-          {/* Card Header */}
-          <div className="space-y-2 text-left">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-[10px] font-mono text-emerald-300 uppercase tracking-wider">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>Kế toán Quản trị Nội bộ</span>
+        {/* Center: Khối giới thiệu nghiệp vụ & Mạng lưới chi nhánh */}
+        <div className="relative z-10 my-auto py-10 max-w-md space-y-6">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#202E25] border border-[#819B78]/30 text-[11px] font-medium text-[#819B78]">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#819B78] shrink-0" />
+              <span>Kế toán Quản trị Nội bộ & An toàn Dữ liệu</span>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              Đăng nhập hệ thống
+            <h1 className="text-3xl xl:text-4xl font-bold tracking-tight text-white leading-tight font-sans">
+              Hạch toán quản trị chuẩn mực, kiểm soát dòng tiền độc lập.
             </h1>
-            <p className="text-xs text-stone-400 leading-relaxed">
-              Dành riêng cho Ban Quản trị và Quản lý cơ sở Lục Trà Tinh Hoa.
+            <p className="text-sm text-[#C8CEC4] leading-relaxed font-normal">
+              Nền tảng kiểm soát tài chính chuyên sâu dành cho Ban Quản trị và Quản lý cơ sở: hạch toán chi nhánh độc lập, đối soát doanh thu ứng dụng giao hàng và tính giá vốn bình quân di động (WAC).
             </p>
           </div>
+
+          {/* Mạng lưới chi nhánh đang kết nối */}
+          <div className="p-4 rounded-2xl bg-[#25372C]/90 border border-[#819B78]/25 shadow-lg backdrop-blur-sm space-y-3">
+            <div className="flex items-center justify-between text-xs border-b border-[#819B78]/20 pb-2">
+              <span className="font-semibold text-white flex items-center gap-2">
+                <Building2 className="w-4 h-4 text-[#819B78]" />
+                Mạng lưới Chi nhánh Lục Trà Tinh Hoa
+              </span>
+              <span className="text-[10px] font-mono text-[#819B78] bg-[#202E25] px-2 py-0.5 rounded border border-[#819B78]/30">
+                4 Cơ sở Active
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5 text-[12px] text-[#E5DED4]">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#819B78] shrink-0" />
+                <span className="truncate">768 Nguyễn Văn Quá (Q12)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#819B78] shrink-0" />
+                <span className="truncate">Nguyễn Gia Trí (Bình Thạnh)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#819B78] shrink-0" />
+                <span className="truncate">Cao Thắng (Quận 10)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#819B78] shrink-0" />
+                <span className="truncate">Lê Văn Lương (Quận 7)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Footer: Ranh giới bất biến */}
+        <div className="relative z-10 pt-4 border-t border-[#3E5747] flex items-center justify-between text-[11px] text-[#C8CEC4]">
+          <span className="font-mono">
+            Hạch toán chi nhánh độc lập · Doanh thu tổng hợp ngày
+          </span>
+          <span className="font-mono text-[#819B78] font-semibold px-2 py-0.5 rounded bg-[#202E25] border border-[#819B78]/30">
+            NO POS
+          </span>
+        </div>
+      </div>
+
+      {/* ======================================================== */}
+      {/* CỘT PHẢI (54% - 56%): Warm-white Login Surface           */}
+      {/* ======================================================== */}
+      <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 lg:p-16 bg-[#FFFCF8]">
+        {/* Mobile Header (Màn hình nhỏ < 1024px) */}
+        <div className="lg:hidden flex items-center space-x-3 mb-8 pb-4 border-b border-[#E5DED4]">
+          <img
+            src="/assets/luc-tra-tinh-hoa/brand-logo-thumb.webp"
+            alt="Logo Lục Trà Tinh Hoa"
+            className="w-10 h-10 rounded-full object-cover ring-1 ring-[#819B78]/30"
+          />
+          <div>
+            <span className="font-bold text-base tracking-tight text-[#352D26] block">
+              Lục Trà Tinh Hoa
+            </span>
+            <span className="text-[11px] text-[#786C60] font-medium block">
+              Hệ thống Quản trị MTMS
+            </span>
+          </div>
+        </div>
+
+        {/* Form Container */}
+        <div className="w-full max-w-sm mx-auto my-auto space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="space-y-1.5 text-left"
+          >
+            <h2 className="text-2xl font-bold tracking-tight text-[#352D26]">
+              Đăng nhập hệ thống
+            </h2>
+            <p className="text-xs text-[#786C60] leading-relaxed">
+              Nhập tài khoản quản trị để truy cập phân hệ điều hành Lục Trà Tinh Hoa.
+            </p>
+          </motion.div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Alert Error Banner */}
@@ -159,9 +221,9 @@ export function LoginPage() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -6 }}
                   transition={{ duration: 0.15 }}
-                  className="rounded-lg bg-red-950/80 border border-red-800/80 p-3 text-red-200 flex items-start gap-2.5 text-xs font-medium"
+                  className="rounded-xl bg-red-50 border border-red-200 p-3 text-red-700 flex items-start gap-2.5 text-xs font-medium"
                 >
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-400" />
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
                   <span className="leading-tight">{errorMessage}</span>
                 </motion.div>
               )}
@@ -171,22 +233,22 @@ export function LoginPage() {
             <div className="space-y-1.5">
               <label
                 htmlFor="loginIdentifier"
-                className="text-xs font-medium text-stone-300 block"
+                className="text-xs font-semibold text-[#352D26] block"
               >
                 Tên đăng nhập hoặc Email
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <User className="w-4 h-4 text-[#786C60] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <Input
                   id="loginIdentifier"
                   name="loginIdentifier"
                   type="text"
                   autoComplete="username"
-                  placeholder="admin hoặc manager_q1"
+                  placeholder="Nhập tên đăng nhập hoặc email"
                   value={loginIdentifier}
                   onChange={(e) => setLoginIdentifier(e.target.value)}
                   disabled={isLoading}
-                  className="pl-9 text-sm h-10 bg-stone-950/80 border-stone-700/80 text-white placeholder:text-stone-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:border-emerald-500"
+                  className="pl-9 text-sm h-11 bg-white border-[#E5DED4] text-[#352D26] placeholder:text-[#786C60]/60 focus-visible:ring-1 focus-visible:ring-[#B96849] focus-visible:border-[#B96849] rounded-xl"
                   error={Boolean(errorMessage)}
                 />
               </div>
@@ -197,13 +259,13 @@ export function LoginPage() {
               <div className="flex items-center justify-between">
                 <label
                   htmlFor="password"
-                  className="text-xs font-medium text-stone-300 block"
+                  className="text-xs font-semibold text-[#352D26] block"
                 >
                   Mật khẩu
                 </label>
               </div>
               <div className="relative">
-                <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Lock className="w-4 h-4 text-[#786C60] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <Input
                   id="password"
                   name="password"
@@ -213,13 +275,13 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={isLoading}
-                  className="pl-9 pr-9 text-sm h-10 bg-stone-950/80 border-stone-700/80 text-white placeholder:text-stone-500 focus-visible:ring-1 focus-visible:ring-emerald-500 focus-visible:border-emerald-500"
+                  className="pl-9 pr-9 text-sm h-11 bg-white border-[#E5DED4] text-[#352D26] placeholder:text-[#786C60]/60 focus-visible:ring-1 focus-visible:ring-[#B96849] focus-visible:border-[#B96849] rounded-xl"
                   error={Boolean(errorMessage)}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-white transition-colors p-0.5 rounded focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#786C60] hover:text-[#352D26] transition-colors p-1 rounded focus:outline-none focus:ring-1 focus:ring-[#B96849]"
                   aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
                   tabIndex={-1}
                 >
@@ -232,12 +294,12 @@ export function LoginPage() {
               </div>
             </div>
 
-            {/* Submit Button with Motion Micro-interaction */}
+            {/* Submit Button với Terracotta Accent và vi hiệu ứng Motion */}
             <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.985 }}>
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-10 text-sm font-semibold tracking-wide bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+                className="w-full h-11 text-sm font-semibold tracking-wide bg-[#B96849] hover:bg-[#A55639] text-white shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-[#B96849] rounded-xl cursor-pointer"
               >
                 {isLoading ? (
                   <span className="flex items-center gap-2">
@@ -245,38 +307,27 @@ export function LoginPage() {
                     Đang xác thực...
                   </span>
                 ) : (
-                  'Đăng nhập'
+                  'Đăng nhập vào hệ thống'
                 )}
               </Button>
             </motion.div>
           </form>
 
-          {/* Gợi ý tài khoản demo khi kiểm thử */}
-          <div className="pt-2 text-center border-t border-stone-800">
-            <p className="text-[11px] text-stone-400 leading-relaxed">
-              Tài khoản mẫu: <span className="font-mono text-emerald-400">admin</span> / <span className="font-mono text-stone-300">admin123</span> (Tổng quản trị)
+          {/* Chính sách truy cập */}
+          <div className="pt-2 text-center border-t border-[#E5DED4]/60">
+            <p className="text-[11px] text-[#786C60] leading-relaxed">
+              Hệ thống dành riêng cho tài khoản được cấp quyền bởi Ban Quản trị.
               <br />
-              <span className="font-mono text-emerald-400">manager_q1</span> / <span className="font-mono text-stone-300">manager123</span> (Quản lý chi nhánh)
+              Mọi lượt truy cập đều được ghi vết bảo mật trong Audit Log.
             </p>
           </div>
-        </motion.div>
-      </main>
-
-      {/* ======================================================== */}
-      {/* 4. FOOTER: RANH GIỚI BẤT BIẾN & BẢO MẬT                 */}
-      {/* ======================================================== */}
-      <footer className="relative z-10 w-full max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between text-[11px] text-stone-400 gap-2 border-t border-stone-800/80">
-        <div className="flex items-center gap-3">
-          <span>Chuỗi Cửa Hàng Lục Trà Tinh Hoa · MTMS v1.1 © 2026</span>
-          <span className="hidden sm:inline text-stone-600">|</span>
-          <span className="font-mono text-stone-400">
-            Hạch toán độc lập theo chi nhánh · Doanh thu tổng hợp ngày
-          </span>
         </div>
-        <span className="font-mono text-emerald-400 font-semibold px-2 py-0.5 rounded bg-stone-900 border border-stone-800">
-          NO POS
-        </span>
-      </footer>
+
+        {/* Footer */}
+        <div className="w-full max-w-sm mx-auto text-center pt-8 text-[11px] text-[#786C60]">
+          <span>Lục Trà Tinh Hoa · MTMS v1.1 © 2026</span>
+        </div>
+      </div>
     </div>
   )
 }
