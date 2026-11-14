@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies exactly one migration (V001) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(1);
-        assertThat(result.targetSchemaVersion).isIn("1", "001");
+        assertThat(result.migrationsExecuted).isEqualTo(2);
+        assertThat(result.targetSchemaVersion).isIn("2", "002");
     }
 
     @Test
@@ -258,6 +258,119 @@ class FlywayBaselineMigrationTest {
                 stmt.setString(3, "$2a$12$anotherhash");
                 stmt.setString(4, "User Invalid");
                 stmt.setString(5, "BANNED"); // Invalid status
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(5)
+    @DisplayName("P0-ORG-05 / V002 Constraint verification: Scoped role grants integrity")
+    void testScopedRoleGrantsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+            UUID adminId = UUID.randomUUID();
+
+            // Insert base entity, branch, and users
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_SCOPE");
+                stmt.setString(3, "Scope Testing Entity");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_SCOPE_01");
+                stmt.setString(4, "Scope Branch 1");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "scoped_user@mtms.local");
+                stmt.setString(3, "$2a$12$dummyhash");
+                stmt.setString(4, "Scoped User");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+
+                stmt.setObject(1, adminId);
+                stmt.setString(2, "grant_admin@mtms.local");
+                stmt.setString(3, "$2a$12$dummyhash");
+                stmt.setString(4, "Grant Admin");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid scoped grant
+            UUID validGrantId = UUID.randomUUID();
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.scoped_role_grants (id, business_entity_id, branch_id, user_id, role_key, action_scope, valid_from, valid_to, granted_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, validGrantId);
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setObject(4, userId);
+                stmt.setString(5, "BRANCH_OWNER");
+                stmt.setString(6, "ALL");
+                stmt.setObject(7, java.sql.Date.valueOf("2026-01-01"));
+                stmt.setObject(8, java.sql.Date.valueOf("2026-12-31"));
+                stmt.setObject(9, adminId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Reject invalid role_key
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.scoped_role_grants (id, business_entity_id, branch_id, user_id, role_key, valid_from, granted_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setObject(4, userId);
+                stmt.setString(5, "INVALID_ROLE"); // Not in allowed enum list
+                stmt.setObject(6, java.sql.Date.valueOf("2026-01-01"));
+                stmt.setObject(7, adminId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Reject invalid date range (valid_to < valid_from)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.scoped_role_grants (id, business_entity_id, branch_id, user_id, role_key, valid_from, valid_to, granted_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setObject(4, userId);
+                stmt.setString(5, "MANAGER");
+                stmt.setObject(6, java.sql.Date.valueOf("2026-12-31"));
+                stmt.setObject(7, java.sql.Date.valueOf("2026-01-01")); // valid_to < valid_from
+                stmt.setObject(8, adminId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Reject non-system-admin role with NULL branch_id
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.scoped_role_grants (id, business_entity_id, branch_id, user_id, role_key, valid_from, granted_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setNull(3, java.sql.Types.OTHER); // branch_id is null for MANAGER
+                stmt.setObject(4, userId);
+                stmt.setString(5, "MANAGER");
+                stmt.setObject(6, java.sql.Date.valueOf("2026-01-01"));
+                stmt.setObject(7, adminId);
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }
