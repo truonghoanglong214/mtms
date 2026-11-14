@@ -1,5 +1,15 @@
 # MTMS — File changes and decisions
 
+## 2026-11-14 — Frontend design system baseline and split-screen login upgrade
+- **Authorization:** Owner explicit alignment on frontend aesthetic, density, palette, typography and layout.
+- **ADD:**
+  - `docs/design/FRONTEND_DESIGN_SYSTEM.md` (Single source of truth for UI/UX guidelines: Modern Editorial Linear/Supabase style, Forest Emerald & Deep Matcha palette, High-Density layout, Monospace tabular nums, Motion micro-interactions, Vercel React best practices, and Web Design accessibility).
+- **MODIFY:**
+  - `frontend/src/features/auth/pages/LoginPage.tsx` (Complete redesign into high-end Split-Screen 50/50: left column visual brand showcase & operational philosophy, right column clean minimal auth form with emerald focus states and animated RFC 7807 alerts).
+- **Build Evidence:**
+  - `npm --prefix frontend run build`: Successful build in 5.84s with zero TypeScript/CSS errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-13 — P0-SEC-06 responsive shell UI implementation and verification
 - **Authorization:** Owner explicit approval to implement `P0-SEC-06`.
 - **Skills applied:** `design-taste-frontend`, `motion`, `vercel-react-best-practices`, `web-design-guidelines`.
