@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronRight,
   RefreshCw,
+  CreditCard,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -25,6 +26,7 @@ import { CreateEntityModal } from '../components/CreateEntityModal'
 import { CreateBranchModal } from '../components/CreateBranchModal'
 import { CreateUserModal } from '../components/CreateUserModal'
 import { GrantRoleModal } from '../components/GrantRoleModal'
+import { BranchBankModal } from '../components/BranchBankModal'
 import type { BusinessEntityDto, BranchDto, UserDto } from '../types'
 
 export const OrganizationAdminPage: React.FC = () => {
@@ -52,6 +54,8 @@ export const OrganizationAdminPage: React.FC = () => {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false)
   const [isGrantModalOpen, setIsGrantModalOpen] = useState(false)
   const [selectedUserForGrant, setSelectedUserForGrant] = useState<string | undefined>()
+  const [isBankModalOpen, setIsBankModalOpen] = useState(false)
+  const [selectedBranchForBank, setSelectedBranchForBank] = useState<BranchDto | null>(null)
 
   // Fetch all initial data
   const loadData = async () => {
@@ -427,6 +431,7 @@ export const OrganizationAdminPage: React.FC = () => {
                                   <th className="py-2.5 px-4 font-medium">Múi giờ</th>
                                   <th className="py-2.5 px-4 font-medium">Trạng thái</th>
                                   <th className="py-2.5 px-4 font-medium">Ngày tạo</th>
+                                  <th className="py-2.5 px-4 font-medium text-right">Thao tác</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-stone-800/60 text-stone-200">
@@ -460,6 +465,21 @@ export const OrganizationAdminPage: React.FC = () => {
                                     </td>
                                     <td className="py-2.5 px-4 font-mono text-[11px] text-stone-400">
                                       {new Date(branch.createdAt).toLocaleDateString('vi-VN')}
+                                    </td>
+                                    <td className="py-2.5 px-4 text-right">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedBranchForBank(branch)
+                                          setIsBankModalOpen(true)
+                                        }}
+                                        className="h-7 px-2.5 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-950/40 inline-flex items-center space-x-1"
+                                        title="Quản lý tài khoản ngân hàng & Go-live readiness"
+                                      >
+                                        <CreditCard className="h-3.5 w-3.5 mr-1" />
+                                        <span>Tài khoản NH</span>
+                                      </Button>
                                     </td>
                                   </tr>
                                 ))}
@@ -696,6 +716,29 @@ export const OrganizationAdminPage: React.FC = () => {
             })
           )
           showToast(`Đã cấp quyền ${newGrant.roleKey} thành công`)
+        }}
+      />
+
+      <BranchBankModal
+        isOpen={isBankModalOpen}
+        branch={selectedBranchForBank}
+        onClose={() => {
+          setIsBankModalOpen(false)
+          setSelectedBranchForBank(null)
+        }}
+        onUpdated={async () => {
+          await loadData()
+          if (selectedBranchForBank) {
+            try {
+              const branches = await organizationApi.getBranches(
+                selectedBranchForBank.businessEntityId
+              )
+              const updated = branches.find((b) => b.id === selectedBranchForBank.id)
+              if (updated) setSelectedBranchForBank(updated)
+            } catch {
+              // ignore
+            }
+          }
         }}
       />
     </div>

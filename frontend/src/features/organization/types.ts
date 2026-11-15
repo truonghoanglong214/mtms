@@ -1,5 +1,7 @@
 import type { RoleKey, ScopedRoleGrantDto, UserDto } from '../auth/types'
 
+export type BranchStatus = 'ACTIVE' | 'INACTIVE' | 'DRAFT'
+
 export interface BusinessEntityDto {
   id: string
   entityCode: string
@@ -15,7 +17,7 @@ export interface BranchDto {
   branchCode: string
   name: string
   timeZone: string
-  status: 'ACTIVE' | 'INACTIVE' | 'DRAFT'
+  status: BranchStatus
   createdAt: string
 }
 
@@ -30,7 +32,7 @@ export interface CreateBranchRequest {
   branchCode: string
   name: string
   timeZone: string
-  status: 'ACTIVE' | 'INACTIVE' | 'DRAFT'
+  status: BranchStatus
 }
 
 export interface CreateUserRequest {
@@ -53,6 +55,34 @@ export interface GrantRoleRequest {
   reportPermissionGroup?: string
   validFrom: string
   validTo?: string | null
+}
+
+export interface BranchBankAccountDto {
+  id: string
+  branchId: string
+  bankName: string
+  accountHolderName: string
+  maskedAccountNumber: string
+  isPrimary: boolean
+  status: 'ACTIVE' | 'INACTIVE'
+  createdAt: string
+}
+
+export interface CreateBankAccountCommand {
+  bankName: string
+  accountHolderName: string
+  accountNumber: string
+  isPrimary: boolean
+}
+
+export interface BranchReadinessDto {
+  branchId: string
+  branchCode: string
+  status: BranchStatus
+  readyForActivation: boolean
+  hasActiveBankAccount: boolean
+  primaryBankAccountId?: string
+  missingRequirements: string[]
 }
 
 export type { RoleKey, ScopedRoleGrantDto, UserDto }

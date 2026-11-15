@@ -10,6 +10,9 @@ import type {
   GrantRoleRequest,
   ScopedRoleGrantDto,
   UserDto,
+  BranchBankAccountDto,
+  CreateBankAccountCommand,
+  BranchReadinessDto,
 } from './types'
 
 export const organizationApi = {
@@ -34,6 +37,45 @@ export const organizationApi = {
     const res = await apiClient.post<ApiResponse<BranchDto>>(
       `/organizations/entities/${entityId}/branches`,
       data
+    )
+    return res.data.data
+  },
+
+  // Branch Bank Accounts & Readiness (BR-ORG-03, TC-003)
+  async getBranchBankAccounts(branchId: string): Promise<BranchBankAccountDto[]> {
+    const res = await apiClient.get<ApiResponse<BranchBankAccountDto[]>>(
+      `/branches/${branchId}/bank-accounts`
+    )
+    return res.data.data
+  },
+
+  async createBranchBankAccount(
+    branchId: string,
+    cmd: CreateBankAccountCommand
+  ): Promise<BranchBankAccountDto> {
+    const res = await apiClient.post<ApiResponse<BranchBankAccountDto>>(
+      `/branches/${branchId}/bank-accounts`,
+      cmd
+    )
+    return res.data.data
+  },
+
+  async setPrimaryBankAccount(branchId: string, accountId: string): Promise<void> {
+    await apiClient.patch<ApiResponse<void>>(
+      `/branches/${branchId}/bank-accounts/${accountId}/primary`
+    )
+  },
+
+  async getBranchReadiness(branchId: string): Promise<BranchReadinessDto> {
+    const res = await apiClient.get<ApiResponse<BranchReadinessDto>>(
+      `/branches/${branchId}/readiness`
+    )
+    return res.data.data
+  },
+
+  async activateBranch(branchId: string): Promise<BranchDto> {
+    const res = await apiClient.patch<ApiResponse<BranchDto>>(
+      `/branches/${branchId}/activate`
     )
     return res.data.data
   },

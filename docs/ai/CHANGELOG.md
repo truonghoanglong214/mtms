@@ -1,5 +1,38 @@
 # MTMS — File changes and decisions
 
+## 2026-11-15 — P0-ORG-07 branch bank onboarding & TC-003 Go-live readiness gate
+- **Authorization:** Owner approval to implement `P0-ORG-07` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-ORG-03`, `TC-003`, `FE-P0-05`, `03-branch-authorization.md`, `08-sensitive-data.md`.
+- **ADD:**
+  - `database/migrations/V003__create_branch_bank_accounts.sql` (bảng `mtms.branch_bank_accounts`, `ck_branch_bank_accounts_status`, `idx_branch_bank_accounts_branch_id`, partial unique index `uq_branch_primary_bank`).
+  - `backend/src/main/java/com/mtms/organization/domain/BankAccountStatus.java` (`ACTIVE`, `INACTIVE`).
+  - `backend/src/main/java/com/mtms/organization/domain/BranchBankAccount.java` (domain model with invariant validation).
+  - `backend/src/main/java/com/mtms/organization/domain/BranchBankAccountRepository.java`.
+  - `backend/src/main/java/com/mtms/organization/infrastructure/persistence/BranchBankAccountJpaEntity.java`.
+  - `backend/src/main/java/com/mtms/organization/infrastructure/persistence/BranchBankAccountJpaRepository.java`.
+  - `backend/src/main/java/com/mtms/organization/infrastructure/persistence/BranchBankAccountRepositoryImpl.java`.
+  - `backend/src/main/java/com/mtms/organization/application/dto/CreateBankAccountCommand.java`.
+  - `backend/src/main/java/com/mtms/organization/application/dto/BranchBankAccountDto.java` (safe public DTO, masked account numbers).
+  - `backend/src/main/java/com/mtms/organization/application/dto/BranchReadinessDto.java` (readiness status, missingRequirements).
+  - `backend/src/main/java/com/mtms/organization/application/exception/BranchNotReadyException.java`.
+  - `backend/src/main/java/com/mtms/organization/application/BankAccountCryptoUtils.java` (AES encryption at-rest, masking).
+  - `backend/src/main/java/com/mtms/organization/application/BranchBankService.java` (add, list, set primary, readiness check, activate branch).
+  - `backend/src/main/java/com/mtms/organization/web/BranchBankController.java` (`GET/POST /api/v1/branches/{id}/bank-accounts`, `PATCH .../primary`, `GET .../readiness`, `PATCH .../activate` with `@branchAuth`).
+  - `backend/src/test/java/com/mtms/organization/BranchBankIntegrationTest.java` (7 integration tests: TC-003 missing bank blocks activation, adding bank allows activation, primary toggle, branch isolation 403, RBAC).
+  - `frontend/src/features/organization/components/BranchBankModal.tsx` (accessible modal, Viet bank dropdown, masked numbers, primary badge, readiness alert & activation button).
+  - `docs/planning/P0_ORG_07_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/BranchAuthorizationService.java` (enhanced multi-role and action scope matching).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (added assertions for V003 schema, constraints, and partial unique index).
+  - `frontend/src/features/organization/types.ts` (added bank account and readiness DTOs).
+  - `frontend/src/features/organization/organizationApi.ts` (added 5 bank and readiness endpoints).
+  - `frontend/src/features/organization/pages/OrganizationAdminPage.tsx` (added bank action button and modal integration).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn clean test`: 78 tests run, 0 failures, 0 errors, 0 skipped. All green (ArchUnit, Flyway 6/6, BranchBankIntegrationTest 7/7, TC-003 verified).
+  - `npm --prefix frontend run build`: Clean build in 21s, zero TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-14 — P0-ORG-06 org and users admin UI implementation and verification
 - **Authorization:** Owner explicit approval to implement `P0-ORG-06`.
 - **Requirements & Rules:** `BR-ORG-01`, `BR-ORG-04`, `TC-001`, `TC-003`, `FRONTEND_DESIGN_SYSTEM.md`, `03-branch-authorization.md`.

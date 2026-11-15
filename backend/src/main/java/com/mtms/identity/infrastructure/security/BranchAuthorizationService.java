@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -25,11 +26,16 @@ public class BranchAuthorizationService {
         this.grantRepository = grantRepository;
     }
 
+    private static final Set<String> ROLE_KEYWORDS = Set.of(
+            "ADMIN", "SYSTEM_ADMIN", "OWNER", "BRANCH_OWNER", "MANAGER", "FINANCE", "EMPLOYEE", "INVESTOR"
+    );
+
     /**
      * Checks if current authenticated user has active access to target branch.
+     * Evaluates against roles (e.g. 'ADMIN', 'OWNER', 'MANAGER') or actions (e.g. 'READ', 'WRITE').
      * SYSTEM_ADMIN role always grants access across all branches.
      */
-    public boolean hasBranchAccess(UUID branchId, String requiredAction) {
+    public boolean hasBranchAccess(UUID branchId, String... rolesOrActions) {
         UUID currentUserId = getCurrentUserId();
         if (currentUserId == null || branchId == null) {
             return false;
@@ -50,21 +56,34 @@ public class BranchAuthorizationService {
             return false;
         }
 
-        // 3. If no specific action required or action matches wildcard
-        if (requiredAction == null || requiredAction.isBlank() || "*".equals(requiredAction.trim()) || "all".equalsIgnoreCase(requiredAction.trim())) {
+        // 3. If no specific action or role required
+        if (rolesOrActions == null || rolesOrActions.length == 0) {
             return true;
         }
 
-        String targetAction = requiredAction.trim().toLowerCase();
-        for (ScopedRoleGrantJpaEntity grant : activeGrants) {
-            String actionScope = grant.getActionScope();
-            if (actionScope == null || "*".equals(actionScope.trim()) || "all".equalsIgnoreCase(actionScope.trim())) {
+        for (String item : rolesOrActions) {
+            if (item == null || item.isBlank() || "*".equals(item.trim()) || "all".equalsIgnoreCase(item.trim())) {
                 return true;
             }
-            for (String allowed : actionScope.toLowerCase().split(",")) {
-                String trimmed = allowed.trim();
-                if (trimmed.equals(targetAction) || "*".equals(trimmed) || "all".equals(trimmed)) {
-                    return true;
+            String target = item.trim().toUpperCase();
+            if (ROLE_KEYWORDS.contains(target)) {
+                for (ScopedRoleGrantJpaEntity grant : activeGrants) {
+                    if (matchesRole(grant.getRoleKey(), target)) {
+                        return true;
+                    }
+                }
+            } else {
+                for (ScopedRoleGrantJpaEntity grant : activeGrants) {
+                    String actionScope = grant.getActionScope();
+                    if (actionScope == null || "*".equals(actionScope.trim()) || "all".equalsIgnoreCase(actionScope.trim())) {
+                        return true;
+                    }
+                    for (String allowed : actionScope.toUpperCase().split(",")) {
+                        String trimmed = allowed.trim();
+                        if (trimmed.equals(target) || "*".equals(trimmed) || "ALL".equals(trimmed)) {
+                            return true;
+                        }
+                    }
                 }
             }
         }
@@ -72,11 +91,28 @@ public class BranchAuthorizationService {
         return false;
     }
 
+    private boolean matchesRole(String actualRoleKey, String targetRole) {
+        if (actualRoleKey == null) {
+            return false;
+        }
+        String actual = actualRoleKey.trim().toUpperCase();
+        if (actual.equals(targetRole)) {
+            return true;
+        }
+        if ("ADMIN".equals(targetRole) && ("SYSTEM_ADMIN".equals(actual) || actual.contains("ADMIN"))) {
+            return true;
+        }
+        if ("OWNER".equals(targetRole) && ("BRANCH_OWNER".equals(actual) || actual.contains("OWNER"))) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Enforces branch access; throws AccessForbiddenException (HTTP 403) if denied.
      */
-    public void checkBranchAccess(UUID branchId, String requiredAction) {
-        if (!hasBranchAccess(branchId, requiredAction)) {
+    public void checkBranchAccess(UUID branchId, String... rolesOrActions) {
+        if (!hasBranchAccess(branchId, rolesOrActions)) {
             throw new AccessForbiddenException("Access to the requested branch resource is forbidden");
         }
     }

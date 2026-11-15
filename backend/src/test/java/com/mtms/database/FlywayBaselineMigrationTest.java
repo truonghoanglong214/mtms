@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(2);
-        assertThat(result.targetSchemaVersion).isIn("2", "002");
+        assertThat(result.migrationsExecuted).isEqualTo(3);
+        assertThat(result.targetSchemaVersion).isIn("3", "003");
     }
 
     @Test
@@ -371,6 +371,118 @@ class FlywayBaselineMigrationTest {
                 stmt.setString(5, "MANAGER");
                 stmt.setObject(6, java.sql.Date.valueOf("2026-01-01"));
                 stmt.setObject(7, adminId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(6)
+    @DisplayName("P0-ORG-07 / V003 Constraint verification: Branch bank accounts integrity")
+    void testBranchBankAccountsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+
+            // Insert business entity and branch
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_BANK_TEST");
+                stmt.setString(3, "Bank Testing Entity");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_BANK_01");
+                stmt.setString(4, "Bank Branch 1");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid primary bank account
+            UUID account1 = UUID.randomUUID();
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branch_bank_accounts (id, branch_id, bank_name, account_holder_name, account_number_ciphertext, masked_account_number, is_primary, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, account1);
+                stmt.setObject(2, branchId);
+                stmt.setString(3, "Vietcombank");
+                stmt.setString(4, "CTY LUC TRA TINH HOA");
+                stmt.setString(5, "cipher_12345");
+                stmt.setString(6, "**** **** 1234");
+                stmt.setBoolean(7, true);
+                stmt.setString(8, "ACTIVE");
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Insert second primary bank account on SAME branch with ACTIVE status -> violates partial unique index uq_branch_primary_bank
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branch_bank_accounts (id, branch_id, bank_name, account_holder_name, account_number_ciphertext, masked_account_number, is_primary, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                stmt.setString(3, "Techcombank");
+                stmt.setString(4, "CTY LUC TRA TINH HOA");
+                stmt.setString(5, "cipher_67890");
+                stmt.setString(6, "**** **** 6789");
+                stmt.setBoolean(7, true); // duplicate primary
+                stmt.setString(8, "ACTIVE");
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Insert non-primary bank account on SAME branch -> succeeds
+            UUID account2 = UUID.randomUUID();
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branch_bank_accounts (id, branch_id, bank_name, account_holder_name, account_number_ciphertext, masked_account_number, is_primary, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, account2);
+                stmt.setObject(2, branchId);
+                stmt.setString(3, "Techcombank");
+                stmt.setString(4, "CTY LUC TRA TINH HOA");
+                stmt.setString(5, "cipher_67890");
+                stmt.setString(6, "**** **** 6789");
+                stmt.setBoolean(7, false); // non-primary
+                stmt.setString(8, "ACTIVE");
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 4. Reject invalid status (check constraint ck_branch_bank_accounts_status)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branch_bank_accounts (id, branch_id, bank_name, account_holder_name, account_number_ciphertext, masked_account_number, is_primary, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                stmt.setString(3, "ACB");
+                stmt.setString(4, "CTY LUC TRA TINH HOA");
+                stmt.setString(5, "cipher_acb");
+                stmt.setString(6, "**** **** 9999");
+                stmt.setBoolean(7, false);
+                stmt.setString(8, "SUSPENDED"); // Invalid status
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 5. Reject orphaned bank account (FK violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branch_bank_accounts (id, branch_id, bank_name, account_holder_name, account_number_ciphertext, masked_account_number, is_primary, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, UUID.randomUUID()); // Nonexistent branch
+                stmt.setString(3, "BIDV");
+                stmt.setString(4, "CTY LUC TRA TINH HOA");
+                stmt.setString(5, "cipher_bidv");
+                stmt.setString(6, "**** **** 0000");
+                stmt.setBoolean(7, false);
+                stmt.setString(8, "ACTIVE");
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }
