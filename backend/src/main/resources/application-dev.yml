@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mtms}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/mtms}
     username: ${SPRING_DATASOURCE_USERNAME:mtms_user}
     password: ${SPRING_DATASOURCE_PASSWORD:mtms_pass}
     driver-class-name: org.postgresql.Driver

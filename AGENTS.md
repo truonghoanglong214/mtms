@@ -28,9 +28,13 @@ When sources disagree, cite their BR/ADR/Task/TC IDs and report the contradictio
 - **Never** run destructive file/database operations without explicit per-action approval. Never claim tests passed when not run.
 - Do not reinterpret preparation of this repository folder as G0 or a task implementation approval.
 
-## Coordination
-- Primary Agent: `mtms-tech-lead`.
-- Specialists: `mtms-business-analyst`, `mtms-architect`, `mtms-backend-engineer`, `mtms-frontend-engineer`, `mtms-qa-reviewer`.
+## Coordination & Execution Model (Single Agent + Dynamic Subagents)
+- **Primary Agent Mode (Giao tiếp đơn lẻ):** Người dùng tương tác trực tiếp với **một Agent duy nhất** đóng vai trò Lead/Fullstack Engineer. Không yêu cầu người dùng phải xoay tua phiên hay thực hiện quy trình bàn giao thủ công.
+- **Tự động kích hoạt Kỹ năng (Auto Skill Routing):**
+  - **Khi làm về Backend (BE, Java, API, DB):** Tự động áp dụng `mtms-spring-boot-backend`, `mtms-postgresql-flyway`, `mtms-api-contract`, `07-backend-quality.md`, `03-branch-authorization.md`, `test-driven-development`.
+  - **Khi làm về Frontend (FE, React, UI, Giao diện):** Tự động áp dụng `mtms-react-frontend`, `design-taste-frontend`, `motion`, `vercel-react-best-practices`, `web-design-guidelines`, `06-frontend-quality.md`.
+- **Tối ưu tốc độ với Subagents chạy song song (Parallel Subagents):**
+  - Khi một task có các phần việc độc lập (ví dụ: vừa viết API Backend vừa dựng màn hình Frontend, hoặc chạy kiểm thử/review độc lập), Agent chính được phép tự động khởi tạo các **Subagent chạy song song** (`subagent-driven-development`, `dispatching-parallel-agents`, sử dụng các specialist roles `mtms-backend-engineer`, `mtms-frontend-engineer`, `mtms-qa-reviewer`, `mtms-architect`, `mtms-business-analyst`) để xử lý đồng thời, rút ngắn tối đa thời gian chờ đợi của người dùng. Sau khi hoàn thành, Agent chính tự động tổng hợp kết quả và báo cáo cho người dùng.
 - Use `.agents/skills/` and `.agents/rules/` as task-relevant guidance. Avoid competing edits to the same migration/API contract.
 - Begin with `docs/ai/START_HERE.md` and check `docs/planning/CURRENT_STATE.md`.
 - New files must be integrated using `docs/ai/HOW_TO_ADD_FILES.md`; preserve user code and current migrations.

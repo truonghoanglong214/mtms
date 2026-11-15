@@ -12,7 +12,8 @@ import {
   X,
   ShieldCheck,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Building2
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
@@ -29,6 +30,7 @@ const navItems = [
   { name: 'Sổ quỹ & Dòng tiền', path: '/finance', icon: Wallet },
   { name: 'Chốt sổ kỳ kinh doanh', path: '/closing', icon: FileCheck2 },
   { name: 'Báo cáo P&L quản trị', path: '/reporting', icon: PieChart },
+  { name: 'Cơ cấu & Phân quyền', path: '/admin/organization', icon: Building2 },
 ]
 
 export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {

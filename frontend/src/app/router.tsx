@@ -37,6 +37,11 @@ const ReportingPage = lazy(() =>
     default: m.ReportingPage,
   }))
 )
+const OrganizationAdminPage = lazy(() =>
+  import('@/features/organization/pages/OrganizationAdminPage').then((m) => ({
+    default: m.OrganizationAdminPage,
+  }))
+)
 
 export const router = createBrowserRouter([
   // Public-only route (Login)
@@ -85,6 +90,10 @@ export const router = createBrowserRouter([
           {
             path: 'reporting',
             element: <ReportingPage />,
+          },
+          {
+            path: 'admin/organization',
+            element: <OrganizationAdminPage />,
           },
           {
             path: '*',

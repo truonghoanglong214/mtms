@@ -1,5 +1,62 @@
 # MTMS — File changes and decisions
 
+## 2026-11-14 — P0-ORG-06 org and users admin UI implementation and verification
+- **Authorization:** Owner explicit approval to implement `P0-ORG-06`.
+- **Requirements & Rules:** `BR-ORG-01`, `BR-ORG-04`, `TC-001`, `TC-003`, `FRONTEND_DESIGN_SYSTEM.md`, `03-branch-authorization.md`.
+- **ADD:**
+  - `backend/src/main/java/com/mtms/identity/application/dto/CreateUserCommand.java` (username validation, password min 8, display name).
+  - `backend/src/main/java/com/mtms/identity/application/dto/UpdateUserStatusCommand.java` (status transition: ACTIVE / SUSPENDED).
+  - `backend/src/main/java/com/mtms/identity/application/UserService.java` (user onboarding with BCrypt, listing with active role grants, status update).
+  - `backend/src/main/java/com/mtms/identity/web/UserController.java` (`GET /api/v1/users`, `GET /api/v1/users/{id}`, `POST /api/v1/users`, `PATCH /api/v1/users/{id}/status`, protected by `@branchAuth.isSystemAdmin()`).
+  - `backend/src/test/java/com/mtms/identity/UserControllerTest.java` (8 integration tests: unauthenticated 401, non-admin 403 TC-001 negative test, duplicate 409 conflict, validation 400 bad request, admin create/list/status 200/201).
+  - `frontend/src/features/organization/types.ts` (Entity, Branch, User, ScopedGrant DTOs & command types).
+  - `frontend/src/features/organization/organizationApi.ts` (REST client for entities, branches, users, and grants).
+  - `frontend/src/features/organization/components/CreateEntityModal.tsx` (accessible modal for entity onboarding).
+  - `frontend/src/features/organization/components/CreateBranchModal.tsx` (accessible modal for branch onboarding).
+  - `frontend/src/features/organization/components/CreateUserModal.tsx` (accessible modal for employee/user onboarding).
+  - `frontend/src/features/organization/components/GrantRoleModal.tsx` (interactive modal with **Permission Preview** matrix, role descriptions, and temporal constraints).
+  - `frontend/src/features/organization/pages/OrganizationAdminPage.tsx` (high-density split tabs: Entities & Branches accordion, Users & Grants with role badges, status toggles, revoke grant actions, search & filters).
+  - `docs/planning/P0_ORG_06_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `frontend/src/features/auth/types.ts` (added `RoleKey`, `ScopedRoleGrantDto`, and aligned `UserDto.grants`).
+  - `frontend/src/app/layout/Sidebar.tsx` (added `Cơ cấu & Phân quyền` navigation item with `Building2` icon).
+  - `frontend/src/app/router.tsx` (lazy code-split route for `/admin/organization`).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn clean test`: 70 tests run, 0 failures, 0 errors, 0 skipped. All green (ArchUnit 2/2, Flyway 10/10, UserControllerTest 8/8, TC-001 boundary tests all PASS).
+  - `npm --prefix frontend run build`: Clean build in 6.6s, code-split chunk `OrganizationAdminPage-*.js` (44.61 kB), zero TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-14 — P0-ORG-05 scoped permissions implementation and verification
+- **Authorization:** Owner explicit approval to implement `P0-ORG-05`.
+- **Requirements & Rules:** `BR-ORG-04`, `TC-001`, `03-branch-authorization.md`, `01-financial-data-safety.md`.
+- **ADD:**
+  - `database/migrations/V002__create_scoped_role_grants.sql` (composite FK to branches, valid date range check, branch requirement check, lookup index).
+  - `backend/src/main/java/com/mtms/identity/domain/RoleKey.java` (`SYSTEM_ADMIN`, `BRANCH_OWNER`, `MANAGER`, `FINANCE`, `EMPLOYEE`, `INVESTOR`).
+  - `backend/src/main/java/com/mtms/identity/domain/ScopedRoleGrant.java` (pure domain entity with date range and branch invariants).
+  - `backend/src/main/java/com/mtms/identity/infrastructure/persistence/ScopedRoleGrantJpaEntity.java` & `ScopedRoleGrantJpaRepository.java`.
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/BranchAuthorizationService.java` (`@branchAuth` server-side authorization engine).
+  - `backend/src/main/java/com/mtms/identity/application/ScopedPermissionService.java` (grant, revoke, list active grants).
+  - `backend/src/main/java/com/mtms/identity/application/dto/GrantRoleCommand.java`, `ScopedRoleGrantDto.java`.
+  - `backend/src/main/java/com/mtms/identity/web/ScopedRoleGrantController.java` (`POST /api/v1/auth/grants`, `GET /api/v1/auth/grants/user/{userId}`, `DELETE /api/v1/auth/grants/{grantId}`).
+  - `backend/src/test/java/com/mtms/identity/ScopedPermissionServiceTest.java`.
+  - `backend/src/test/java/com/mtms/identity/BranchAuthorizationSecurityTest.java` (TC-001 negative branch isolation & temporal expiry test suite).
+  - `docs/planning/P0_ORG_05_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/UserPrincipal.java` (loaded scoped granted authorities).
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/JwtAuthenticationFilter.java` (resolved active role grants at request time).
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/SecurityConfig.java` (`@EnableMethodSecurity`, `accessDeniedHandler` with RFC 7807 403 Forbidden).
+  - `backend/src/main/java/com/mtms/identity/application/AuthenticationService.java` (loaded user grants into UserDto on login and profile).
+  - `backend/src/main/java/com/mtms/identity/application/dto/UserDto.java` (added grants list).
+  - `backend/src/main/java/com/mtms/common/error/GlobalExceptionHandler.java` (handled Spring Security `AccessDeniedException` with RFC 7807 `urn:mtms:error:forbidden`).
+  - `backend/src/main/java/com/mtms/organization/web/OrganizationController.java` (applied `@PreAuthorize("@branchAuth.hasBranchAccess(#branchId, 'READ')")`).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (added V002 schema migration & constraint tests).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn clean test`: 62 tests run, 0 failures, 0 errors (ArchUnit 2/2, Flyway Postgres 17 10/10, Service Unit Tests, TC-001 MockMvc Integration Tests all PASS).
+  - `npm --prefix frontend run build`: Clean build in 6.2s, 0 TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-14 — Frontend design system baseline and split-screen login upgrade
 - **Authorization:** Owner explicit alignment on frontend aesthetic, density, palette, typography and layout.
 - **ADD:**
