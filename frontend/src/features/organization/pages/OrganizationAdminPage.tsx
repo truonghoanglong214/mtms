@@ -17,6 +17,7 @@ import {
   ChevronRight,
   RefreshCw,
   CreditCard,
+  FileText,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -27,6 +28,7 @@ import { CreateBranchModal } from '../components/CreateBranchModal'
 import { CreateUserModal } from '../components/CreateUserModal'
 import { GrantRoleModal } from '../components/GrantRoleModal'
 import { BranchBankModal } from '../components/BranchBankModal'
+import { BranchEvidenceManagerModal } from '@/features/evidence'
 import type { BusinessEntityDto, BranchDto, UserDto } from '../types'
 
 export const OrganizationAdminPage: React.FC = () => {
@@ -56,6 +58,8 @@ export const OrganizationAdminPage: React.FC = () => {
   const [selectedUserForGrant, setSelectedUserForGrant] = useState<string | undefined>()
   const [isBankModalOpen, setIsBankModalOpen] = useState(false)
   const [selectedBranchForBank, setSelectedBranchForBank] = useState<BranchDto | null>(null)
+  const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false)
+  const [selectedBranchForEvidence, setSelectedBranchForEvidence] = useState<BranchDto | null>(null)
 
   // Fetch all initial data
   const loadData = async () => {
@@ -466,7 +470,20 @@ export const OrganizationAdminPage: React.FC = () => {
                                     <td className="py-2.5 px-4 font-mono text-[11px] text-stone-400">
                                       {new Date(branch.createdAt).toLocaleDateString('vi-VN')}
                                     </td>
-                                    <td className="py-2.5 px-4 text-right">
+                                    <td className="py-2.5 px-4 text-right space-x-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedBranchForEvidence(branch)
+                                          setIsEvidenceModalOpen(true)
+                                        }}
+                                        className="h-7 px-2.5 text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-950/40 inline-flex items-center space-x-1"
+                                        title="Quản lý chứng từ chi nhánh & Secure preview"
+                                      >
+                                        <FileText className="h-3.5 w-3.5 mr-1" />
+                                        <span>Chứng từ</span>
+                                      </Button>
                                       <Button
                                         variant="ghost"
                                         size="sm"
@@ -739,6 +756,15 @@ export const OrganizationAdminPage: React.FC = () => {
               // ignore
             }
           }
+        }}
+      />
+
+      <BranchEvidenceManagerModal
+        isOpen={isEvidenceModalOpen}
+        branch={selectedBranchForEvidence}
+        onClose={() => {
+          setIsEvidenceModalOpen(false)
+          setSelectedBranchForEvidence(null)
         }}
       />
     </div>

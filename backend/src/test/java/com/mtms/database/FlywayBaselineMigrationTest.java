@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(3);
-        assertThat(result.targetSchemaVersion).isIn("3", "003");
+        assertThat(result.migrationsExecuted).isEqualTo(4);
+        assertThat(result.targetSchemaVersion).isIn("4", "004");
     }
 
     @Test
@@ -483,6 +483,140 @@ class FlywayBaselineMigrationTest {
                 stmt.setString(6, "**** **** 0000");
                 stmt.setBoolean(7, false);
                 stmt.setString(8, "ACTIVE");
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(7)
+    @DisplayName("P0-SEC-01 / V004 Constraint verification: Evidence files integrity")
+    void testEvidenceFilesConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+
+            // Insert business entity, branch, and user
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_EVIDENCE_TEST");
+                stmt.setString(3, "Evidence Testing Entity");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_EVD_01");
+                stmt.setString(4, "Evidence Branch 1");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "evidence_uploader@mtms.local");
+                stmt.setString(3, "$2a$12$dummyhash");
+                stmt.setString(4, "Evidence Uploader");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid evidence file
+            UUID file1 = UUID.randomUUID();
+            String storageKey = "branches/" + branchId + "/receipt1.pdf";
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.evidence_files (id, business_entity_id, branch_id, storage_object_key, original_filename, content_type, byte_size, checksum_sha256, visibility_class, retention_until, uploaded_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, file1);
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, storageKey);
+                stmt.setString(5, "receipt1.pdf");
+                stmt.setString(6, "application/pdf");
+                stmt.setLong(7, 1024L);
+                stmt.setString(8, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+                stmt.setString(9, "BRANCH_PRIVATE");
+                stmt.setObject(10, java.sql.Date.valueOf("2027-12-31"));
+                stmt.setObject(11, userId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Reject duplicate storage_object_key (UNIQUE constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.evidence_files (id, business_entity_id, branch_id, storage_object_key, original_filename, content_type, byte_size, checksum_sha256, visibility_class, uploaded_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, storageKey); // duplicate
+                stmt.setString(5, "receipt2.pdf");
+                stmt.setString(6, "application/pdf");
+                stmt.setLong(7, 2048L);
+                stmt.setString(8, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+                stmt.setString(9, "BRANCH_PRIVATE");
+                stmt.setObject(10, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Reject invalid visibility_class (CHECK constraint ck_evidence_files_visibility)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.evidence_files (id, business_entity_id, branch_id, storage_object_key, original_filename, content_type, byte_size, checksum_sha256, visibility_class, uploaded_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, "branches/" + branchId + "/invalid_vis.pdf");
+                stmt.setString(5, "receipt3.pdf");
+                stmt.setString(6, "application/pdf");
+                stmt.setLong(7, 2048L);
+                stmt.setString(8, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+                stmt.setString(9, "PUBLIC_FOR_ALL"); // Invalid visibility
+                stmt.setObject(10, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Reject byte_size <= 0 (CHECK constraint byte_size > 0)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.evidence_files (id, business_entity_id, branch_id, storage_object_key, original_filename, content_type, byte_size, checksum_sha256, visibility_class, uploaded_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, "branches/" + branchId + "/zero_byte.pdf");
+                stmt.setString(5, "empty.pdf");
+                stmt.setString(6, "application/pdf");
+                stmt.setLong(7, 0L); // invalid byte size
+                stmt.setString(8, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+                stmt.setString(9, "BRANCH_PRIVATE");
+                stmt.setObject(10, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 5. Reject orphaned branch (FK constraint fk_evidence_files_branch)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.evidence_files (id, business_entity_id, branch_id, storage_object_key, original_filename, content_type, byte_size, checksum_sha256, visibility_class, uploaded_by) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, UUID.randomUUID()); // Nonexistent branch
+                stmt.setString(4, "branches/orphan/file.pdf");
+                stmt.setString(5, "orphan.pdf");
+                stmt.setString(6, "application/pdf");
+                stmt.setLong(7, 1024L);
+                stmt.setString(8, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+                stmt.setString(9, "BRANCH_PRIVATE");
+                stmt.setObject(10, userId);
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }

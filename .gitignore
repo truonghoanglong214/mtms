@@ -114,5 +114,6 @@ ENV/
 **/tmp/
 **/temp/
 **/runtime-data/
+**/mtms-storage/
 
 # Keep baseline documentation and templates under version control

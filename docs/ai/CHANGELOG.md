@@ -1,5 +1,38 @@
 # MTMS — File changes and decisions
 
+## 2026-11-16 — P0-SEC-01 private evidence storage & TC-043 Signed URL branch boundary
+- **Authorization:** Owner approval to implement `P0-SEC-01` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-SEC-01`, `TC-043`, `FE-P0-06`, `03-branch-authorization.md`, `08-sensitive-data.md`.
+- **ADD:**
+  - `database/migrations/V004__create_evidence_files.sql` (bảng `mtms.evidence_files`, constraints visibility & byte size > 0, indices scope & entity).
+  - `backend/src/main/java/com/mtms/evidence/domain/VisibilityClass.java` (`BRANCH_PRIVATE`, `ENTITY_PRIVATE`, `GLOBAL_ADMIN_ONLY`).
+  - `backend/src/main/java/com/mtms/evidence/domain/EvidenceFile.java` (immutable domain entity with 5MB validation, MIME whitelist, SHA-256 integrity, path traversal protection).
+  - `backend/src/main/java/com/mtms/evidence/domain/EvidenceFileRepository.java`.
+  - `backend/src/main/java/com/mtms/evidence/infrastructure/storage/StorageService.java` & `LocalStorageService.java` (private storage outside webroot).
+  - `backend/src/main/java/com/mtms/evidence/infrastructure/persistence/EvidenceFileJpaEntity.java`, `EvidenceFileJpaRepository.java`, `EvidenceFileRepositoryImpl.java`.
+  - `backend/src/main/java/com/mtms/evidence/application/EvidenceTokenService.java` (HMAC-SHA256 signed download tokens with 15-min TTL, constant-time verification).
+  - `backend/src/main/java/com/mtms/evidence/application/EvidenceService.java` (upload with SHA-256 checksum & MIME check, download token generation with branch check, content streaming).
+  - `backend/src/main/java/com/mtms/evidence/application/dto/EvidenceFileDto.java`, `EvidenceUploadResponse.java`, `DownloadTokenResponse.java`, `FilePayload.java`.
+  - `backend/src/main/java/com/mtms/evidence/web/EvidenceController.java` (`POST /branches/{id}/evidence`, `GET /branches/{id}/evidence`, `POST /evidence/{id}/token`, `GET /evidence/{id}/content?token=...`).
+  - `backend/src/test/java/com/mtms/evidence/EvidenceIntegrationTest.java` (7 integration tests: PDF/PNG upload, 5MB limit, MIME reject, TC-043 cross-branch 403, tampered token 403, expired token 403, token mismatch 403, stream download).
+  - `frontend/src/features/evidence/types.ts`, `evidenceApi.ts`, `utils.ts`, `index.ts`.
+  - `frontend/src/features/evidence/components/EvidenceDropzone.tsx` (drag & drop, client validation 5MB / types, progress bar, toast).
+  - `frontend/src/features/evidence/components/EvidencePreviewModal.tsx` (HD zoom/rotate image & secure PDF viewer with auto signed token fetch).
+  - `frontend/src/features/evidence/components/BranchEvidenceManagerModal.tsx` (branch evidence management dialog).
+  - `docs/planning/P0_SEC_01_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/common/error/GlobalExceptionHandler.java` (handled `MaxUploadSizeExceededException`).
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/SecurityConfig.java` (permitted public signed token stream `/api/v1/evidence/*/content`).
+  - `backend/src/test/java/com/mtms/arch/ModuleBoundaryTest.java` (included `evidence` in module architecture boundary checks).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (added assertions for V004 evidence files table and constraints).
+  - `frontend/src/features/organization/pages/OrganizationAdminPage.tsx` (added "Chứng từ" action button and modal integration).
+  - `.gitignore` (ignored `**/mtms-storage/`).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn clean test`: 87 tests run, 0 failures, 0 errors, 0 skipped. All green (ArchUnit, Flyway 7/7, EvidenceIntegrationTest 7/7, TC-043 verified).
+  - `npm --prefix frontend run build`: Clean build in 32s, zero TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-15 — P0-ORG-07 branch bank onboarding & TC-003 Go-live readiness gate
 - **Authorization:** Owner approval to implement `P0-ORG-07` using parallel subagent coordination.
 - **Requirements & Rules:** `BR-ORG-03`, `TC-003`, `FE-P0-05`, `03-branch-authorization.md`, `08-sensitive-data.md`.
