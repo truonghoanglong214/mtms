@@ -91,6 +91,13 @@ public class BranchAuthorizationService {
         return false;
     }
 
+    /**
+     * Alias for hasBranchAccess to support hasBranchPermission syntax.
+     */
+    public boolean hasBranchPermission(UUID branchId, String... rolesOrActions) {
+        return hasBranchAccess(branchId, rolesOrActions);
+    }
+
     private boolean matchesRole(String actualRoleKey, String targetRole) {
         if (actualRoleKey == null) {
             return false;
@@ -103,6 +110,9 @@ public class BranchAuthorizationService {
             return true;
         }
         if ("OWNER".equals(targetRole) && ("BRANCH_OWNER".equals(actual) || actual.contains("OWNER"))) {
+            return true;
+        }
+        if ("MANAGER".equals(targetRole) && ("BRANCH_OWNER".equals(actual) || actual.contains("MANAGER") || actual.contains("OWNER"))) {
             return true;
         }
         return false;

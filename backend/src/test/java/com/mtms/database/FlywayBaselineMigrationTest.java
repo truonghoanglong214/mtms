@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004, V005, V006) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004, V005, V006, V007) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(6);
-        assertThat(result.targetSchemaVersion).isIn("6", "006");
+        assertThat(result.migrationsExecuted).isEqualTo(7);
+        assertThat(result.targetSchemaVersion).isIn("7", "007");
     }
 
     @Test
@@ -828,6 +828,112 @@ class FlywayBaselineMigrationTest {
                 stmt.setObject(2, userId);
                 stmt.setString(3, "invalid-status-key");
                 stmt.setString(4, requestHash);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("P0-SEC-04 / V007 Constraint verification: Import batches and rows tables, foreign keys, and unique constraints")
+    void testImportBatchesAndRowsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+
+            // Insert prerequisite entity, branch, user
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_IMPORT_TEST");
+                stmt.setString(3, "Import Test Entity");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_IMPORT_01");
+                stmt.setString(4, "Branch Import Test");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "import_test_user");
+                stmt.setString(3, "$2a$10$dummyHashToSatisfyConstraint1234567890");
+                stmt.setString(4, "Import Test User");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid import_batch
+            UUID batchId = UUID.randomUUID();
+            String sha256 = "a1b2c3d4e5f60123456789abcdef0123456789abcdef0123456789abcdef0123";
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.import_batches (id, branch_id, import_kind, source_filename, source_sha256, status, total_rows, valid_rows, error_rows, preview_summary) " +
+                    "VALUES (?, ?, 'OPENING_INVENTORY', 'inventory_20261116.xlsx', ?, 'PREVIEW', 2, 2, 0, '{\"sample\":\"test\"}'::jsonb)")) {
+                stmt.setObject(1, batchId);
+                stmt.setObject(2, branchId);
+                stmt.setString(3, sha256);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Reject duplicate (import_kind, branch_id, source_sha256)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.import_batches (id, branch_id, import_kind, source_filename, source_sha256, status) " +
+                    "VALUES (?, ?, 'OPENING_INVENTORY', 'duplicate.xlsx', ?, 'PREVIEW')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                stmt.setString(3, sha256);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Reject invalid status (check constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.import_batches (id, branch_id, import_kind, source_filename, source_sha256, status) " +
+                    "VALUES (?, ?, 'ITEMS_CATALOG', 'other.xlsx', 'b1b2c3d4e5f60123456789abcdef0123456789abcdef0123456789abcdef0123', 'UNKNOWN_STATUS')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Insert valid import_row
+            UUID rowId = UUID.randomUUID();
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.import_rows (id, import_batch_id, row_number, raw_data, normalized_data, errors, status) " +
+                    "VALUES (?, ?, 1, '{\"item_code\":\"CF-01\"}'::jsonb, '{\"item_code\":\"CF-01\"}'::jsonb, '[]'::jsonb, 'VALID')")) {
+                stmt.setObject(1, rowId);
+                stmt.setObject(2, batchId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 5. Reject duplicate (import_batch_id, row_number)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.import_rows (id, import_batch_id, row_number, raw_data, status) " +
+                    "VALUES (?, ?, 1, '{\"item_code\":\"CF-02\"}'::jsonb, 'VALID')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, batchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 6. Reject invalid row_number <= 0 (check constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.import_rows (id, import_batch_id, row_number, raw_data, status) " +
+                    "VALUES (?, ?, 0, '{\"item_code\":\"CF-03\"}'::jsonb, 'VALID')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, batchId);
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }

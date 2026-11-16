@@ -19,6 +19,11 @@ import {
   CreditCard,
   FileText,
   History,
+  FileSpreadsheet,
+  Layers,
+  Package,
+  Truck,
+  ArrowRight,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -31,11 +36,12 @@ import { GrantRoleModal } from '../components/GrantRoleModal'
 import { BranchBankModal } from '../components/BranchBankModal'
 import { BranchEvidenceManagerModal } from '@/features/evidence'
 import { AuditLogTimeline } from '@/features/audit'
+import { ImportWizardModal, IMPORT_KIND_CONFIGS, type ImportKind } from '@/features/importer'
 import { useAuthStore } from '@/features/auth/authStore'
 import type { BusinessEntityDto, BranchDto, UserDto } from '../types'
 
 export const OrganizationAdminPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'org' | 'users' | 'audit'>('org')
+  const [activeTab, setActiveTab] = useState<'org' | 'users' | 'audit' | 'imports'>('org')
   const [selectedBranchForAudit, setSelectedBranchForAudit] = useState<string | undefined>()
 
   const currentUser = useAuthStore((state) => state.user)
@@ -71,6 +77,8 @@ export const OrganizationAdminPage: React.FC = () => {
   const [selectedBranchForBank, setSelectedBranchForBank] = useState<BranchDto | null>(null)
   const [isEvidenceModalOpen, setIsEvidenceModalOpen] = useState(false)
   const [selectedBranchForEvidence, setSelectedBranchForEvidence] = useState<BranchDto | null>(null)
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false)
+  const [selectedBranchForImport, setSelectedBranchForImport] = useState<BranchDto | null>(null)
 
   // Fetch all initial data
   const loadData = async () => {
@@ -288,6 +296,19 @@ export const OrganizationAdminPage: React.FC = () => {
                 Thêm Người dùng
               </Button>
             </>
+          ) : activeTab === 'imports' ? (
+            <Button
+              size="sm"
+              onClick={() => {
+                setSelectedBranchForImport(allBranches[0] || null)
+                setIsImportModalOpen(true)
+              }}
+              disabled={allBranches.length === 0}
+              className="bg-emerald-600 text-white hover:bg-emerald-500 text-xs"
+            >
+              <FileSpreadsheet className="h-3.5 w-3.5 mr-1.5" />
+              Mở Trình nhập liệu
+            </Button>
           ) : null}
         </div>
       </div>
@@ -341,6 +362,21 @@ export const OrganizationAdminPage: React.FC = () => {
         >
           <History className="h-4 w-4" />
           <span>Nhật ký kiểm toán</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('imports')}
+          className={`flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors border-b-2 ${
+            activeTab === 'imports'
+              ? 'border-emerald-500 text-emerald-400 bg-emerald-950/20'
+              : 'border-transparent text-stone-400 hover:text-stone-200 hover:bg-stone-900/40'
+          }`}
+        >
+          <FileSpreadsheet className="h-4 w-4" />
+          <span>Nhập dữ liệu Excel</span>
+          <span className="ml-1 rounded-full bg-emerald-950 px-2 py-0.5 text-[10px] text-emerald-400 font-mono border border-emerald-500/30">
+            BR-SEC-02
+          </span>
         </button>
       </div>
 
@@ -533,6 +569,19 @@ export const OrganizationAdminPage: React.FC = () => {
                                         <CreditCard className="h-3.5 w-3.5 mr-1" />
                                         <span>Tài khoản NH</span>
                                       </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedBranchForImport(branch)
+                                          setIsImportModalOpen(true)
+                                        }}
+                                        className="h-7 px-2.5 text-xs text-amber-400 hover:text-amber-300 hover:bg-amber-950/40 inline-flex items-center space-x-1"
+                                        title="Nhập dữ liệu Excel/CSV (Tồn kho đầu kỳ, Danh mục, NCC)"
+                                      >
+                                        <FileSpreadsheet className="h-3.5 w-3.5 mr-1" />
+                                        <span>Nhập Excel</span>
+                                      </Button>
                                     </td>
                                   </tr>
                                 ))}
@@ -719,6 +768,201 @@ export const OrganizationAdminPage: React.FC = () => {
         />
       )}
 
+      {/* Tab 4: Nhập dữ liệu Excel (BR-SEC-02, TC-045, FE-P0-07) */}
+      {activeTab === 'imports' && (
+        <div className="space-y-6">
+          {/* Banner Intro */}
+          <div className="rounded-xl border border-stone-800 bg-stone-900/60 p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start space-x-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 shrink-0">
+                  <FileSpreadsheet className="h-6 w-6" />
+                </div>
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-base font-bold text-stone-100">
+                      Cổng nhập dữ liệu Excel & CSV (Staging Wizard)
+                    </h3>
+                    <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-950/60 text-[10px] font-mono">
+                      BR-SEC-02 / TC-045
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-stone-400 max-w-2xl leading-relaxed">
+                    Hỗ trợ tải lên, kiểm tra quy tắc toàn vẹn nghiệp vụ theo chi nhánh, phát hiện trùng lặp mã định danh (TC-045) và khử độc công thức CSV trước khi cam kết chính thức vào hệ thống.
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                onClick={() => {
+                  setSelectedBranchForImport(allBranches[0] || null)
+                  setIsImportModalOpen(true)
+                }}
+                disabled={allBranches.length === 0}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold shrink-0"
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-1.5" />
+                Mở Trình nhập liệu
+              </Button>
+            </div>
+          </div>
+
+          {/* 3 Categories Cards */}
+          <div>
+            <h4 className="text-xs font-semibold text-stone-300 uppercase tracking-wider mb-3">
+              Các danh mục nhập liệu được hỗ trợ
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {(['OPENING_INVENTORY', 'ITEMS_CATALOG', 'SUPPLIERS'] as ImportKind[]).map((kind) => {
+                const cfg = IMPORT_KIND_CONFIGS[kind]
+                const IconComponent =
+                  kind === 'OPENING_INVENTORY'
+                    ? Layers
+                    : kind === 'ITEMS_CATALOG'
+                    ? Package
+                    : Truck
+
+                return (
+                  <div
+                    key={kind}
+                    className="rounded-xl border border-stone-800 bg-stone-900/60 p-5 flex flex-col justify-between space-y-4"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-950/60 border border-emerald-500/20 text-emerald-400">
+                          <IconComponent className="h-5 w-5" />
+                        </div>
+                        <Badge variant="outline" className="border-stone-700 text-stone-400 text-[10px] font-mono">
+                          {cfg.badgeText}
+                        </Badge>
+                      </div>
+
+                      <h5 className="text-sm font-bold text-stone-100">{cfg.title}</h5>
+                      <p className="mt-1 text-xs text-stone-400 leading-relaxed">
+                        {cfg.description}
+                      </p>
+
+                      <div className="mt-4 pt-3 border-t border-stone-800/80">
+                        <div className="text-[11px] font-mono text-stone-400 mb-2">
+                          Cột dữ liệu yêu cầu:
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {cfg.columns.map((col) => (
+                            <span
+                              key={col.key}
+                              className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
+                                col.required
+                                  ? 'bg-stone-950 border-stone-700 text-stone-300 font-semibold'
+                                  : 'bg-stone-900/40 border-stone-800 text-stone-500'
+                              }`}
+                              title={col.description}
+                            >
+                              {col.key}
+                              {col.required && <span className="text-red-400 ml-0.5">*</span>}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedBranchForImport(allBranches[0] || null)
+                        setIsImportModalOpen(true)
+                      }}
+                      disabled={allBranches.length === 0}
+                      className="border-stone-800 bg-stone-950/60 hover:bg-stone-800 text-stone-200 text-xs w-full justify-between"
+                    >
+                      <span>Bắt đầu nhập dữ liệu</span>
+                      <ArrowRight className="h-3.5 w-3.5 text-emerald-400" />
+                    </Button>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Branches table with direct import actions */}
+          <div className="rounded-xl border border-stone-800 bg-stone-900/60 overflow-hidden">
+            <div className="p-4 border-b border-stone-800 bg-stone-950/60 flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-stone-200 uppercase tracking-wider">
+                  Chọn chi nhánh để nhập dữ liệu trực tiếp
+                </h4>
+                <p className="text-[11px] text-stone-500 mt-0.5">
+                  Mỗi đợt nhập liệu được gắn chặt với ngữ cảnh chi nhánh theo chính sách @branchAuth
+                </p>
+              </div>
+              <div className="text-xs font-mono text-stone-400">
+                Tổng: <span className="text-emerald-400 font-bold">{allBranches.length}</span> chi nhánh
+              </div>
+            </div>
+
+            {allBranches.length === 0 ? (
+              <div className="p-8 text-center text-xs text-stone-500 font-mono">
+                Chưa có chi nhánh nào trong hệ thống.
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-stone-950/80 text-stone-400 font-mono border-b border-stone-800">
+                    <tr>
+                      <th className="py-2.5 px-4 font-medium">Mã Chi nhánh</th>
+                      <th className="py-2.5 px-4 font-medium">Tên Chi nhánh</th>
+                      <th className="py-2.5 px-4 font-medium">Múi giờ</th>
+                      <th className="py-2.5 px-4 font-medium">Trạng thái</th>
+                      <th className="py-2.5 px-4 font-medium text-right">Thao tác nhập liệu</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-stone-800/60 text-stone-200">
+                    {allBranches.map((branch) => (
+                      <tr key={branch.id} className="hover:bg-stone-800/30 transition-colors">
+                        <td className="py-2.5 px-4 font-mono font-bold text-emerald-400">
+                          {branch.branchCode}
+                        </td>
+                        <td className="py-2.5 px-4 font-medium text-stone-100">
+                          {branch.name}
+                        </td>
+                        <td className="py-2.5 px-4 font-mono text-stone-400 text-[11px]">
+                          {branch.timeZone}
+                        </td>
+                        <td className="py-2.5 px-4">
+                          <Badge
+                            variant="outline"
+                            className={
+                              branch.status === 'ACTIVE'
+                                ? 'border-emerald-500/40 text-emerald-300 bg-emerald-950/40 text-[10px]'
+                                : 'border-stone-700 text-stone-400 text-[10px]'
+                            }
+                          >
+                            {branch.status}
+                          </Badge>
+                        </td>
+                        <td className="py-2.5 px-4 text-right">
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedBranchForImport(branch)
+                              setIsImportModalOpen(true)
+                            }}
+                            className="h-7 px-3 text-xs bg-emerald-600 hover:bg-emerald-500 text-white inline-flex items-center space-x-1.5"
+                          >
+                            <FileSpreadsheet className="h-3.5 w-3.5" />
+                            <span>Nhập tệp Excel / CSV</span>
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Modals */}
       <CreateEntityModal
         isOpen={isEntityModalOpen}
@@ -810,6 +1054,21 @@ export const OrganizationAdminPage: React.FC = () => {
         onClose={() => {
           setIsEvidenceModalOpen(false)
           setSelectedBranchForEvidence(null)
+        }}
+      />
+
+      <ImportWizardModal
+        isOpen={isImportModalOpen}
+        branch={selectedBranchForImport}
+        branches={allBranches}
+        onClose={() => {
+          setIsImportModalOpen(false)
+          setSelectedBranchForImport(null)
+        }}
+        onSuccess={(committedBatch) => {
+          showToast(
+            `Đã cam kết thành công ${committedBatch.validRows} dòng dữ liệu (${committedBatch.importKind})!`
+          )
         }}
       />
     </div>

@@ -1,5 +1,45 @@
 # MTMS — File changes and decisions
 
+## 2026-11-16 — P0-SEC-04 excel and CSV import staging
+- **Authorization:** Owner approval to plan and implement `P0-SEC-04` / `FE-P0-07` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-SEC-02`, `TC-045`, `01-financial-data-safety.md`, `07-backend-quality.md`, `06-frontend-quality.md`.
+- **ADD:**
+  - `database/migrations/V007__create_excel_import_staging.sql` (bảng `mtms.import_batches` với `source_sha256 CHAR(64)`, `preview_summary JSONB`, check constraint `status IN ('PREVIEW','VALIDATED','COMMITTED','REJECTED')`, unique `(import_kind, branch_id, source_sha256)`, bảng `mtms.import_rows` với `raw_data JSONB`, `normalized_data JSONB`, `errors JSONB`, check constraint `row_number > 0`, cascade foreign key).
+  - `backend/src/main/java/com/mtms/importer/domain/ImportKind.java` (`OPENING_INVENTORY`, `ITEMS_CATALOG`, `SUPPLIERS`).
+  - `backend/src/main/java/com/mtms/importer/domain/ImportBatchStatus.java`, `ImportRowStatus.java`.
+  - `backend/src/main/java/com/mtms/importer/domain/RowValidationError.java` (record: `field`, `error`, `message`).
+  - `backend/src/main/java/com/mtms/importer/domain/ImportBatch.java`, `ImportRow.java` (domain models).
+  - `backend/src/main/java/com/mtms/importer/domain/ImportBatchRepository.java`, `ImportRowRepository.java`.
+  - `backend/src/main/java/com/mtms/importer/infrastructure/parser/FormulaSanitizer.java` (neutralize CSV/Excel formula injection starting with `=`, `@`, `\t`, `\r`, `+`, `-`).
+  - `backend/src/main/java/com/mtms/importer/infrastructure/parser/FileImportParser.java` (multi-format parser for XLSX/XLS via Apache POI WorkbookFactory, and CSV).
+  - `backend/src/main/java/com/mtms/importer/application/validation/ImportValidator.java` (schema validation + TC-045 duplicate identifier detection across rows).
+  - `backend/src/main/java/com/mtms/importer/infrastructure/persistence/ImportBatchJpaEntity.java` (`@JdbcTypeCode(SqlTypes.CHAR)` on `source_sha256` avoiding Hibernate validate crash, `@JdbcTypeCode(SqlTypes.JSON)` for JSONB).
+  - `backend/src/main/java/com/mtms/importer/infrastructure/persistence/ImportRowJpaEntity.java`.
+  - `backend/src/main/java/com/mtms/importer/infrastructure/persistence/ImportBatchJpaRepository.java`, `ImportRowJpaRepository.java`.
+  - `backend/src/main/java/com/mtms/importer/infrastructure/persistence/ImportBatchRepositoryImpl.java`, `ImportRowRepositoryImpl.java`.
+  - `backend/src/main/java/com/mtms/importer/application/dto/ImportBatchDto.java`, `ImportRowDto.java`.
+  - `backend/src/main/java/com/mtms/importer/application/ImportStagingService.java` (stageFile, getBatch, getBatchRows, commitBatch with audit logging).
+  - `backend/src/main/java/com/mtms/importer/web/ImportController.java` (`POST /stage`, `GET /{batchId}`, `GET /{batchId}/rows`, `POST /{batchId}/commit` with `@Idempotent` and `@PreAuthorize("@branchAuth...")`).
+  - `backend/src/test/java/com/mtms/importer/ImportIntegrationTest.java` (6 integration tests: XLSX staging & idempotent commit replay, CSV staging, TC-045 duplicate identifier row errors, data validation & formula sanitization, cross-branch 403 access control, recommit conflict 409).
+  - `frontend/src/features/importer/types.ts` (ImportKind, ImportBatch, ImportRow, RowValidationError, IMPORT_KIND_CONFIGS).
+  - `frontend/src/features/importer/importApi.ts` (API client for stage, getBatch, getRows, commit).
+  - `frontend/src/features/importer/ImportRowErrorReport.tsx` (row badges, error badges, explanation, raw value inspection, clipboard copy).
+  - `frontend/src/features/importer/ImportWizardModal.tsx` (3-step wizard: kind & file dropzone + template download, validation preview & row error table, idempotent commit confirmation).
+  - `frontend/src/features/importer/index.ts`.
+  - `docs/planning/P0_SEC_04_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `backend/pom.xml` (added `org.apache.poi:poi-ooxml:5.3.0`).
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/BranchAuthorizationService.java` (added `hasBranchPermission` alias & MANAGER role matching).
+  - `backend/src/test/java/com/mtms/arch/ModuleBoundaryTest.java` (added `com.mtms.importer..` to ArchUnit module boundaries).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (updated for V007 bootstrap & constraint verification).
+  - `frontend/src/features/organization/pages/OrganizationAdminPage.tsx` (added Tab 4 "Nhập dữ liệu Excel" and inline branch import action buttons).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test`: 113 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run build`: Clean build in 14.19s, zero TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+
 ## 2026-11-16 — P0-SEC-03 idempotency & optimistic locking concurrency policy
 - **Authorization:** Owner approval to implement `P0-SEC-03` using parallel subagent coordination.
 - **Requirements & Rules:** `BR-SEC-03`, `TC-011`, `01-financial-data-safety.md`, `07-backend-quality.md`.

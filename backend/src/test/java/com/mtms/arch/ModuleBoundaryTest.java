@@ -45,7 +45,8 @@ class ModuleBoundaryTest {
                         "com.mtms.closing..",
                         "com.mtms.capital..",
                         "com.mtms.evidence..",
-                        "com.mtms.audit.."
+                        "com.mtms.audit..",
+                        "com.mtms.importer.."
                 )
                 .allowEmptyShould(true)
                 .check(importedClasses);
