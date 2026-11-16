@@ -1,5 +1,6 @@
-import React from 'react'
+import type { ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ConcurrencyNotification } from '@/shared/components/ConcurrencyNotification'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -12,13 +13,14 @@ const queryClient = new QueryClient({
 })
 
 interface ProvidersProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function Providers({ children }: ProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
+      <ConcurrencyNotification />
     </QueryClientProvider>
   )
 }

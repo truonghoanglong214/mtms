@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004, V005) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004, V005, V006) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(5);
-        assertThat(result.targetSchemaVersion).isIn("5", "005");
+        assertThat(result.migrationsExecuted).isEqualTo(6);
+        assertThat(result.targetSchemaVersion).isIn("6", "006");
     }
 
     @Test
@@ -757,6 +757,77 @@ class FlywayBaselineMigrationTest {
                 stmt.setObject(3, userId);
                 stmt.setObject(4, UUID.randomUUID());
                 stmt.setString(5, "TEST_EVENT");
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(9)
+    @DisplayName("P0-SEC-03 / V006 Constraint verification: Idempotency records table, unique constraints, and indices")
+    void testIdempotencyRecordsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID userId = UUID.randomUUID();
+
+            // Insert prerequisite user
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "idempotency_test_user");
+                stmt.setString(3, "$2a$10$dummyHashToSatisfyConstraint1234567890");
+                stmt.setString(4, "Idempotency Test User");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid idempotency record
+            UUID recordId = UUID.randomUUID();
+            String idempotencyKey = "req-idem-key-001";
+            String requestHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.idempotency_records (id, actor_user_id, idempotency_key, request_hash, status, response_status, response_headers, response_body, expires_at) " +
+                    "VALUES (?, ?, ?, ?, 'IN_PROGRESS', NULL, NULL, NULL, now() + interval '1 day')")) {
+                stmt.setObject(1, recordId);
+                stmt.setObject(2, userId);
+                stmt.setString(3, idempotencyKey);
+                stmt.setString(4, requestHash);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Reject duplicate (actor_user_id, idempotency_key) -> Unique constraint violation
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.idempotency_records (id, actor_user_id, idempotency_key, request_hash, status, expires_at) " +
+                    "VALUES (?, ?, ?, ?, 'COMPLETED', now() + interval '1 day')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, userId);
+                stmt.setString(3, idempotencyKey);
+                stmt.setString(4, requestHash);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Reject invalid actor_user_id (foreign key violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.idempotency_records (id, actor_user_id, idempotency_key, request_hash, status, expires_at) " +
+                    "VALUES (?, ?, ?, ?, 'IN_PROGRESS', now() + interval '1 day')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, UUID.randomUUID()); // non-existent user
+                stmt.setString(3, "another-key");
+                stmt.setString(4, requestHash);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Reject invalid status (check constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.idempotency_records (id, actor_user_id, idempotency_key, request_hash, status, expires_at) " +
+                    "VALUES (?, ?, ?, ?, 'INVALID_STATUS', now() + interval '1 day')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, userId);
+                stmt.setString(3, "invalid-status-key");
+                stmt.setString(4, requestHash);
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }

@@ -1,6 +1,7 @@
 package com.mtms.identity.web;
 
 import com.mtms.common.api.ApiResponse;
+import com.mtms.common.idempotency.Idempotent;
 import com.mtms.identity.application.ScopedPermissionService;
 import com.mtms.identity.application.dto.GrantRoleCommand;
 import com.mtms.identity.application.dto.ScopedRoleGrantDto;
@@ -38,6 +39,7 @@ public class ScopedRoleGrantController {
         this.branchAuthorizationService = branchAuthorizationService;
     }
 
+    @Idempotent
     @PostMapping
     @PreAuthorize("@branchAuth.isSystemAdmin()")
     public ResponseEntity<ApiResponse<ScopedRoleGrantDto>> grantRole(

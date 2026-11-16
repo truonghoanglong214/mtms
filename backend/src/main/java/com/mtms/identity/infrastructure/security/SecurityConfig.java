@@ -1,6 +1,7 @@
 package com.mtms.identity.infrastructure.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mtms.common.idempotency.IdempotencyFilter;
 import com.mtms.identity.infrastructure.persistence.ScopedRoleGrantJpaRepository;
 import com.mtms.identity.infrastructure.persistence.UserJpaRepository;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,9 +59,18 @@ public class SecurityConfig {
     }
 
     @Bean
+    public FilterRegistrationBean<IdempotencyFilter> idempotencyFilterRegistration(
+            IdempotencyFilter filter) {
+        FilterRegistrationBean<IdempotencyFilter> registration = new FilterRegistrationBean<>(filter);
+        registration.setEnabled(false);
+        return registration;
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
+            JwtAuthenticationFilter jwtAuthenticationFilter,
+            IdempotencyFilter idempotencyFilter) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -101,7 +111,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(idempotencyFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

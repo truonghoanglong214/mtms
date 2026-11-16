@@ -1,5 +1,9 @@
 package com.mtms.common.error;
 
+import com.mtms.common.idempotency.IdempotencyConflictException;
+import com.mtms.common.idempotency.IdempotencyPayloadMismatchException;
+import jakarta.persistence.OptimisticLockException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -113,6 +117,45 @@ public class GlobalExceptionHandler {
         );
         problemDetail.setType(URI.create("urn:mtms:error:illegal-argument"));
         problemDetail.setTitle("Invalid Argument");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler({
+            OptimisticLockingFailureException.class,
+            OptimisticLockException.class
+    })
+    public ProblemDetail handleOptimisticLockException(Exception ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                "Dữ liệu đã được cập nhật bởi một giao dịch khác. Vui lòng tải lại và thử lại."
+        );
+        problemDetail.setType(URI.create("urn:mtms:error:version-conflict"));
+        problemDetail.setTitle("Version Conflict");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(IdempotencyConflictException.class)
+    public ProblemDetail handleIdempotencyConflictException(IdempotencyConflictException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT,
+                ex.getMessage()
+        );
+        problemDetail.setType(URI.create("urn:mtms:error:idempotency-in-progress"));
+        problemDetail.setTitle("Idempotency In Progress");
+        problemDetail.setProperty("timestamp", Instant.now());
+        return problemDetail;
+    }
+
+    @ExceptionHandler(IdempotencyPayloadMismatchException.class)
+    public ProblemDetail handleIdempotencyPayloadMismatchException(IdempotencyPayloadMismatchException ex) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                ex.getMessage()
+        );
+        problemDetail.setType(URI.create("urn:mtms:error:idempotency-payload-mismatch"));
+        problemDetail.setTitle("Idempotency Payload Mismatch");
         problemDetail.setProperty("timestamp", Instant.now());
         return problemDetail;
     }

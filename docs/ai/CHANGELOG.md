@@ -1,5 +1,38 @@
 # MTMS — File changes and decisions
 
+## 2026-11-16 — P0-SEC-03 idempotency & optimistic locking concurrency policy
+- **Authorization:** Owner approval to implement `P0-SEC-03` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-SEC-03`, `TC-011`, `01-financial-data-safety.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `database/migrations/V006__create_idempotency_records.sql` (bảng `mtms.idempotency_records`, unique constraint `(actor_user_id, idempotency_key)`, TTL index `idx_idempotency_expires_at`).
+  - `backend/src/main/java/com/mtms/common/idempotency/IdempotencyStatus.java` (`IN_PROGRESS`, `COMPLETED`, `FAILED`).
+  - `backend/src/main/java/com/mtms/common/idempotency/IdempotencyRecord.java` (domain entity).
+  - `backend/src/main/java/com/mtms/common/idempotency/IdempotencyRecordJpaEntity.java` & `IdempotencyRecordJpaRepository.java`.
+  - `backend/src/main/java/com/mtms/common/idempotency/AcquireStatus.java`, `AcquireResult.java`, `CurrentActorProvider.java`.
+  - `backend/src/main/java/com/mtms/identity/infrastructure/security/SecurityContextActorProvider.java` (adapter).
+  - `backend/src/main/java/com/mtms/common/idempotency/IdempotencyService.java` (`tryAcquire` with REQUIRES_NEW transaction, hash verification, `recordSuccess`, `recordFailure`).
+  - `backend/src/main/java/com/mtms/common/idempotency/Idempotent.java` (custom controller annotation).
+  - `backend/src/main/java/com/mtms/common/idempotency/CachedBodyHttpServletRequest.java` & `IdempotencyFilter.java` (request caching, replay with `Idempotent-Replayed: true`).
+  - `backend/src/main/java/com/mtms/common/idempotency/IdempotencyConflictException.java` & `IdempotencyPayloadMismatchException.java`.
+  - `backend/src/test/java/com/mtms/common/idempotency/IdempotencyIntegrationTest.java` (8 integration tests: TC-011 duplicate request deduplication, cache replay, payload mismatch 422, in-progress conflict 409, optimistic lock translation 409).
+  - `frontend/src/shared/utils/idempotency.ts` (UUID v4 generator, mutation method checks, RFC 7807 error types).
+  - `frontend/src/shared/stores/concurrencyNotificationStore.ts` (Zustand notification store with deduplication and timeout).
+  - `frontend/src/shared/components/ConcurrencyNotification.tsx` & `ConcurrencyConflictToast.tsx` (Dark-mode UI, Spring animation, instant reload action).
+  - `frontend/src/app/api/client.ts` (convenience alias).
+  - `docs/planning/P0_SEC_03_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/common/error/GlobalExceptionHandler.java` (added RFC 7807 handlers for `OptimisticLockingFailureException`, `OptimisticLockException`, `IdempotencyConflictException`, and `IdempotencyPayloadMismatchException`).
+  - `backend/src/main/java/com/mtms/organization/web/BranchBankController.java` (annotated `@Idempotent` on bank account creation and branch activation).
+  - `backend/src/main/java/com/mtms/identity/web/ScopedRoleGrantController.java` (annotated `@Idempotent` on grant role).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (updated for V006 bootstrap and constraint verification).
+  - `frontend/src/shared/api/apiClient.ts` (Axios interceptors for mutation `Idempotency-Key` injection, replay detection, and 409/422 error handlers).
+  - `frontend/src/app/providers.tsx` (mounted `<ConcurrencyNotification />`).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test`: 106 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run build`: Clean build in 22s, zero TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-16 — P0-SEC-02 audit event spine & activity log
 - **Authorization:** Owner approval to implement `P0-SEC-02` using parallel subagent coordination.
 - **Requirements & Rules:** `BR-SEC-03`, `TC-041`, `03-branch-authorization.md`, `04-accounting-postings.md`.

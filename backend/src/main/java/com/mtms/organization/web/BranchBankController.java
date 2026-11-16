@@ -1,6 +1,7 @@
 package com.mtms.organization.web;
 
 import com.mtms.common.api.ApiResponse;
+import com.mtms.common.idempotency.Idempotent;
 import com.mtms.organization.application.BranchBankService;
 import com.mtms.organization.application.dto.BranchBankAccountDto;
 import com.mtms.organization.application.dto.BranchDto;
@@ -48,6 +49,7 @@ public class BranchBankController {
         return ResponseEntity.ok(ApiResponse.ok(accounts));
     }
 
+    @Idempotent
     @PostMapping("/bank-accounts")
     @PreAuthorize("@branchAuth.hasBranchAccess(#branchId, 'ADMIN', 'OWNER')")
     public ResponseEntity<ApiResponse<BranchBankAccountDto>> addBankAccount(
@@ -75,6 +77,7 @@ public class BranchBankController {
         return ResponseEntity.ok(ApiResponse.ok(readiness));
     }
 
+    @Idempotent
     @PatchMapping("/activate")
     @PreAuthorize("@branchAuth.hasBranchAccess(#branchId, 'ADMIN', 'OWNER')")
     public ResponseEntity<ApiResponse<BranchDto>> activateBranch(
