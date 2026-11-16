@@ -65,3 +65,8 @@ jobs:
       - name: Run Workspace Validator
         run: |
           python scripts/validate_workspace.py
+
+      - name: Verify Backup & Restore CLI Scripts
+        run: |
+          python scripts/backup_database.py --help
+          python scripts/restore_database.py --help

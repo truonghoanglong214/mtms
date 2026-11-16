@@ -1,5 +1,24 @@
 # MTMS — File changes and decisions
 
+## 2026-11-16 — P0-SEC-05 monitoring and CI baseline
+- **Authorization:** Owner approval to implement `P0-SEC-05` operational monitoring, backup/restore tooling, and CI pipeline.
+- **Requirements & Rules:** `BR-SEC-04`, `TC-044`, `07-backend-quality.md`.
+- **ADD:**
+  - `backend/src/main/java/com/mtms/common/health/SystemReadinessHealthIndicator.java` (Spring Boot Actuator custom health indicator reporting database connectivity, response time, and local storage usable disk space).
+  - `backend/src/test/java/com/mtms/operations/BackupRestoreVerificationTest.java` (3 automated tests: Actuator health status UP, TC-044 staging restore integrity audit across 11 core tables, and schema nullability constraint rejection).
+  - `scripts/backup_database.py` (database backup utility supporting native pg_dump and Docker containerized pg_dump, SHA-256 calculation, and JSON manifest generation).
+  - `scripts/restore_database.py` (database restore utility with SHA-256 integrity verification, clean schema restore, and automated TC-044 table/row count audit engine).
+  - `docs/operations/BACKUP_RESTORE_RUNBOOK.md` (authoritative operational runbook with RPO/RTO objectives, on-demand backup procedures, clean staging drill steps, and disaster recovery checklist).
+  - `docs/planning/P0_SEC_05_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `.github/workflows/ci.yml` (added backup & restore CLI dry-run verification steps).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `scripts/backup_database.py` & `scripts/restore_database.py`: Executed against Docker PostgreSQL 17 container, verified SHA-256 checksum, reported `TC-044 VERIFICATION RESULT: PASS` for all 11 tables.
+  - `mvn test`: 116 tests run, 0 failures, 0 errors, 100% green.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+
 ## 2026-11-16 — P0-SEC-04 excel and CSV import staging
 - **Authorization:** Owner approval to plan and implement `P0-SEC-04` / `FE-P0-07` using parallel subagent coordination.
 - **Requirements & Rules:** `BR-SEC-02`, `TC-045`, `01-financial-data-safety.md`, `07-backend-quality.md`, `06-frontend-quality.md`.
