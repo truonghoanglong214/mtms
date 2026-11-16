@@ -1,5 +1,7 @@
 package com.mtms.identity.application;
 
+import com.mtms.audit.application.AuditLogService;
+import com.mtms.audit.application.dto.RecordAuditEventCommand;
 import com.mtms.common.error.ResourceNotFoundException;
 import com.mtms.identity.application.dto.GrantRoleCommand;
 import com.mtms.identity.application.dto.ScopedRoleGrantDto;
@@ -25,11 +27,14 @@ public class ScopedPermissionService {
 
     private final ScopedRoleGrantJpaRepository grantRepository;
     private final UserJpaRepository userRepository;
+    private final AuditLogService auditLogService;
 
     public ScopedPermissionService(ScopedRoleGrantJpaRepository grantRepository,
-                                   UserJpaRepository userRepository) {
+                                   UserJpaRepository userRepository,
+                                   AuditLogService auditLogService) {
         this.grantRepository = grantRepository;
         this.userRepository = userRepository;
+        this.auditLogService = auditLogService;
     }
 
     public ScopedRoleGrantDto grantRole(GrantRoleCommand cmd, UUID actorId) {
@@ -56,15 +61,49 @@ public class ScopedPermissionService {
         ScopedRoleGrantJpaEntity entity = ScopedRoleGrantJpaEntity.fromDomain(grant);
         ScopedRoleGrantJpaEntity saved = grantRepository.save(entity);
 
+        String newSnapshot = "{\"userId\":\"" + saved.getUserId() +
+                "\",\"roleKey\":\"" + saved.getRoleKey() +
+                "\",\"branchId\":\"" + saved.getBranchId() +
+                "\",\"actionScope\":\"" + saved.getActionScope() + "\"}";
+
+        auditLogService.recordEvent(new RecordAuditEventCommand(
+                saved.getBranchId(),
+                actorId,
+                UUID.randomUUID(),
+                "SCOPED_ROLE_GRANT",
+                saved.getId(),
+                "ROLE_GRANTED",
+                "Granted role " + saved.getRoleKey() + " to user",
+                null,
+                newSnapshot
+        ));
+
         return ScopedRoleGrantDto.fromDomain(saved.toDomain());
     }
 
     public void revokeGrant(UUID grantId) {
         Objects.requireNonNull(grantId, "Grant ID must not be null");
-        if (!grantRepository.existsById(grantId)) {
-            throw new ResourceNotFoundException("Role grant not found with id: " + grantId);
-        }
+        ScopedRoleGrantJpaEntity existing = grantRepository.findById(grantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Role grant not found with id: " + grantId));
+
+        String oldSnapshot = "{\"userId\":\"" + existing.getUserId() +
+                "\",\"roleKey\":\"" + existing.getRoleKey() +
+                "\",\"branchId\":\"" + existing.getBranchId() +
+                "\",\"actionScope\":\"" + existing.getActionScope() + "\"}";
+
         grantRepository.deleteById(grantId);
+
+        auditLogService.recordEvent(new RecordAuditEventCommand(
+                existing.getBranchId(),
+                null,
+                UUID.randomUUID(),
+                "SCOPED_ROLE_GRANT",
+                grantId,
+                "ROLE_REVOKED",
+                "Revoked role " + existing.getRoleKey() + " from user",
+                oldSnapshot,
+                null
+        ));
     }
 
     @Transactional(readOnly = true)

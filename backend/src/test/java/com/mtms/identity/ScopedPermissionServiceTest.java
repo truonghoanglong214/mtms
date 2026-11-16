@@ -1,5 +1,6 @@
 package com.mtms.identity;
 
+import com.mtms.audit.application.AuditLogService;
 import com.mtms.common.error.ResourceNotFoundException;
 import com.mtms.identity.application.ScopedPermissionService;
 import com.mtms.identity.application.dto.GrantRoleCommand;
@@ -16,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -36,11 +38,14 @@ class ScopedPermissionServiceTest {
     @Mock
     private UserJpaRepository userRepository;
 
+    @Mock
+    private AuditLogService auditLogService;
+
     private ScopedPermissionService permissionService;
 
     @BeforeEach
     void setUp() {
-        permissionService = new ScopedPermissionService(grantRepository, userRepository);
+        permissionService = new ScopedPermissionService(grantRepository, userRepository, auditLogService);
     }
 
     @Test
@@ -192,18 +197,33 @@ class ScopedPermissionServiceTest {
     @DisplayName("Successfully revoke existing grant")
     void testRevokeGrantSuccess() {
         UUID grantId = UUID.randomUUID();
-        when(grantRepository.existsById(grantId)).thenReturn(true);
+        ScopedRoleGrantJpaEntity mockEntity = new ScopedRoleGrantJpaEntity(
+                grantId,
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                "MANAGER",
+                "ALL",
+                "ALL",
+                "ALL",
+                LocalDate.now(),
+                null,
+                UUID.randomUUID(),
+                Instant.now()
+        );
+        when(grantRepository.findById(grantId)).thenReturn(Optional.of(mockEntity));
 
         permissionService.revokeGrant(grantId);
 
         verify(grantRepository).deleteById(grantId);
+        verify(auditLogService).recordEvent(any());
     }
 
     @Test
     @DisplayName("Throw ResourceNotFoundException when revoking nonexistent grant")
     void testRevokeGrantNotFound() {
         UUID grantId = UUID.randomUUID();
-        when(grantRepository.existsById(grantId)).thenReturn(false);
+        when(grantRepository.findById(grantId)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> permissionService.revokeGrant(grantId))
                 .isInstanceOf(ResourceNotFoundException.class)

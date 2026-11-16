@@ -1,5 +1,7 @@
 package com.mtms.organization.application;
 
+import com.mtms.audit.application.AuditLogService;
+import com.mtms.audit.application.dto.RecordAuditEventCommand;
 import com.mtms.organization.application.dto.BranchBankAccountDto;
 import com.mtms.organization.application.dto.BranchDto;
 import com.mtms.organization.application.dto.BranchReadinessDto;
@@ -27,11 +29,14 @@ public class BranchBankService {
 
     private final BranchJpaRepository branchRepository;
     private final BranchBankAccountRepository bankAccountRepository;
+    private final AuditLogService auditLogService;
 
     public BranchBankService(BranchJpaRepository branchRepository,
-                             BranchBankAccountRepository bankAccountRepository) {
+                             BranchBankAccountRepository bankAccountRepository,
+                             AuditLogService auditLogService) {
         this.branchRepository = branchRepository;
         this.bankAccountRepository = bankAccountRepository;
+        this.auditLogService = auditLogService;
     }
 
     public BranchBankAccountDto addBankAccount(UUID branchId, CreateBankAccountCommand cmd) {
@@ -69,6 +74,25 @@ public class BranchBankService {
         );
 
         BranchBankAccount saved = bankAccountRepository.save(domain);
+
+        String newSnapshot = "{\"bankName\":\"" + escapeJson(saved.getBankName()) +
+                "\",\"accountHolderName\":\"" + escapeJson(saved.getAccountHolderName()) +
+                "\",\"maskedAccountNumber\":\"" + escapeJson(saved.getMaskedAccountNumber()) +
+                "\",\"isPrimary\":" + saved.isPrimary() +
+                ",\"status\":\"" + saved.getStatus().name() + "\"}";
+
+        auditLogService.recordEvent(new RecordAuditEventCommand(
+                branchId,
+                null,
+                UUID.randomUUID(),
+                "BRANCH_BANK_ACCOUNT",
+                saved.getId(),
+                "BANK_ACCOUNT_ADDED",
+                "Dedicated bank account added for branch",
+                null,
+                newSnapshot
+        ));
+
         return toDto(saved);
     }
 
@@ -140,8 +164,24 @@ public class BranchBankService {
         BranchJpaEntity branch = branchRepository.findById(branchId)
                 .orElseThrow(() -> new EntityNotFoundException("Branch", branchId));
 
+        BranchStatus oldStatus = branch.getStatus();
         branch.setStatus(BranchStatus.ACTIVE);
         BranchJpaEntity saved = branchRepository.save(branch);
+
+        String oldSnapshot = "{\"status\":\"" + oldStatus.name() + "\"}";
+        String newSnapshot = "{\"status\":\"ACTIVE\"}";
+
+        auditLogService.recordEvent(new RecordAuditEventCommand(
+                branchId,
+                null,
+                UUID.randomUUID(),
+                "BRANCH",
+                branchId,
+                "BRANCH_ACTIVATED",
+                "Branch activated after readiness check",
+                oldSnapshot,
+                newSnapshot
+        ));
 
         return new BranchDto(
                 saved.getId(),
@@ -152,6 +192,11 @@ public class BranchBankService {
                 saved.getStatus(),
                 saved.getCreatedAt()
         );
+    }
+
+    private String escapeJson(String input) {
+        if (input == null) return "";
+        return input.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 
     private BranchBankAccountDto toDto(BranchBankAccount account) {

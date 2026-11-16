@@ -18,6 +18,7 @@ import {
   RefreshCw,
   CreditCard,
   FileText,
+  History,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -29,10 +30,20 @@ import { CreateUserModal } from '../components/CreateUserModal'
 import { GrantRoleModal } from '../components/GrantRoleModal'
 import { BranchBankModal } from '../components/BranchBankModal'
 import { BranchEvidenceManagerModal } from '@/features/evidence'
+import { AuditLogTimeline } from '@/features/audit'
+import { useAuthStore } from '@/features/auth/authStore'
 import type { BusinessEntityDto, BranchDto, UserDto } from '../types'
 
 export const OrganizationAdminPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'org' | 'users'>('org')
+  const [activeTab, setActiveTab] = useState<'org' | 'users' | 'audit'>('org')
+  const [selectedBranchForAudit, setSelectedBranchForAudit] = useState<string | undefined>()
+
+  const currentUser = useAuthStore((state) => state.user)
+  const isSystemAdmin = useMemo(() => {
+    return (
+      currentUser?.grants?.some((g) => g.roleKey === 'SYSTEM_ADMIN') ?? true
+    )
+  }, [currentUser])
 
   // Data states
   const [entities, setEntities] = useState<BusinessEntityDto[]>([])
@@ -253,7 +264,7 @@ export const OrganizationAdminPage: React.FC = () => {
                 Thêm Pháp nhân
               </Button>
             </>
-          ) : (
+          ) : activeTab === 'users' ? (
             <>
               <Button
                 variant="outline"
@@ -277,7 +288,7 @@ export const OrganizationAdminPage: React.FC = () => {
                 Thêm Người dùng
               </Button>
             </>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -318,6 +329,18 @@ export const OrganizationAdminPage: React.FC = () => {
           <span className="ml-1 rounded-full bg-stone-800 px-2 py-0.5 text-[10px] text-stone-300 font-mono">
             {users.length}
           </span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('audit')}
+          className={`flex items-center space-x-2 px-4 py-2 text-xs font-semibold rounded-t-lg transition-colors border-b-2 ${
+            activeTab === 'audit'
+              ? 'border-emerald-500 text-emerald-400 bg-emerald-950/20'
+              : 'border-transparent text-stone-400 hover:text-stone-200 hover:bg-stone-900/40'
+          }`}
+        >
+          <History className="h-4 w-4" />
+          <span>Nhật ký kiểm toán</span>
         </button>
       </div>
 
@@ -471,6 +494,19 @@ export const OrganizationAdminPage: React.FC = () => {
                                       {new Date(branch.createdAt).toLocaleDateString('vi-VN')}
                                     </td>
                                     <td className="py-2.5 px-4 text-right space-x-1">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setSelectedBranchForAudit(branch.id)
+                                          setActiveTab('audit')
+                                        }}
+                                        className="h-7 px-2.5 text-xs text-purple-400 hover:text-purple-300 hover:bg-purple-950/40 inline-flex items-center space-x-1"
+                                        title="Xem nhật ký kiểm toán của chi nhánh này"
+                                      >
+                                        <History className="h-3.5 w-3.5 mr-1" />
+                                        <span>Kiểm toán</span>
+                                      </Button>
                                       <Button
                                         variant="ghost"
                                         size="sm"
@@ -672,6 +708,15 @@ export const OrganizationAdminPage: React.FC = () => {
             </div>
           )}
         </div>
+      )}
+
+      {/* Tab 3: Nhật ký kiểm toán (BR-SEC-03, TC-041) */}
+      {activeTab === 'audit' && (
+        <AuditLogTimeline
+          initialBranchId={selectedBranchForAudit}
+          branches={allBranches}
+          isSystemAdmin={isSystemAdmin}
+        />
       )}
 
       {/* Modals */}

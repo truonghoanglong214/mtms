@@ -1,5 +1,7 @@
 package com.mtms.identity.application;
 
+import com.mtms.audit.application.AuditLogService;
+import com.mtms.audit.application.dto.RecordAuditEventCommand;
 import com.mtms.common.error.ResourceConflictException;
 import com.mtms.common.error.ResourceNotFoundException;
 import com.mtms.identity.application.dto.CreateUserCommand;
@@ -32,13 +34,16 @@ public class UserService {
     private final UserJpaRepository userRepository;
     private final ScopedRoleGrantJpaRepository grantRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogService auditLogService;
 
     public UserService(UserJpaRepository userRepository,
                        ScopedRoleGrantJpaRepository grantRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder,
+                       AuditLogService auditLogService) {
         this.userRepository = userRepository;
         this.grantRepository = grantRepository;
         this.passwordEncoder = passwordEncoder;
+        this.auditLogService = auditLogService;
     }
 
     public UserDto createUser(CreateUserCommand cmd) {
@@ -122,8 +127,24 @@ public class UserService {
         UserJpaEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
+        UserStatus oldStatus = entity.getStatus();
         entity.setStatus(cmd.status());
         UserJpaEntity updated = userRepository.save(entity);
+
+        String oldSnapshot = "{\"status\":\"" + oldStatus.name() + "\"}";
+        String newSnapshot = "{\"status\":\"" + updated.getStatus().name() + "\"}";
+
+        auditLogService.recordEvent(new RecordAuditEventCommand(
+                null,
+                null,
+                UUID.randomUUID(),
+                "USER",
+                userId,
+                "USER_STATUS_CHANGED",
+                "User status changed from " + oldStatus + " to " + updated.getStatus(),
+                oldSnapshot,
+                newSnapshot
+        ));
 
         List<ScopedRoleGrantDto> grants = grantRepository.findActiveGrantsByUserId(userId, LocalDate.now())
                 .stream()

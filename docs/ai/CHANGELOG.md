@@ -1,5 +1,35 @@
 # MTMS — File changes and decisions
 
+## 2026-11-16 — P0-SEC-02 audit event spine & activity log
+- **Authorization:** Owner approval to implement `P0-SEC-02` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-SEC-03`, `TC-041`, `03-branch-authorization.md`, `04-accounting-postings.md`.
+- **ADD:**
+  - `database/migrations/V005__create_audit_events.sql` (bảng `mtms.audit_events`, indices `idx_audit_target`, `idx_audit_branch`, `idx_audit_actor`).
+  - `backend/src/main/java/com/mtms/audit/domain/AuditEvent.java` (immutable domain entity with JSON snapshots).
+  - `backend/src/main/java/com/mtms/audit/domain/AuditEventRepository.java`.
+  - `backend/src/main/java/com/mtms/audit/infrastructure/persistence/AuditEventJpaEntity.java` (`@JdbcTypeCode(SqlTypes.JSON)` for JSONB mapping).
+  - `backend/src/main/java/com/mtms/audit/infrastructure/persistence/AuditEventJpaRepository.java`.
+  - `backend/src/main/java/com/mtms/audit/infrastructure/persistence/AuditEventRepositoryImpl.java`.
+  - `backend/src/main/java/com/mtms/audit/application/dto/AuditEventDto.java`, `RecordAuditEventCommand.java`.
+  - `backend/src/main/java/com/mtms/audit/application/AuditLogService.java` (append-only recordEvent, listEventsByBranch, listGlobalEvents, findByTarget).
+  - `backend/src/main/java/com/mtms/audit/web/AuditController.java` (`GET /api/v1/audit-events`, `GET /api/v1/branches/{id}/audit-events`, `GET /api/v1/audit-events/target`).
+  - `backend/src/test/java/com/mtms/audit/AuditIntegrationTest.java` (9 integration tests: record & query, JSON snapshot preservation, branch isolation 403, system admin access, non-admin 403, sensitive event hooks).
+  - `frontend/src/features/audit/types.ts`, `auditApi.ts`, `index.ts`.
+  - `frontend/src/features/audit/components/AuditLogTimeline.tsx` (timeline, smart filters, event badges, actor info, Before/After Snapshot visual diff view & raw JSON view, pagination).
+  - `docs/planning/P0_SEC_02_TASK_BRIEF.md`.
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/organization/application/BranchBankService.java` (hooked audit events: `BRANCH_ACTIVATED`, `BANK_ACCOUNT_ADDED`).
+  - `backend/src/main/java/com/mtms/identity/application/UserService.java` (hooked audit event: `USER_STATUS_CHANGED`).
+  - `backend/src/main/java/com/mtms/identity/application/ScopedPermissionService.java` (hooked audit events: `ROLE_GRANTED`, `ROLE_REVOKED`).
+  - `backend/src/test/java/com/mtms/arch/ModuleBoundaryTest.java` (included `audit` in ArchUnit boundary tests).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (added assertions for V005 audit events table, DDL, constraints).
+  - `frontend/src/features/organization/pages/OrganizationAdminPage.tsx` (integrated Tab 3 "Nhật ký kiểm toán" and quick audit jump button).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test`: 97 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run build`: Clean build in 21s, zero TypeScript errors.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-16 — P0-SEC-01 private evidence storage & TC-043 Signed URL branch boundary
 - **Authorization:** Owner approval to implement `P0-SEC-01` using parallel subagent coordination.
 - **Requirements & Rules:** `BR-SEC-01`, `TC-043`, `FE-P0-06`, `03-branch-authorization.md`, `08-sensitive-data.md`.

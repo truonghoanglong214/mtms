@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001, V002, V003, V004, V005) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(4);
-        assertThat(result.targetSchemaVersion).isIn("4", "004");
+        assertThat(result.migrationsExecuted).isEqualTo(5);
+        assertThat(result.targetSchemaVersion).isIn("5", "005");
     }
 
     @Test
@@ -617,6 +617,146 @@ class FlywayBaselineMigrationTest {
                 stmt.setString(8, "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
                 stmt.setString(9, "BRANCH_PRIVATE");
                 stmt.setObject(10, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(8)
+    @DisplayName("P0-SEC-02 / V005 Constraint verification: Audit events spine integrity & JSONB")
+    void testAuditEventsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+
+            // Insert business entity, branch, and user
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_AUDIT_TEST");
+                stmt.setString(3, "Audit Testing Entity");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_AUDIT_01");
+                stmt.setString(4, "Audit Branch 1");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "audit_actor@mtms.local");
+                stmt.setString(3, "$2a$12$dummyhash");
+                stmt.setString(4, "Audit Actor");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid audit event with JSONB snapshots
+            UUID eventId1 = UUID.randomUUID();
+            UUID correlationId = UUID.randomUUID();
+            UUID targetId = UUID.randomUUID();
+            String oldJson = "{\"status\":\"DRAFT\",\"name\":\"Old Name\"}";
+            String newJson = "{\"status\":\"ACTIVE\",\"name\":\"New Name\"}";
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.audit_events (id, branch_id, actor_user_id, correlation_id, target_type, target_id, event_name, action_reason, old_snapshot, new_snapshot) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?::jsonb)")) {
+                stmt.setObject(1, eventId1);
+                stmt.setObject(2, branchId);
+                stmt.setObject(3, userId);
+                stmt.setObject(4, correlationId);
+                stmt.setString(5, "BRANCH");
+                stmt.setObject(6, targetId);
+                stmt.setString(7, "BRANCH_ACTIVATED");
+                stmt.setString(8, "Onboarding completed");
+                stmt.setString(9, oldJson);
+                stmt.setString(10, newJson);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // Verify select & read JSONB
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT id, branch_id, actor_user_id, correlation_id, target_type, target_id, event_name, action_reason, old_snapshot::text, new_snapshot::text, occurred_at " +
+                    "FROM mtms.audit_events WHERE id = ?")) {
+                stmt.setObject(1, eventId1);
+                try (var rs = stmt.executeQuery()) {
+                    assertThat(rs.next()).isTrue();
+                    assertThat(rs.getObject("branch_id")).isEqualTo(branchId);
+                    assertThat(rs.getObject("actor_user_id")).isEqualTo(userId);
+                    assertThat(rs.getObject("correlation_id")).isEqualTo(correlationId);
+                    assertThat(rs.getString("target_type")).isEqualTo("BRANCH");
+                    assertThat(rs.getObject("target_id")).isEqualTo(targetId);
+                    assertThat(rs.getString("event_name")).isEqualTo("BRANCH_ACTIVATED");
+                    assertThat(rs.getString("action_reason")).isEqualTo("Onboarding completed");
+                    assertThat(rs.getString("old_snapshot")).contains("\"status\": \"DRAFT\"");
+                    assertThat(rs.getString("new_snapshot")).contains("\"status\": \"ACTIVE\"");
+                    assertThat(rs.getTimestamp("occurred_at")).isNotNull();
+                }
+            }
+
+            // 2. Insert valid system audit event (NULL branch_id, NULL actor_user_id)
+            UUID eventId2 = UUID.randomUUID();
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.audit_events (id, branch_id, actor_user_id, correlation_id, target_type, target_id, event_name, action_reason, old_snapshot, new_snapshot) " +
+                    "VALUES (?, NULL, NULL, NULL, ?, ?, ?, ?, NULL, NULL)")) {
+                stmt.setObject(1, eventId2);
+                stmt.setString(2, "SYSTEM");
+                stmt.setObject(3, UUID.randomUUID());
+                stmt.setString(4, "SYSTEM_INIT");
+                stmt.setString(5, "Automated bootstrap");
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 3. Reject invalid branch_id (FK constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.audit_events (id, branch_id, actor_user_id, target_type, target_id, event_name) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, UUID.randomUUID()); // nonexistent branch
+                stmt.setObject(3, userId);
+                stmt.setString(4, "BRANCH");
+                stmt.setObject(5, UUID.randomUUID());
+                stmt.setString(6, "BRANCH_UPDATED");
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Reject invalid actor_user_id (FK constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.audit_events (id, branch_id, actor_user_id, target_type, target_id, event_name) " +
+                    "VALUES (?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                stmt.setObject(3, UUID.randomUUID()); // nonexistent user
+                stmt.setString(4, "BRANCH");
+                stmt.setObject(5, UUID.randomUUID());
+                stmt.setString(6, "BRANCH_UPDATED");
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 5. Reject null target_type (NOT NULL constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.audit_events (id, branch_id, actor_user_id, target_type, target_id, event_name) " +
+                    "VALUES (?, ?, ?, NULL, ?, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                stmt.setObject(3, userId);
+                stmt.setObject(4, UUID.randomUUID());
+                stmt.setString(5, "TEST_EVENT");
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }
