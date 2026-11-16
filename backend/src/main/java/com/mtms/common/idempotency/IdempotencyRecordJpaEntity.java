@@ -37,6 +37,7 @@ public class IdempotencyRecordJpaEntity {
     @Column(name = "idempotency_key", length = 160, nullable = false)
     private String idempotencyKey;
 
+    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "request_hash", length = 64, nullable = false)
     private String requestHash;
 

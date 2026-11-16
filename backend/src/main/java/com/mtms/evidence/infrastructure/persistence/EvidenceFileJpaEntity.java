@@ -7,6 +7,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,6 +44,7 @@ public class EvidenceFileJpaEntity {
     @Column(name = "byte_size", nullable = false)
     private long byteSize;
 
+    @JdbcTypeCode(SqlTypes.CHAR)
     @Column(name = "checksum_sha256", nullable = false, length = 64)
     private String checksumSha256;
 
