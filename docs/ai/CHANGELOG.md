@@ -1,5 +1,453 @@
 # MTMS — File changes and decisions
 
+## 2026-11-20 — P0-HR-07, P0-HR-08 & P0-HR-09 Payroll payment recording, employee statement UI & integration validation (BR-HR-03, BR-HR-05, BR-HR-06, TC-015, TC-016, TC-017, FE-P0-22, FE-P0-23)
+- **Authorization:** Owner explicit approval on artifact `P0-HR-07-09-Implementation-Plan.md` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-HR-03`, `BR-HR-05`, `BR-HR-06`, `TC-015`, `TC-016`, `TC-017`, `FE-P0-22`, `FE-P0-23`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `08-sensitive-data.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-HR-07-09.md` (authoritative API contract for payroll payments, cash ledger linkage TC-016, bulk payroll payout, and employee payslip privacy guard TC-017).
+  - `database/migrations/V023__create_payroll_payments.sql` (bảng `mtms.payroll_payments` liên kết dòng lương `payroll_lines`, tài khoản quỹ `financial_accounts`, bút toán sổ quỹ `cash_ledger_entries`, chứng từ `evidence_files`, phương thức `CASH`/`BANK_TRANSFER`, và trạng thái `POSTED`/`REVERSED`).
+  - `backend/src/main/java/com/mtms/hr/domain/` (`PaymentMethod`, `PayrollPaymentStatus`, bổ sung các ngoại lệ domain RFC 7807: `PayrollPaymentExceedsRemainingException`, `PayrollNotApprovedException`, `PayrollPaymentNotFoundException` trong `HrExceptions.java`).
+  - `backend/src/main/java/com/mtms/hr/infrastructure/persistence/` (`PayrollPaymentJpaEntity`, `PayrollPaymentJpaRepository`).
+  - `backend/src/main/java/com/mtms/hr/application/` (`PayrollPaymentDtos` gồm commands chi trả đơn/hàng loạt, `PayslipDto`; `PayrollPaymentService` thực thi chi lương từng phần/tất toán, khóa bi quan chống chi âm quỹ, liên kết `CashLedgerService.postLedgerEntry` với danh mục `PAY_SALARY` bảo đảm bất biến **TC-016**: kỳ chi phí tháng 11, ngày thực chi tháng 12 trừ số dư tháng 12 và không sửa hồi tố số dư tháng 11; bảo mật phiếu lương cá nhân **TC-017**).
+  - `backend/src/main/java/com/mtms/hr/web/PayrollPaymentController.java` (REST API chi trả lương đơn/hàng loạt, lịch sử chi trả và tra cứu phiếu lương cá nhân).
+  - `backend/src/test/java/com/mtms/hr/PayrollPaymentAndLifecycleIntegrationTest.java` (8 integration tests chứng minh: thanh toán từng phần & tất toán, chặn chi vượt lương nợ 400, chặn chi khi bảng lương DRAFT 400, **TC-016 hạch toán chi phí vs xuất quỹ**, chặn chi âm quỹ 400, chi lương hàng loạt, bảo mật phiếu lương cá nhân TC-017, cô lập chi nhánh 403).
+  - `frontend/src/features/hr/types/payment.types.ts` (TypeScript types, badges tiến độ thanh toán PAID, PARTIALLY_PAID, UNPAID).
+  - `frontend/src/features/hr/api/paymentApi.ts` (5 API client endpoints chi trả lương và tra cứu phiếu lương).
+  - `frontend/src/features/hr/components/` (`PaySalaryModal.tsx` chi lương từng nhân viên đối chiếu số dư khả dụng, `BulkPaySalaryModal.tsx` chi lương hàng loạt cả kỳ, `PaymentHistoryModal.tsx` lịch sử nhận tiền kèm mã bút toán sổ quỹ, `EmployeePayslipModal.tsx` phiếu lương chuẩn F&B in ấn chuyên nghiệp).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 23, bổ sung test ràng buộc V023).
+  - `backend/src/main/java/com/mtms/hr/web/HrExceptionHandler.java` (đăng ký mã lỗi RFC 7807: `payroll-payment-exceeds-remaining`, `payroll-not-approved`, `insufficient-funds`).
+  - `frontend/src/features/hr/components/PayrollLinesTable.tsx` (thêm cột Đã chi, Còn nợ, Tiến độ, nút Chi lương, Lịch sử, Phiếu lương).
+  - `frontend/src/features/hr/pages/PayrollManagementPage.tsx` (thêm thẻ KPI Đã thanh toán, Còn nợ lại, nút Chi trả lương hàng loạt).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 302 tests run, 0 failures, 0 errors, 26 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 17.12s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-19 — P0-HR-05 & P0-HR-06 Payroll calculation engine, approval & invariant snapshots (BR-HR-04, BR-HR-05, BR-HR-10, TC-013, TC-014, TC-015, TC-017, FE-P0-20, FE-P0-21)
+- **Authorization:** Owner explicit approval on artifact `P0-HR-05-06-Implementation-Plan.md` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-HR-04`, `BR-HR-05`, `BR-HR-10`, `TC-013`, `TC-014`, `TC-015`, `TC-017`, `FE-P0-20`, `FE-P0-21`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `08-sensitive-data.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-HR-05-06.md` (authoritative API contract for payroll calculation engine, midmonth wage slices TC-013, monthly proration TC-014, primary branch allocation TC-015, and immutable snapshots TC-017).
+  - `database/migrations/V022__create_payroll_periods_lines_and_adjustments.sql` (bảng `mtms.payroll_periods` ràng buộc `CHECK (EXTRACT(DAY FROM month_start) = 1)`, unique `(branch_id, month_start, revision)`, partial unique index `uq_payroll_period_current`; bảng `mtms.payroll_lines` lưu snapshot JSONB `policy_snapshot` và `calculation_snapshot`, ràng buộc `paid_amount <= gross_salary`, unique `(payroll_period_id, employee_id)`; bảng `mtms.payroll_adjustments` lưu các khoản phụ cấp, thưởng, phạt, tạm ứng với ràng buộc `signed_amount <> 0`).
+  - `backend/src/main/java/com/mtms/hr/domain/` (`PayrollPeriodStatus`, `AdjustmentCode`, bổ sung `PayrollPeriodNotFoundException`, `PayrollLineNotFoundException`, `PayrollAdjustmentNotFoundException`, `PayrollAlreadyApprovedException`, `InvalidPayrollDataException` trong `HrExceptions.java`).
+  - `backend/src/main/java/com/mtms/hr/infrastructure/persistence/` (`PayrollPeriodJpaEntity`, `PayrollLineJpaEntity` ánh xạ JSONB qua `@JdbcTypeCode`, `PayrollAdjustmentJpaEntity`, và các repositories tra cứu liên kết).
+  - `backend/src/main/java/com/mtms/hr/application/` (`PayrollDtos` gồm DTOs dòng lương, phân rã lát ngày `RateSliceDto`, snapshot JSONB, commands tính lại và điều chỉnh; `PayrollService` thực thi engine tính lương đa lát **TC-013** không hồi tố, quy đổi lương tháng **TC-014** theo ngày công chuẩn 26 ngày, phân bổ chi phí về chi nhánh chính cuối tháng **TC-015**, và kiểm soát bất biến **TC-017**: chỉ Owner/Admin mới được duyệt bảng lương, Quản lý bị chặn 403 Forbidden).
+  - `backend/src/main/java/com/mtms/hr/web/PayrollController.java` (REST API tại `/api/v1/branches/{branchId}/hr/payroll-periods` bảo vệ bằng `@PreAuthorize("@branchAuth.hasBranchAccess(#branchId)")`).
+  - `backend/src/test/java/com/mtms/hr/PayrollEngineIntegrationTest.java` (7 integration tests chứng minh: **TC-013** 50h@22k + 50h@25k = 2.350.000đ, **TC-014** 7.000.000 * 13 / 26 = 3.500.000đ, **TC-015** điều chuyển chi nhánh gánh toàn bộ chi phí tại CN cuối tháng, thêm/xóa điều chỉnh thủ công, **TC-017** Quản lý bị chặn duyệt bảng lương 403 / Chủ quán duyệt 200 OK, chặn sửa/tính lại bảng lương đã duyệt 409, cô lập chi nhánh 403).
+  - `frontend/src/features/hr/types/payroll.types.ts` (TypeScript types, interfaces, dictionaries và badge metadata cho bảng lương và khoản điều chỉnh).
+  - `frontend/src/features/hr/api/payrollApi.ts` (6 API client endpoints quản lý bảng lương và điều chỉnh).
+  - `frontend/src/features/hr/components/` (`PayrollLinesTable.tsx`, `CreateAdjustmentModal.tsx`, `CalculationDetailModal.tsx` trực quan hóa công thức TC-013 và TC-014, `ApprovePayrollModal.tsx` với bảo vệ vai trò Owner TC-017).
+  - `frontend/src/features/hr/pages/PayrollManagementPage.tsx` (trang điều hành bảng lương với 4 thẻ KPI, nút recalculate, nút duyệt chốt và bảng chi tiết).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 22, bổ sung test ràng buộc V022).
+  - `backend/src/main/java/com/mtms/hr/web/HrExceptionHandler.java` (đăng ký mã lỗi RFC 7807: `payroll-not-found`, `payroll-already-approved`, `invalid-payroll-data`).
+  - `frontend/src/app/router.tsx` (bổ sung route `/hr/payroll`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Bảng lương & Phê duyệt (TC-013/014)").
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 293 tests run, 0 failures, 0 errors, 25 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 8.69s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-19 — P0-HR-03 & P0-HR-04 Approved hours input & paid-time review UI (BR-HR-02, TC-013, TC-017, FE-P0-19)
+- **Authorization:** Owner explicit approval on artifact `P0-HR-03-04-Implementation-Plan.md` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-HR-02`, `TC-013`, `TC-017`, `FE-P0-19`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `08-sensitive-data.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-HR-03-04.md` (authoritative API contract for approved hours input, bulk entry, paid-time review queue, and strict TC-017 no self-approval enforcement).
+  - `database/migrations/V021__create_timesheet_entries.sql` (bảng `mtms.timesheet_entries` với `UNIQUE (employee_id, branch_id, work_date)`, các ràng buộc `approved_minutes >= 0`, `payable_workdays >= 0`, trạng thái `DRAFT`, `SUBMITTED`, `APPROVED`, `REJECTED`, các indexes tối ưu cho truy vấn lọc ngày, nhân viên và trạng thái duyệt).
+  - `backend/src/main/java/com/mtms/hr/domain/` (`TimesheetStatus`, `TimesheetSourceType`, bổ sung `SelfApprovalDeniedException`, `TimesheetNotFoundException`, `InvalidTimesheetDataException`, `TimesheetAlreadyApprovedException` trong `HrExceptions.java`).
+  - `backend/src/main/java/com/mtms/hr/infrastructure/persistence/` (`TimesheetEntryJpaEntity`, `TimesheetEntryJpaRepository` với các truy vấn tra cứu phân trang, bộ lọc linh hoạt và báo cáo tổng hợp tháng).
+  - `backend/src/main/java/com/mtms/hr/application/` (`TimesheetDtos` bao gồm commands nhập đơn/hàng loạt, duyệt đơn/hàng loạt, DTOs chi tiết và `MonthlyTimesheetSummaryDto`; `TimesheetService` quản lý nhập liệu công, tính tổng hợp tháng, và thực thi bất biến cốt lõi **TC-017**: Quản lý cố tình duyệt công của chính tài khoản mình bị từ chối `403 Forbidden` `urn:mtms:error:self-approval-denied`, công của Quản lý bắt buộc do Chủ quán hoặc Admin duyệt).
+  - `backend/src/main/java/com/mtms/hr/web/TimesheetController.java` (REST API tại `/api/v1/branches/{branchId}/hr/timesheets` bao gồm các endpoints: danh sách lọc phân trang, `/monthly-summary`, tạo đơn, `/bulk`, `/{id}/approve`, `/bulk-approve`, `/{id}/reject`).
+  - `backend/src/test/java/com/mtms/hr/TimesheetIntegrationTest.java` (11 integration tests chứng minh toàn diện: tạo/sửa nháp, nhập hàng loạt theo ca, Quản lý duyệt cấp dưới, **TC-017 Quản lý tự duyệt bị chặn 403**, **TC-017 Quản lý kẹp công mình duyệt hàng loạt bị chặn**, **TC-017 Chủ quán duyệt Quản lý thành công 200**, từ chối kèm lý do, chặn sửa bản ghi đã duyệt 409, chặn phút âm, báo cáo tổng hợp tháng và cô lập chi nhánh).
+  - `frontend/src/features/hr/types/timesheet.types.ts` (TypeScript types, interfaces, dictionaries và badge metadata cho trạng thái chấm công).
+  - `frontend/src/features/hr/api/timesheetApi.ts` (7 API client endpoints và các helper formatters giờ/công).
+  - `frontend/src/features/hr/components/` (`TimesheetReviewQueueTab.tsx` hàng đợi duyệt công có checkbox duyệt hàng loạt và đánh dấu TC-017, `TimesheetGridTab.tsx` ma trận chấm công cả tháng trực quan, `CreateTimesheetModal.tsx`, `BulkTimesheetModal.tsx` chấm công nhanh cả ca có phím tắt 8h/4h/6h, `TimesheetApprovalModal.tsx`).
+  - `frontend/src/features/hr/pages/TimesheetManagementPage.tsx` (trang quản lý chấm công với 4 thẻ KPI tóm tắt, banner cảnh báo TC-017, và 2 tabs Review Queue & Timesheet Matrix).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 21, bổ sung test ràng buộc V021).
+  - `backend/src/main/java/com/mtms/hr/web/HrExceptionHandler.java` (đăng ký mã lỗi RFC 7807 cho timesheets, đặc biệt `urn:mtms:error:self-approval-denied`).
+  - `frontend/src/app/router.tsx` (bổ sung route `/hr/timesheets`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Chấm công & Giờ làm (TC-017)").
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 285 tests run, 0 failures, 0 errors, 24 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 8.69s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-19 — P0-HR-01 & P0-HR-02 Workforce directory, branch assignments & effective salary policies (BR-HR-01, BR-HR-03, TC-013, TC-015, FE-P0-17, FE-P0-18)
+- **Authorization:** Owner explicit approval on artifact `P0-HR-01-02-Implementation-Plan.md` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-HR-01`, `BR-HR-03`, `TC-013`, `TC-015`, `FE-P0-17`, `FE-P0-18`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `08-sensitive-data.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-HR-01-02.md` (authoritative API contract for workforce directory, branch assignments history, and effective salary policies).
+  - `database/migrations/V020__create_employees_assignments_and_salary_policies.sql` (bảng `mtms.employees` với `staff_code` UNIQUE, `status` CHECK, `left_on >= hired_on` CHECK; bảng `mtms.employee_assignments` lưu lịch sử phân bổ chi nhánh kèm `is_primary` và `effective_to >= effective_from` CHECK; bảng `mtms.salary_policies` lưu chính sách lương `HOURLY`/`MONTHLY`, đơn giá, ngày công chuẩn, khối làm tròn, và mốc thời gian hiệu lực `effective_to >= effective_from`).
+  - `backend/src/main/java/com/mtms/hr/domain/` (`EmployeeStatus`, `RateType`, `HrExceptions` với các ngoại lệ domain RFC 7807).
+  - `backend/src/main/java/com/mtms/hr/infrastructure/persistence/` (`EmployeeJpaEntity`, `EmployeeAssignmentJpaEntity`, `SalaryPolicyJpaEntity`, `EmployeeJpaRepository`, `EmployeeAssignmentJpaRepository`, `SalaryPolicyJpaRepository`).
+  - `backend/src/main/java/com/mtms/hr/application/` (`HrDtos`, `EmployeeService` quản lý hồ sơ nhân viên, tự động gán phân bổ chi nhánh ban đầu, điều chuyển chi nhánh chính TC-015; `SalaryPolicyService` quản lý chính sách lương đa mốc thời gian TC-013, truy vấn chính sách hiệu lực theo ngày).
+  - `backend/src/main/java/com/mtms/hr/web/` (`EmployeeController`, `SalaryPolicyController`, `HrExceptionHandler` chuyển ngữ RFC 7807 problem details).
+  - `backend/src/test/java/com/mtms/hr/EmployeeAndSalaryPolicyIntegrationTest.java` (10 integration tests chứng minh toàn diện: tạo nhân sự, chặn trùng mã, chặn ngày nghỉ việc trước ngày vào làm, TC-015 điều chuyển chi nhánh chính, TC-013 cắt lát lương giữa tháng không hồi tố, lương tháng với công chuẩn, chặn số âm, phân quyền cô lập chi nhánh).
+  - `frontend/src/features/hr/types/hr.types.ts` (TypeScript types, interfaces, dictionaries và badge metadata tiếng Việt).
+  - `frontend/src/features/hr/api/hrApi.ts` (8 API client endpoints quản lý nhân sự, phân bổ chi nhánh và chính sách lương).
+  - `frontend/src/features/hr/components/` (`EmployeeListTab.tsx`, `CreateEmployeeModal.tsx`, `EditEmployeeModal.tsx`, `AssignBranchModal.tsx`, `SalaryPolicyModal.tsx`, `EmployeeDetailDrawer.tsx`).
+  - `frontend/src/features/hr/pages/EmployeeManagementPage.tsx` (trang quản lý nhân sự với 4 thẻ KPI, bảng nhân viên và tích hợp toàn diện các Modal/Drawer).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 20, bổ sung test ràng buộc V020).
+  - `frontend/src/app/router.tsx` (bổ sung route `/hr/employees` và alias `/hr`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Hồ sơ Nhân sự & Lương (P0-HR)").
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 273 tests run, 0 failures, 0 errors, 23 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 8.58s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-19 — P0-FIN-08 Opening balances import & cutover batch (BR-FIN-08, GAP-01, ADR-009, FE-P0-16, TC-017)
+- **Authorization:** Owner explicit approval to implement `P0-FIN-08` / `BR-FIN-08` / `GAP-01` / `ADR-009` / `FE-P0-16` / `TC-017` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-FIN-08`, `GAP-01`, `ADR-009`, `FE-P0-16`, `TC-017`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-FIN-08.md` (authoritative API contract for opening balances cutover batch, Net Working Capital calculation, and immutable ledger posting).
+  - `database/migrations/V019__create_opening_balance_batches.sql` (bảng `mtms.opening_balance_batches` lưu thông tin đợt chốt chuyển giao cutover, ngày cutover, trạng thái `DRAFT` / `POSTED`, snapshot JSONB tổng tài sản lưu động ròng Net Working Capital, ràng buộc `UNIQUE (branch_id)`; bảng `mtms.opening_account_balances` lưu số dư tiền mặt/ngân hàng từng tài khoản; seed danh mục hệ thống `OPENING_BALANCE` nhóm `CAPITAL_FLOW` / `INFLOW`).
+  - `backend/src/main/java/com/mtms/finance/domain/` (`OpeningBatchStatus`, `OpeningBatchNotFoundException`, `OpeningBatchAlreadyExistsException`, `OpeningBatchAlreadyPostedException`, `InvalidOpeningBatchStatusException`, `InvalidCutoverDateException`).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/` (`OpeningBalanceBatchJpaEntity`, `OpeningBalanceBatchJpaRepository` với khóa bi quan và tìm kiếm theo chi nhánh; `OpeningAccountBalanceJpaEntity`, `OpeningAccountBalanceJpaRepository`).
+  - `backend/src/main/java/com/mtms/finance/application/OpeningBalanceService.java` (lập đợt cutover số dư đầu kỳ từ hệ thống cũ, tổng hợp 5 trụ cột tài chính: Tiền mặt, Ngân hàng, Tồn kho vật tư, Công nợ NCC, Khoản phải thu khác, Nghĩa vụ thuế, tính Net Working Capital, lưu snapshot JSONB, và ghi nhận `POSTED` vĩnh viễn sinh bút toán `INFLOW` danh mục `OPENING_BALANCE` vào sổ quỹ dưới khóa bi quan).
+  - `backend/src/main/java/com/mtms/finance/web/OpeningBalanceController.java` (`POST /api/v1/branches/{branchId}/opening-balances`, `GET /api/v1/branches/{branchId}/opening-balances`, `POST /api/v1/branches/{branchId}/opening-balances/{id}/post`).
+  - `backend/src/test/java/com/mtms/finance/OpeningBalanceIntegrationTest.java` (11 integration tests chứng minh toàn diện vòng đời cutover: tạo batch, tính toán đúng Net Working Capital, khóa vĩnh viễn khi POSTED, sinh đúng bút toán sổ quỹ, chặn sửa/xóa sau khi post, chặn tạo 2 batch cho 1 chi nhánh, chặn số âm, và cô lập chi nhánh).
+  - `frontend/src/features/finance/components/OpeningBalancesTab.tsx` (Tab 7 số dư đầu kỳ với giao diện kép Dual-View: Wizard nhập liệu đa bước cho đợt DRAFT / chi nhánh mới và Dashboard chứng nhận số dư chốt sổ cho đợt POSTED kèm công thức Vốn lưu động ròng).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 19, bổ sung kiểm tra schema bảng V019).
+  - `backend/src/main/java/com/mtms/finance/domain/SourceType.java` (thêm `OPENING_BALANCE`).
+  - `backend/src/main/java/com/mtms/finance/web/FinanceExceptionHandler.java` (đăng ký các mã lỗi RFC 7807 cho opening cutover batches).
+  - `frontend/src/features/finance/types/finance.types.ts` (thêm types, DTOs và badges cho số dư đầu kỳ).
+  - `frontend/src/features/finance/api/financeApi.ts` (thêm 3 endpoints API client quản lý đợt cutover số dư đầu kỳ).
+  - `frontend/src/features/finance/pages/FinancePage.tsx` (tích hợp Tab 7 "Số dư đầu kỳ" với icon `FolderArchive` và badge BR-FIN-08 / GAP-01).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 262 tests run, 0 failures, 0 errors, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 10.01s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-19 — P0-FIN-07 Tax manual obligations (BR-FIN-04, TC-012, FE-P0-15)
+- **Authorization:** Owner explicit approval to implement `P0-FIN-07` / `BR-FIN-04` / `TC-012` / `FE-P0-15` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-FIN-04`, `TC-012`, `FE-P0-15`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-FIN-07.md` (authoritative API contract for tax manual obligations and state budget payments).
+  - `database/migrations/V018__create_tax_obligations_and_payments.sql` (cập nhật check constraint `source_type` trên `mtms.cash_ledger_entries` cho phép `'TAX_PAYMENT'`; seed danh mục hệ thống `TAX_PAYMENT` nhóm `OTHER` / `OUTFLOW`; tạo bảng `mtms.entity_tax_obligations` với ràng buộc toán học `amount_paid <= amount_due`, `tax_period_end >= tax_period_start`, unique theo pháp nhân và mã nghĩa vụ thuế; tạo bảng `mtms.tax_payments` theo dõi từng đợt nộp thuế kèm chứng từ nộp NSNN/UNC và khóa ngoại tới sổ quỹ).
+  - `backend/src/main/java/com/mtms/finance/domain/` (`TaxObligationType`, `TaxObligationStatus`, exceptions `TaxObligationNotFoundException`, `TaxObligationAlreadyExistsException`, `TaxPaymentExceedsRemainingLiabilityException`, `TaxObligationAlreadyPaidException`, `TaxObligationCancelledException`, `CannotCancelPaidTaxException`).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/` (`EntityTaxObligationJpaEntity`, `EntityTaxObligationJpaRepository` với khóa bi quan và truy vấn theo chi nhánh/pháp nhân; `TaxPaymentJpaEntity`, `TaxPaymentJpaRepository`).
+  - `backend/src/main/java/com/mtms/finance/application/` (`TaxObligationService` quản lý khai báo nghĩa vụ thuế thủ công không thuật toán giả mạo, trích tiền nộp thuế từng phần/toàn bộ qua `CashLedgerService.postLedgerEntry` ghi nhận `TAX_PAYMENT` không đúp chi phí hay ảnh hưởng tồn kho, hủy nghĩa vụ chưa nộp).
+  - `backend/src/main/java/com/mtms/finance/web/TaxObligationController.java` (`GET`, `POST /tax-obligations`, `GET /{id}`, `POST /{id}/pay`, `POST /{id}/cancel`).
+  - `backend/src/test/java/com/mtms/finance/TaxObligationIntegrationTest.java` (8 integration tests chứng minh vòng đời khai báo thuế, thanh toán từng phần, thanh toán tất toán, chặn nộp thừa, chặn hủy sai trạng thái, chặn trùng mã, và cô lập chi nhánh/pháp nhân).
+  - `frontend/src/features/finance/components/TaxObligationsTab.tsx` (Tab 6 nghĩa vụ thuế với 4 thẻ KPI, bộ lọc loại thuế/kỳ tính thuế/trạng thái, bảng danh sách nghĩa vụ thuế và nút hành động).
+  - `frontend/src/features/finance/components/CreateTaxObligationModal.tsx` (Modal khai báo nghĩa vụ thuế với bộ sinh mã gợi ý, chọn kỳ tính thuế, phạm vi chi nhánh/pháp nhân, đính kèm tờ khai/thông báo).
+  - `frontend/src/features/finance/components/PayTaxModal.tsx` (Modal nộp tiền vào NSNN với kiểm tra số dư tài khoản quỹ và cảnh báo thiếu tiền).
+  - `frontend/src/features/finance/components/TaxObligationDetailModal.tsx` (Modal chi tiết nghĩa vụ thuế và lịch sử các đợt nộp tiền kèm liên kết chứng từ UNC).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 18, bổ sung test ràng buộc V018).
+  - `backend/src/main/java/com/mtms/finance/domain/SourceType.java` (thêm `TAX_PAYMENT`).
+  - `backend/src/main/java/com/mtms/finance/web/FinanceExceptionHandler.java` (đăng ký các mã lỗi RFC 7807 cho tax obligations).
+  - `frontend/src/features/finance/types/finance.types.ts` (thêm types, labels và badges cho nghĩa vụ thuế).
+  - `frontend/src/features/finance/api/financeApi.ts` (thêm 5 endpoints API client quản lý nghĩa vụ thuế).
+  - `frontend/src/features/finance/pages/FinancePage.tsx` (tích hợp Tab 6 "Nghĩa vụ thuế & Ngân sách" với icon `Landmark` và badge BR-FIN-04 / FE-P0-15).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 250 tests run, 0 failures, 0 errors, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 8.93s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-18 — P0-FIN-06 Cash/bank reconciliation (BR-FIN-06, TC-012, FE-P0-14)
+- **Authorization:** Owner explicit approval to implement `P0-FIN-06` / `BR-FIN-06` / `TC-012` / `FE-P0-14` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-FIN-06`, `TC-012`, `FE-P0-14`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-FIN-06.md` (authoritative API contract for cash and bank account reconciliation snapshots, variances, explanations, and authorized adjustments).
+  - `database/migrations/V017__create_cash_reconciliations.sql` (bảng `mtms.cash_reconciliations` lưu snapshot số dư sổ sách `recorded_balance`, số kiểm kê thực tế `observed_balance`, chênh lệch `variance_amount = observed_balance - recorded_balance`, trạng thái `OPEN`, `EXPLAINED`, `ADJUSTED`, `CLOSED`, ràng buộc toán học, unique theo ngày và tài khoản; seed 2 danh mục hệ thống `ADJ_SURPLUS` và `ADJ_SHORTAGE`).
+  - `backend/src/main/java/com/mtms/finance/domain/` (`ReconciliationDisposition`, `ReconciliationNotFoundException`, `ReconciliationAlreadyExistsException`, `ReconciliationAlreadyAdjustedException`, `NoVarianceToAdjustException`, `InvalidReconciliationStatusException`).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/` (`CashReconciliationJpaEntity`, `CashReconciliationJpaRepository` với khóa bi quan và tìm kiếm phân trang).
+  - `backend/src/main/java/com/mtms/finance/application/` (`CashReconciliationService` lập snapshot kiểm kê, tính toán chênh lệch, bảo đảm TC-012 bất biến không xóa dấu vết chênh lệch, giải trình, duyệt điều chỉnh quỹ `ADJUSTED` sinh bút toán vào `CashLedgerService` dưới khóa bi quan, và đóng đối soát).
+  - `backend/src/main/java/com/mtms/finance/web/CashReconciliationController.java` (`GET`, `POST /reconciliations`, `POST /{id}/explain`, `POST /{id}/adjust`, `POST /{id}/close`).
+  - `backend/src/test/java/com/mtms/finance/CashReconciliationIntegrationTest.java` (8 integration tests chứng minh toàn diện TC-012: chênh lệch thiếu ghi nhận OUTFLOW, chênh lệch thừa ghi nhận INFLOW, chặn tái điều chỉnh, chặn trùng ngày, chặn vượt quyền).
+  - `frontend/src/features/finance/components/ReconciliationTab.tsx` (Tab 5 đối soát quỹ với 3 KPI thẻ thống kê, bộ lọc tài khoản/trạng thái/thời gian, bảng đối soát với cảnh báo chênh lệch màu và nút hành động).
+  - `frontend/src/features/finance/components/CreateReconciliationModal.tsx` (Modal lập đợt kiểm kê với tính toán chênh lệch trực tiếp theo thời gian thực và cảnh báo TC-012, đính kèm biên bản/sao kê).
+  - `frontend/src/features/finance/components/ExplainDiscrepancyModal.tsx` (Modal giải trình chênh lệch quỹ).
+  - `frontend/src/features/finance/components/AdjustVarianceModal.tsx` (Modal phê duyệt điều chỉnh sổ quỹ dành riêng cho Chủ quán/Owner).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 17, bổ sung kiểm tra ràng buộc V017).
+  - `backend/src/main/java/com/mtms/finance/web/FinanceExceptionHandler.java` (đăng ký các mã lỗi RFC 7807 cho reconciliation).
+  - `frontend/src/features/finance/types/finance.types.ts` (thêm types và disposition badges).
+  - `frontend/src/features/finance/api/financeApi.ts` (thêm 6 endpoints API client đối soát quỹ).
+  - `frontend/src/features/finance/pages/FinancePage.tsx` (tích hợp Tab 5 "Kiểm kê & Đối soát quỹ" với icon `Scale` và badge TC-012 / FE-P0-14).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 241 tests run, 0 failures, 0 errors, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 11.55s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
+## 2026-11-18 — P0-FIN-03 & P0-FIN-04 expense model, approval & mobile entry UI
+- **Authorization:** Owner explicit approval to implement `P0-FIN-03` / `P0-FIN-04` / `FE-P0-12` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-FIN-07`, `BR-FIN-01`, `TC-011`, `FE-P0-12`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-FIN-03-04.md` (authoritative single-source-of-truth contract for operating expense model, approvals and mobile entry UI).
+  - `database/migrations/V016__create_expenses_and_approval.sql` (bảng `mtms.branch_expense_configs` cấu hình hạn mức cảnh báo 2M và hạn mức đính kèm hóa đơn 500k; `mtms.expenses` quản lý phiếu chi với mã code duy nhất, cờ `review_flag`, liên kết tài khoản thanh toán hoặc nợ phải trả `mtms.payables`, bằng chứng chứng từ).
+  - `backend/src/main/java/com/mtms/finance/domain/` (`Expense`, `ExpenseStatus`, `BranchExpenseConfig`, exceptions `InvalidExpenseCategoryException`, `ExpenseAlreadyConfirmedException`, `ExpenseAlreadyVoidedException`, `ExpenseNotFoundException`).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/` (`ExpenseJpaEntity`, `BranchExpenseConfigJpaEntity`, repositories có khóa bi quan và bộ sinh mã phiếu chi).
+  - `backend/src/main/java/com/mtms/finance/application/` (`ExpenseService` kiểm tra danh mục OPEX, tự động phát hiện cảnh báo chi tiêu lớn `review_flag = true`, trừ tiền quỹ qua `CashLedgerService.postLedgerEntry` dưới khóa bi quan khi thanh toán ngay hoặc ghi nợ vào `mtms.payables` khi chưa thanh toán, xử lý hủy phiếu chi hoàn tiền đảo bút toán).
+  - `backend/src/main/java/com/mtms/finance/web/ExpenseController.java` (`GET /expenses`, `POST /expenses`, `GET /expenses/{id}`, `POST /expenses/{id}/confirm`, `POST /expenses/{id}/void`, config endpoints).
+  - `backend/src/test/java/com/mtms/finance/web/ExpenseIntegrationTest.java` (8 integration tests: chi phí tiền mặt OPEX giảm quỹ và không có review flag; chi phí lớn 3.5M kích hoạt `review_flag = true`; chi phí ghi nợ tạo `mtms.payables` và giữ nguyên quỹ tiền; hủy phiếu chi hoàn tiền lại quỹ và đảo bút toán; chặn danh mục ngoài OPEX 400 Bad Request; chặn chi vượt số dư quỹ 400; chặn truy cập trái phép 403 Forbidden; cấu hình hạn mức chi nhánh).
+  - `frontend/src/features/finance/components/` (`OperatingExpensesTab.tsx` 4 thẻ KPI chi phí, bộ lọc đa tiêu chí và bảng phiếu chi; `CreateExpenseModal.tsx` form tối ưu di động kèm cảnh báo hạn mức realtime và tải hóa đơn `EvidenceDropzone`; `ExpenseDetailModal.tsx` xem chi tiết, bằng chứng, bút toán sổ quỹ liên kết và hủy phiếu chi).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V016 và kiểm tra ràng buộc DB mới).
+  - `backend/src/main/java/com/mtms/finance/web/FinanceExceptionHandler.java` (mapping các mã lỗi RFC 7807 mới).
+  - `frontend/src/features/finance/types/finance.types.ts` & `frontend/src/features/finance/api/financeApi.ts` (mở rộng types và client API).
+  - `frontend/src/features/finance/pages/FinancePage.tsx` (tích hợp Tab 2 "Chi phí Vận hành (OPEX - FE-P0-12)").
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `ExpenseIntegrationTest`: 8/8 passed (100% green).
+  - `FlywayBaselineMigrationTest`: 19/19 passed.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công bundle trong 11.95s).
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS 100%.
+  - `TC-011` Tests: PASS.
+
+## 2026-11-18 — P0-FIN-05 payable/receivable ledger & partial debt settlement
+- **Authorization:** Owner explicit approval to implement `P0-FIN-05` / `FE-P0-13` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-FIN-02`, `TC-009`, `TC-008`, `TC-011`, `FE-P0-13`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-FIN-05.md` (authoritative single-source-of-truth contract for payables/receivables ledger and partial debt settlement).
+  - `database/migrations/V015__create_payable_payments_and_receivables.sql` (bảng `mtms.payable_payments`, `mtms.receivables`, `mtms.receivable_receipts`; mở rộng ràng buộc loại nguồn `RECEIVABLE_RECEIPT`; seed danh mục hệ thống `REC_OTHER`).
+  - `backend/src/main/java/com/mtms/finance/domain/` (`PayablePayment`, `PaymentMethod`, `Receivable`, `ReceivableReceipt`, `ReceivableStatus`, exceptions `PaymentExceedsRemainingDebtException`, `PayableAlreadySettledException`, `PayableNotFoundException`, `ReceivableNotFoundException`, `ReceiptExceedsRemainingReceivableException`).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/` (`PayablePaymentJpaEntity`, `ReceivableJpaEntity`, `ReceivableReceiptJpaEntity`, repositories kèm khóa bi quan `findByIdForUpdate` trên `PayableJpaRepository` và `ReceivableJpaRepository`).
+  - `backend/src/main/java/com/mtms/finance/application/` (`PayableSettlementService` xử lý thanh toán nợ từng đợt có khóa bi quan, đồng bộ trạng thái `payment_status` trên phiếu nhập kho, ghi sổ dòng tiền giảm quỹ danh mục `DEBT_SUPPLIER` đảm bảo **TC-009 No Double Cost**; `ReceivableService` quản lý phải thu khác và thu tiền nộp quỹ; DTOs/Commands).
+  - `backend/src/main/java/com/mtms/finance/web/` (`PayableController`, `ReceivableController`, `FinanceExceptionHandler` mapping RFC 7807 problem details 400/404/409).
+  - `backend/src/test/java/com/mtms/finance/web/PayableSettlementIntegrationTest.java` (7 integration tests: **TC-009** thanh toán 2 đợt phiếu nhập kho nợ 5M làm giảm tiền mặt/ngân hàng và giảm nợ, không phát sinh chi phí OPEX/COGS kép; chặn trả vượt nợ 400 Bad Request; chặn trả vào nợ đã tất toán 400; chặn âm quỹ tiền mặt 400; chặn truy cập trái phép 403 Forbidden; tạo và quản lý nợ thủ công; vòng đời công nợ phải thu và thu tiền).
+  - `frontend/src/features/finance/components/` (`PayablesLedgerTab.tsx` 3 thẻ KPI công nợ, thanh % tiến độ trả nợ; `PayDebtModal.tsx` modal thanh toán nợ có chọn nhanh số tiền, đính kèm UNC `EvidenceDropzone` và banner giải trình TC-009; `PayableDetailModal.tsx` xem chi tiết và lịch sử các đợt thanh toán; `CreatePayableModal.tsx` tạo nợ thủ công; `ReceivablesLedgerTab.tsx` quản lý phải thu khác).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V015 và kiểm tra ràng buộc DB mới).
+  - `frontend/src/features/finance/types/finance.types.ts` & `frontend/src/features/finance/api/financeApi.ts` (mở rộng types và client API).
+  - `frontend/src/features/finance/pages/FinancePage.tsx` (tích hợp 3 tabs: Sổ quỹ, Sổ nợ NCC, Sổ phải thu khác).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `PayableSettlementIntegrationTest`: 7/7 passed (100% green).
+  - `FlywayBaselineMigrationTest`: 18/18 passed.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công bundle).
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS 100%.
+  - `TC-009`, `TC-008`, `TC-011` Tests: PASS.
+
+## 2026-11-17 — P0-REV-05 revenue cash linkage & TC-007 delivery app net separation
+- **Authorization:** Owner explicit approval to implement `P0-REV-05` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-REV-04`, `TC-007`, `TC-006`, `TC-011`, `00-product-boundary.md` (NO POS & aggregate daily revenue), `01-financial-data-safety.md` (Delivery App NET separation from bank cash), `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-REV-05.md` (authoritative single-source-of-truth contract for revenue cash linkage and TC-007 app net isolation).
+  - `backend/src/main/java/com/mtms/finance/application/RevenueCashLinkageService.java` (tự động ghi sổ tiền mặt `REV_CASH` và chuyển khoản `REV_BANK` vào sổ quỹ chi nhánh có khóa bi quan; xử lý đảo bút toán cũ khi điều chỉnh revision; thực thi nghiêm ngặt **TC-007**: tuyệt đối không ghi nhận dòng tiền app giao hàng vào ngân hàng).
+  - `backend/src/test/java/com/mtms/revenue/web/DailyRevenueCashLinkageIntegrationTest.java` (4 integration tests chứng minh **TC-007**: Tiền mặt +5M, Chuyển khoản +3M, App Net 2M -> Ngân hàng chỉ tăng 3M, không tăng 2M App Net, tạo đúng 2 bút toán sổ quỹ; Idempotency **TC-006/011** xác nhận lại không bị double post; Revision Adjustment đảo bút toán cũ và cập nhật số dư ròng; Branch Isolation 403 Forbidden).
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/finance/application/FinancialAccountService.java` (thêm `ensureDefaultBankAccount` đảm bảo chi nhánh luôn có tài khoản ngân hàng liên kết).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/CashLedgerEntryJpaRepository.java` (thêm query methods tìm bút toán theo nguồn).
+  - `backend/src/main/java/com/mtms/revenue/application/service/DailyRevenueService.java` (tiêm `RevenueCashLinkageService` gọi tự động khi xác nhận báo cáo hoặc tạo revision mới).
+  - `backend/src/main/java/com/mtms/revenue/web/DailyRevenueController.java` (thêm endpoint `GET /api/v1/branches/{branchId}/daily-revenue/{id}/ledger-entries`).
+  - `frontend/src/features/revenue/api/revenueApi.ts` (thêm hàm `getRevenueLedgerEntries`).
+  - `frontend/src/features/revenue/components/DailyRevenueDetailModal.tsx` (thêm khu vực liên kết sổ quỹ, bảng bút toán liên kết có snapshot số dư và banner cảnh báo tím TC-007).
+  - `frontend/src/features/revenue/components/DailyRevenueListTab.tsx` (thêm badge "Đã liên kết sổ quỹ" trên cả bản desktop và mobile).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `DailyRevenueCashLinkageIntegrationTest`: 4/4 passed (100% green).
+  - `DailyRevenueIntegrationTest`: 7/7 passed.
+  - `CashLedgerIntegrationTest`: 8/8 passed.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công bundle).
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS 100%.
+  - `TC-007`, `TC-006`, `TC-011` Tests: PASS.
+
+## 2026-11-17 — P0-FIN-01 & P0-FIN-02 financial chart of categories & cash/bank ledger
+- **Authorization:** Owner explicit approval to implement `P0-FIN-01` / `P0-FIN-02` / `FE-P0-11` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-FIN-01`, `BR-FIN-09`, `TC-010`, `TC-011`, `FE-P0-11`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-FIN-01-02.md` (authoritative single-source-of-truth contract for financial categories and cash/bank ledger).
+  - `database/migrations/V014__create_financial_categories_and_cash_ledger.sql` (bảng `mtms.financial_categories` với 7 nhóm danh mục và 13 danh mục hệ thống seed sẵn; `mtms.financial_accounts` tài khoản tiền mặt và liên kết ngân hàng chi nhánh; `mtms.internal_transfers` lệnh chuyển quỹ nội bộ; `mtms.cash_ledger_entries` sổ quỹ bất biến với snapshot `running_balance` và khóa duy nhất chống ghi đúp `UNIQUE (account_id, source_type, source_id, source_leg)` bảo đảm `TC-011`).
+  - `backend/src/main/java/com/mtms/finance/domain/` (`FinancialCategory`, `CategoryGroup`, `FlowDirection`, `FinancialAccount`, `AccountKind`, `AccountStatus`, `CashLedgerEntry`, `EntryType`, `SourceType`, `LedgerStatus`, `InternalTransfer`, domain exceptions `InsufficientAccountBalanceException`, `InvalidTransferAccountsException`, `InvalidCategoryGroupException`, `FinancialAccountNotFoundException`, `FinancialCategoryNotFoundException`, `DuplicateLedgerPostingException`).
+  - `backend/src/main/java/com/mtms/finance/infrastructure/persistence/` (`FinancialCategoryJpaEntity`, `FinancialAccountJpaEntity`, `InternalTransferJpaEntity`, `CashLedgerEntryJpaEntity`, JPA repositories với `@Lock(LockModeType.PESSIMISTIC_WRITE)` trên `FinancialAccountJpaRepository.findByIdForUpdate`).
+  - `backend/src/main/java/com/mtms/finance/application/` (`FinancialCategoryService` quản lý danh mục và chặn đổi nhóm hệ thống; `FinancialAccountService` quản lý tài khoản và tự động tạo Quỹ tiền mặt mặc định; `CashLedgerService` thực hiện ghi sổ có khóa tài khoản, snapshot số dư tức thời, chuyển quỹ nội bộ `TC-010` tránh deadlock với thứ tự UUID cố định; DTOs/Commands).
+  - `backend/src/main/java/com/mtms/finance/web/` (`FinancialCategoryController`, `FinancialAccountController`, `CashLedgerController`, `FinanceExceptionHandler` mapping RFC 7807 problem details 400/404/409).
+  - `backend/src/test/java/com/mtms/finance/web/CashLedgerIntegrationTest.java` (8 integration tests chứng minh **TC-010**: chuyển 5M tiền mặt sang ngân hàng bảo toàn tổng số dư 12M VND và không ảnh hưởng P&L; **TC-011**: chống ghi đúp đồng thời với 409 Conflict; dòng vốn góp `CAPITAL_FLOW` tăng tiền nhưng không lẫn vào doanh thu; chặn chi quá số dư quỹ 400 Bad Request; kiểm tra cách ly chi nhánh 403 Forbidden).
+  - `frontend/src/features/finance/types/finance.types.ts` (TypeScript interfaces khớp 100% contract).
+  - `frontend/src/features/finance/api/financeApi.ts` (API client tương tác REST backend có tích hợp sinh header `Idempotency-Key` và tiện ích format VND).
+  - `frontend/src/features/finance/components/` (`AccountSummaryCards.tsx` 3 thẻ KPI số dư tiền mặt/ngân hàng/tổng tiền lưu động kèm nút reload; `CashLedgerTable.tsx` bảng sổ quỹ bất biến có badge màu dòng tiền, số dư tức thời và tải chứng từ gốc; `InternalTransferModal.tsx` modal chuyển tiền nội bộ có chọn nhanh số tiền và tải biên lai `EvidenceDropzone`; `CreateManualEntryModal.tsx` ghi nhận dòng tiền trực tiếp; `FinancialCategoryModal.tsx` xem 13 danh mục hệ thống và tạo danh mục chi phí con mới).
+  - `frontend/src/features/finance/index.ts` (barrel export).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V014 và kiểm tra ràng buộc DB).
+  - `frontend/src/features/finance/pages/FinancePage.tsx` (nâng cấp toàn diện thành trang quản lý sổ quỹ và tài chính chi nhánh `FE-P0-11`).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 211 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/FinancePage-*.js`).
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS 100%.
+  - `TC-010` & `TC-011` Tests: PASS.
+
+## 2026-11-17 — P0-REV-01, P0-REV-02, P0-REV-03, P0-REV-04 business calendar, daily revenue report, capture API & entry UI
+- **Authorization:** Owner explicit approval to implement `P0-REV-01` / `P0-REV-02` / `P0-REV-03` / `P0-REV-04` (`FE-P0-08`) using parallel subagent coordination.
+- **Requirements & Rules:** `BR-REV-01`, `BR-REV-02`, `BR-REV-03`, `TC-004`, `TC-005`, `TC-006`, `FE-P0-08`, `00-product-boundary.md` (NO POS & aggregate daily revenue), `01-financial-data-safety.md` (Delivery App NET separation), `03-branch-authorization.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-REV-01-04.md` (authoritative single-source-of-truth contract for business calendar and daily revenue reporting).
+  - `database/migrations/V013__create_business_days_and_daily_revenue.sql` (bảng `mtms.business_days` quản lý lịch kinh doanh với trạng thái `OPEN/CLOSED` và ràng buộc lý do đóng cửa; `mtms.daily_revenue_reports` lưu trữ báo cáo doanh thu theo phiên bản revision, ràng buộc số học `ck_daily_revenue_total_math`, và partial unique index `uq_daily_revenue_current` đảm bảo duy nhất 1 bản ghi hiện hành).
+  - `backend/src/main/java/com/mtms/revenue/domain/` (`BusinessDay`, `DailyRevenueReport`, `OperationStatus`, `RevenueReportStatus`, exceptions `InvalidRevenueMathException`, `MissingCloseReasonException`, `DuplicateDailyReportException`, `ReportAlreadyConfirmedException`, `DailyReportNotFoundException`).
+  - `backend/src/main/java/com/mtms/revenue/infrastructure/persistence/` (`BusinessDayJpaEntity`, `DailyRevenueReportJpaEntity`, `BusinessDayJpaRepository`, `DailyRevenueReportJpaRepository`).
+  - `backend/src/main/java/com/mtms/revenue/application/` (`BusinessCalendarService` tính toán ngày thiếu doanh thu phục vụ chốt kỳ TC-004/005; `DailyRevenueService` tạo nháp, gửi duyệt, xác nhận idempotent TC-006 và cơ chế thay thế phiên bản; DTOs/Commands).
+  - `backend/src/main/java/com/mtms/revenue/web/` (`BusinessDayController`, `DailyRevenueController`, `RevenueExceptionHandler` dịch lỗi domain sang RFC 7807 400/404/409).
+  - `backend/src/test/java/com/mtms/revenue/web/DailyRevenueIntegrationTest.java` (7 integration tests: **TC-004** trả về danh sách ngày mở cửa thiếu báo cáo; **TC-005** miễn trừ ngày đóng cửa hợp lệ; **TC-006** xác nhận idempotent không tạo duplicate hay double post; kiểm tra số học tổng tiền 400; kiểm tra bắt buộc lý do đóng cửa; kiểm tra cách ly chi nhánh 403; kiểm tra lưu vết revision khi hiệu chỉnh).
+  - `frontend/src/features/revenue/types/revenue.types.ts` (TypeScript interfaces chuẩn hóa 100% contract).
+  - `frontend/src/features/revenue/api/revenueApi.ts` (API client tương tác REST backend kèm hàm format tiền tệ và parse an toàn).
+  - `frontend/src/features/revenue/components/` (`CreateDailyRevenueModal.tsx` form nhập doanh thu kèm tính tổng tức thì, cảnh báo TC-007 phân tách app giao hàng, tải bằng chứng chứng từ; `DailyRevenueDetailModal.tsx` xem chi tiết và tải bằng chứng; `BusinessDayStatusModal.tsx` cấu hình mở/đóng cửa có lý do; `DailyOverviewCalendarTab.tsx` giao diện lưới lịch tháng trực quan với mã màu phân biệt trạng thái; `DailyRevenueListTab.tsx` bảng danh sách báo cáo có lọc và phân trang).
+  - `frontend/src/features/revenue/pages/DailyRevenuePage.tsx` (trang Doanh thu hàng ngày kết hợp cả 2 tab Lịch tổng quan và Danh sách báo cáo).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V013 và các ràng buộc cơ sở dữ liệu).
+  - `frontend/src/app/router.tsx` & `frontend/src/app/layout/Sidebar.tsx` (định tuyến `/revenue/daily` và menu "Doanh thu hàng ngày (TC-006)").
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 202 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/DailyRevenuePage-*.js`).
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS 100%.
+  - `TC-004`, `TC-005`, `TC-006` Tests: PASS.
+
+## 2026-11-16 — P0-INV-06 & P0-INV-07 inventory dashboard, movements ledger & COGS period read model
+- **Authorization:** Owner explicit approval to implement `P0-INV-06` / `P0-INV-07` / `FE-P0-28` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-INV-01`, `BR-INV-02`, `TC-020`, `TC-021`, `FE-P0-28`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-INV-06-07.md` (authoritative single-source-of-truth contract for inventory dashboard, movements ledger and COGS period read model).
+  - `database/migrations/V012__create_inventory_reporting_indexes.sql` (chỉ mục tối ưu hóa hiệu năng cao: `idx_stock_movements_cogs_lookup` trên `mtms.stock_movements (branch_id, movement_type, business_date)` và `idx_stock_balances_valuation` trên `mtms.stock_balances (branch_id, inventory_value DESC)`).
+  - `backend/src/main/java/com/mtms/inventory/application/dto/` (`TopValuedItemDto`, `InventoryDashboardDto`, `StockMovementLedgerDto`, `StockMovementPageResponse`, `CogsItemDetailDto`, `CogsReportDto` với định dạng chuỗi số thực chính xác tránh làm tròn JS).
+  - `backend/src/main/java/com/mtms/inventory/application/service/InventoryReportingService.java` (tính toán số liệu tổng hợp Dashboard, sổ biến động kho Movements Ledger với bộ lọc và tìm kiếm toàn diện, và mô hình đọc COGS đối soát định kỳ: $\text{Ending} = \text{Beginning} + \text{Purchases} - \text{COGS}$, chứng minh **TC-020 No Double Cost**: tiền nhập hàng ghi nhận nợ/tài sản, chỉ hàng thực tế xuất dùng pha chế mới tính vào COGS).
+  - `backend/src/main/java/com/mtms/inventory/web/InventoryReportingController.java` (`GET /api/v1/branches/{branchId}/inventory/dashboard`, `GET .../movements`, `GET .../cogs-report` bảo vệ bởi `@PreAuthorize("@branchAuth.hasBranchAccess(#branchId)")`).
+  - `backend/src/main/java/com/mtms/inventory/application/exception/InvalidDateRangeException.java` (lỗi ngày bắt đầu lớn hơn ngày kết thúc trả về RFC 7807 400 Bad Request `urn:mtms:error:invalid-date-range`).
+  - `backend/src/test/java/com/mtms/inventory/web/InventoryReportingIntegrationTest.java` (5 integration tests chứng minh **TC-020**: nhập 1.2M, xuất 550k -> COGS = 550k, không tính trùng 1.2M hay 1.75M; **TC-021**: dashboard và sổ kho đầy đủ audit trail và lọc; kiểm tra bảo mật 403 Forbidden; kiểm tra validation 400).
+  - `frontend/src/features/inventory/types/reporting.types.ts` (TypeScript interfaces khớp 100% contract).
+  - `frontend/src/features/inventory/api/reportingApi.ts` (API client tương tác backend REST endpoints).
+  - `frontend/src/features/inventory/components/` (`InventoryDashboardTab.tsx` với 4 thẻ KPI nổi bật và bảng Top mặt hàng giá trị lớn nhất kèm thanh đo %; `StockMovementsLedgerTab.tsx` với badges nhận diện loại chứng từ, bộ lọc ngày/loại/từ khóa và phân trang; `CogsReconciliationTab.tsx` với phương trình cân bằng kế toán, badge xác nhận No Double Cost và banner giải trình nghiệp vụ).
+  - `frontend/src/features/inventory/pages/InventoryReportingPage.tsx` (trang chuyên biệt Báo cáo kho & Giá vốn tập hợp 4 tabs mượt mà).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V012 và xác nhận sự tồn tại của 2 indexes mới).
+  - `backend/src/main/java/com/mtms/inventory/infrastructure/persistence/StockMovementJpaEntity.java` (bổ sung quan hệ với catalog item).
+  - `backend/src/main/java/com/mtms/inventory/infrastructure/persistence/StockMovementJpaRepository.java` & `StockBalanceJpaRepository.java` (thêm các query methods tối ưu phục vụ báo cáo và sổ kho).
+  - `backend/src/main/java/com/mtms/inventory/web/InventoryExceptionHandler.java` (mapping RFC 7807 400 cho `InvalidDateRangeException`).
+  - `frontend/src/app/router.tsx` & `frontend/src/app/layout/Sidebar.tsx` (định tuyến `/inventory/reporting` và liên kết Sidebar "Sổ kho & Giá vốn (TC-021)").
+  - `frontend/src/features/inventory/pages/InventoryPage.tsx` (thêm Quick Launch card cho P0-INV-06/07).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 194 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/InventoryReportingPage-*.js`).
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS 100%.
+  - `TC-020` & `TC-021` Tests: PASS.
+
+## 2026-11-16 — P0-INV-04 & P0-INV-05 manual consumption issue & moving WAC posting engine
+- **Authorization:** Owner explicit approval to implement `P0-INV-04` / `P0-INV-05` / `FE-P0-27` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-INV-02`, `BR-INV-03`, `TC-020`, `TC-021`, `TC-022`, `FE-P0-27`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-INV-04-05.md` (authoritative single-source-of-truth contract for stock issues and moving WAC).
+  - `database/migrations/V011__create_stock_issue_documents.sql` (bảng `mtms.stock_documents` phiếu xuất kho thủ công mã duy nhất `(branch_id, document_number)`, loại `CONSUMPTION_ISSUE/SCRAP_DISPOSAL/ADJUSTMENT`, trạng thái `DRAFT/SUBMITTED/POSTED/CANCELLED`; `mtms.stock_document_lines` chi tiết dòng hàng kèm snapshot đơn giá vốn Moving WAC và xóa cascade).
+  - `backend/src/main/java/com/mtms/inventory/domain/` (`StockDocument`, `StockDocumentLine`, `StockDocumentType`, `StockDocumentStatus`, exceptions `InsufficientStockException`, `StockDocumentAlreadyPostedException`, `StockDocumentNotFoundException`, `InvalidIssueQuantityException`).
+  - `backend/src/main/java/com/mtms/inventory/infrastructure/persistence/` (`StockDocumentJpaEntity`, `StockDocumentLineJpaEntity`, repositories và domain adapters; thêm `@Lock(PESSIMISTIC_WRITE)` query `findWithLockByBranchIdAndItemId` trên `StockBalanceJpaRepository`).
+  - `backend/src/main/java/com/mtms/inventory/application/service/` (`StockIssueService` xử lý tạo và ghi sổ phiếu xuất kho với khóa bi quan, trừ tồn kho `StockBalance.issueStock`, ghi nhật ký xuất kho âm `stock_movements`, bảo vệ không cho phép tồn kho âm; DTOs/Commands).
+  - `backend/src/main/java/com/mtms/inventory/web/` (`StockIssueController`, `InventoryExceptionHandler` mapping RFC 7807 400 Bad Request cho `InsufficientStockException` và 409 Conflict).
+  - `backend/src/test/java/com/mtms/inventory/` (`StockIssueInvariantTest`, `StockIssueIntegrationTest` chứng minh **TC-020**: 10kg@100k + 10kg@120k -> WAC=110k, xuất 5kg = 550k, WAC số dư còn lại giữ nguyên 110k; **TC-021**: tồn 4kg yêu cầu xuất 5kg bị từ chối 400 và không đổi số dư; **TC-022**: kiểm thử tranh chấp đồng thời 2 luồng xuất 5kg cuối cùng -> đúng 1 luồng thành công, tồn kho về 0kg và không bao giờ bị âm).
+  - `frontend/src/features/inventory/types/issue.types.ts` (TypeScript interfaces khớp 100% contract).
+  - `frontend/src/features/inventory/api/issueApi.ts` (API client tương tác backend REST endpoints).
+  - `frontend/src/features/inventory/components/` (`CreateIssueModal.tsx` hiển thị tồn kho và WAC thời gian thực, kiểm tra chặn xuất âm TC-021 trực tiếp; `IssueDetailModal.tsx`, `IssueListTab.tsx`).
+  - `frontend/src/features/inventory/pages/StockIssuePage.tsx` (trang chuyên biệt Xuất kho pha chế).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V011 và các ràng buộc toàn vẹn cơ sở dữ liệu).
+  - `frontend/src/features/inventory/pages/InventoryCatalogPage.tsx` (tích hợp tab "Xuất kho pha chế (TC-020/022)").
+  - `frontend/src/features/inventory/pages/InventoryPage.tsx` (thêm Quick Launch card cho P0-INV-04/05).
+  - `frontend/src/app/router.tsx` & `frontend/src/app/layout/Sidebar.tsx` (định tuyến `/inventory/issues` và liên kết Sidebar "Xuất kho pha chế (TC-020)").
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 188 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/StockIssuePage-*.js`).
+  - `TC-020`, `TC-021`, `TC-022` Tests: PASS.
+
+## 2026-11-16 — P0-INV-03 supplier and goods receipt & TC-008 debt invariant
+- **Authorization:** Owner explicit approval to implement `P0-INV-03` / `FE-P0-26` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-INV-05`, `TC-008`, `FE-P0-26`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-INV-03.md` (authoritative single-source-of-truth contract for goods receipts and payables).
+  - `database/migrations/V010__create_purchase_receipts_and_payables.sql` (bảng `mtms.payables` ghi nhận nợ phải trả theo chi nhánh kèm ràng buộc `paid_amount <= original_amount`; `mtms.purchase_receipts` phiếu nhập kho mua hàng mã duy nhất `(branch_id, receipt_number)`, trạng thái `DRAFT/POSTED/VOIDED`, phương thức thanh toán `UNPAID/PARTIALLY_PAID/PAID`; `mtms.purchase_receipt_lines` chi tiết dòng hàng kèm snapshot quy cách đóng gói và xóa cascade).
+  - `backend/src/main/java/com/mtms/inventory/domain/` (`PurchaseReceipt`, `PurchaseReceiptLine`, `Payable`, `ReceiptStatus`, `PaymentStatus`, `PayableStatus`, exceptions `ReceiptAlreadyPostedException`, `InvalidReceiptQuantityException`, `ReceiptNotFoundException`, `SupplierNotFoundException`, domain repositories).
+  - `backend/src/main/java/com/mtms/inventory/infrastructure/persistence/` (`PurchaseReceiptJpaEntity`, `PurchaseReceiptLineJpaEntity`, `PayableJpaEntity`, repositories và domain adapters).
+  - `backend/src/main/java/com/mtms/inventory/application/service/` (`PurchaseReceiptService` tạo và ghi sổ phiếu nhập kho, tự động tính lại Moving WAC, tăng tồn kho, ghi nhật ký biến động kho và sinh công nợ `mtms.payables` khi UNPAID; `PayableService` tra cứu sổ nợ NCC và tính tổng nợ đọng; DTOs/Commands).
+  - `backend/src/main/java/com/mtms/inventory/web/` (`PurchaseReceiptController`, `PayableController`, `InventoryExceptionHandler` mapping RFC 7807 400, 404, 409).
+  - `backend/src/test/java/com/mtms/inventory/` (`MovingWacUpdateTest` kiểm chứng công thức toán WAC, `PayableInvariantTest`, `PurchaseReceiptInvariantTest`, `PurchaseReceiptIntegrationTest` chứng minh toàn diện **TC-008**: nhập hàng 5 triệu chưa trả tiền làm tăng tồn kho và tăng công nợ 5 triệu, quỹ tiền mặt và chi phí COGS hoàn toàn không đổi; kiểm thử bảo mật phân quyền 403).
+  - `frontend/src/features/inventory/types/receipt.types.ts` (TypeScript interfaces khớp 100% contract).
+  - `frontend/src/features/inventory/api/receiptApi.ts` (API client tương tác backend REST endpoints).
+  - `frontend/src/features/inventory/components/` (`CreateReceiptModal.tsx` biểu mẫu nhập hàng trực tiếp với quy cách tự động từ INV-01 và chế độ ghi nợ UNPAID, `ReceiptDetailModal.tsx`, `ReceiptListTab.tsx`, `PayablesLedgerTab.tsx` với 3 thẻ KPI nợ đọng).
+  - `frontend/src/features/inventory/pages/GoodsReceiptPage.tsx` (trang chuyên biệt Nhập kho & Công nợ NCC).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V010 và các ràng buộc toàn vẹn cơ sở dữ liệu).
+  - `frontend/src/features/inventory/pages/InventoryCatalogPage.tsx` (tích hợp các tab Nhập kho & Công nợ NCC).
+  - `frontend/src/features/inventory/pages/InventoryPage.tsx` (thêm Quick Launch card cho P0-INV-03).
+  - `frontend/src/app/router.tsx` & `frontend/src/app/layout/Sidebar.tsx` (định tuyến `/inventory/receipts` và liên kết Sidebar "Nhập kho & Nợ NCC (TC-008)").
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 178 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/GoodsReceiptPage-*.js`).
+  - `TC-008` Integration test: PASS (Nhập hàng 5 triệu ghi nợ làm tăng tồn kho lên 5 triệu và sinh công nợ phải trả 5 triệu; tiền mặt và COGS không đổi).
+
+## 2026-11-16 — P0-INV-02 opening inventory and valuation & TC-024 retry guard
+- **Authorization:** Owner explicit approval to implement `P0-INV-02` / `FE-P0-25` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-INV-08`, `TC-024`, `FE-P0-25`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-INV-02.md` (authoritative single-source-of-truth contract for opening stock).
+  - `database/migrations/V009__create_inventory_stock_balances_and_movements.sql` (bảng `mtms.stock_balances` với Moving WAC `avg_unit_cost`, `inventory_value`, khóa lạc quan `version`, unique `(branch_id, item_id)`; `mtms.stock_lots` quản lý lô/hạn dùng unique `(branch_id, item_id, lot_code)`; `mtms.stock_movements` sổ cái biến động kho bất biến ghi nhận `OPENING_BALANCE`; bảng `mtms.opening_inventory_records` với `UNIQUE (branch_id)` khóa post-once ngăn chặn nhân đôi số dư).
+  - `backend/src/main/java/com/mtms/inventory/domain/` (`StockBalance`, `StockLot`, `StockMovement`, `OpeningInventoryRecord`, `StockMovementType`, exceptions `OpeningInventoryAlreadyPostedException`, `InvalidStockQuantityException`, `MissingLotCodeException`, domain repositories).
+  - `backend/src/main/java/com/mtms/inventory/infrastructure/persistence/` (`StockBalanceJpaEntity`, `StockBalanceJpaRepository`, `StockBalanceRepositoryImpl`, `StockLotJpaEntity`, `StockLotJpaRepository`, `StockLotRepositoryImpl`, `StockMovementJpaEntity`, `StockMovementJpaRepository`, `StockMovementRepositoryImpl`, `OpeningInventoryRecordJpaEntity`, `OpeningInventoryRecordJpaRepository`, `OpeningInventoryRecordRepositoryImpl`).
+  - `backend/src/main/java/com/mtms/inventory/application/service/` (`OpeningInventoryService` xử lý preview, kiểm tra hàng hoá/lô và commit mở sổ với post-once TC-024; `StockBalanceService` truy vấn tồn kho hiện hành kèm phân trang & tìm kiếm; DTOs/Commands).
+  - `backend/src/main/java/com/mtms/inventory/web/` (`OpeningInventoryController`, `StockBalanceController`, `InventoryExceptionHandler` mapping RFC 7807 409 conflict, 400 bad request, 404 not found).
+  - `backend/src/test/java/com/mtms/inventory/` (`StockBalanceInvariantTest`, `OpeningInventoryServiceTest`, `OpeningInventoryIntegrationTest` xác thực vòng đời mở sổ, tính WAC, chặn 409 khi retry và kiểm chứng số dư không bao giờ bị nhân đôi `TC-024`).
+  - `frontend/src/features/inventory/types/opening.types.ts` (TypeScript interfaces khớp 100% contract).
+  - `frontend/src/features/inventory/api/openingApi.ts` (API client + tiện ích tải template CSV UTF-8 BOM).
+  - `frontend/src/features/inventory/components/` (`OpeningInventoryStatusBanner.tsx`, `OpeningInventoryWizardModal.tsx` 3 bước nạp/preview/ký duyệt, `StockBalancesTable.tsx`, `OpeningInventoryTab.tsx`).
+  - `frontend/src/features/inventory/pages/OpeningInventoryPage.tsx` (trang chuyên biệt cutover mở sổ tồn kho).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung kiểm thử migration V009 và các ràng buộc toàn vẹn cơ sở dữ liệu).
+  - `frontend/src/features/inventory/pages/InventoryCatalogPage.tsx` (tích hợp Tab 5 "Tồn kho đầu kỳ & Số dư WAC").
+  - `frontend/src/features/inventory/pages/InventoryPage.tsx` (thêm Quick Launch card cho P0-INV-02).
+  - `frontend/src/app/router.tsx` & `frontend/src/app/layout/Sidebar.tsx` (định tuyến `/inventory/opening` và menu Sidebar).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 160 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/OpeningInventoryPage-*.js`).
+  - `TC-024` Integration test: PASS (Thử lại nạp mở sổ lần 2 bị chặn `409 Conflict`, số lượng tồn kho bảo toàn 70.000 đơn vị, không bị nhân đôi thành 140.000).
+
+## 2026-11-16 — P0-INV-01 item and base units catalog & TC-023 conversions
+- **Authorization:** Owner explicit approval to implement `P0-INV-01` / `FE-P0-24` using parallel subagent coordination.
+- **Requirements & Rules:** `BR-INV-04`, `TC-023`, `FE-P0-24`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-INV-01.md` (authoritative single-source-of-truth contract for BE/FE synchronization).
+  - `database/migrations/V008__create_inventory_catalog_and_conversions.sql` (bảng `mtms.units` với dimension check và seed data canonical units; `mtms.suppliers` master scoped theo pháp nhân; `mtms.catalog_items` liên kết base_unit_id kèm ràng buộc bất biến `CHECK (NOT expiration_tracking_required OR lot_tracking_required)`; `mtms.supplier_pack_conversions` với ràng buộc `base_units_per_pack > 0`, khoảng ngày hiệu lực và index duy nhất).
+  - `backend/src/main/java/com/mtms/inventory/domain/` (`Unit`, `UnitDimension`, `Supplier`, `SupplierStatus`, `CatalogItem`, `ItemKind`, `ItemStatus`, `SupplierPackConversion`, `PackConversionCalculator`, `PackConversionCalculationResult`, domain repository interfaces, exceptions `InvalidTrackingInvariantException`, `InvalidConversionRateException`).
+  - `backend/src/main/java/com/mtms/inventory/infrastructure/persistence/` (`UnitJpaEntity`, `UnitJpaRepository`, `UnitRepositoryImpl`, `SupplierJpaEntity`, `SupplierJpaRepository`, `SupplierRepositoryImpl`, `CatalogItemJpaEntity`, `CatalogItemJpaRepository`, `CatalogItemRepositoryImpl`, `SupplierPackConversionJpaEntity`, `SupplierPackConversionJpaRepository`, `SupplierPackConversionRepositoryImpl`).
+  - `backend/src/main/java/com/mtms/inventory/application/` (`UnitService`, `SupplierService`, `CatalogItemService`, `SupplierPackConversionService`, DTOs/Commands: `UnitDto`, `CreateUnitCommand`, `SupplierDto`, `CreateSupplierCommand`, `CatalogItemDto`, `CreateCatalogItemCommand`, `UpdateCatalogItemCommand`, `SupplierPackConversionDto`, `CreatePackConversionCommand`, `PackConversionCalculationRequest`, `PackConversionCalculationResponse`, exceptions).
+  - `backend/src/main/java/com/mtms/inventory/web/` (`UnitController`, `SupplierController`, `CatalogItemController`, `SupplierPackConversionController` với bảo mật `@branchAuth.hasEntityAccess` và RFC 7807 problem details).
+  - `backend/src/test/java/com/mtms/inventory/` (`PackConversionCalculatorTest` kiểm chứng TC-023: 1 box = 24 units, receipt 2 boxes -> 48 base units snapshot; `CatalogItemInvariantTest` kiểm chứng bất biến lot/expiration; `SupplierPackConversionInvariantTest`; `CatalogItemServiceTest`; `SupplierPackConversionServiceTest`; `InventoryCatalogIntegrationTest` kiểm tra 4 controllers, 403 entity boundary test, 400 validation, 409 duplicate code).
+  - `frontend/src/features/inventory/types/catalog.types.ts` (TypeScript interfaces khớp 100% contract).
+  - `frontend/src/features/inventory/api/catalogApi.ts` (API client tương tác backend REST endpoints).
+  - `frontend/src/features/inventory/components/` (`CatalogItemList.tsx`, `CreateItemModal.tsx`, `EditItemModal.tsx`, `CreatePackConversionModal.tsx`, `PackConversionCalculatorCard.tsx`, `PackConversionsTab.tsx`, `CreateSupplierModal.tsx`, `SuppliersTab.tsx`, `CreateUnitModal.tsx`, `UnitsTab.tsx`).
+  - `frontend/src/features/inventory/pages/InventoryCatalogPage.tsx` (giao diện quản lý 4 tab với motion animations và TC-023 Live Calculator).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (bổ sung V008 schema validation test).
+  - `frontend/src/features/inventory/pages/InventoryPage.tsx` (thêm banner quick launch dẫn tới `/inventory/catalog`).
+  - `frontend/src/app/router.tsx` & `frontend/src/app/routes/router.tsx` (cấu hình route `/inventory/catalog`).
+  - `frontend/src/app/layout/Sidebar.tsx` (bổ sung liên kết "Danh mục & Quy vị TC-023" trên Sidebar).
+  - `docs/planning/CURRENT_STATE.md`.
+- **Build & Test Evidence:**
+  - `mvn test -f backend/pom.xml`: 144 tests run, 0 failures, 0 errors, 100% green.
+  - `npm --prefix frontend run lint`: EXIT 0 (0 TypeScript errors).
+  - `npm --prefix frontend run build`: EXIT 0 (build thành công `dist/assets/InventoryCatalogPage-Cu4OJSnZ.js`).
+  - `TC-023` Unit test (`tc023_shouldCalculate48BaseUnitsFrom2Boxes`) và Live API endpoint: PASS.
+
 ## 2026-11-16 — P0-SEC-05 monitoring and CI baseline
 - **Authorization:** Owner approval to implement `P0-SEC-05` operational monitoring, backup/restore tooling, and CI pipeline.
 - **Requirements & Rules:** `BR-SEC-04`, `TC-044`, `07-backend-quality.md`.

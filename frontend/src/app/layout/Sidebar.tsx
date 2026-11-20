@@ -3,7 +3,6 @@ import { NavLink } from 'react-router-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   LayoutDashboard,
-  Receipt,
   Users,
   Package,
   Wallet,
@@ -13,7 +12,16 @@ import {
   ShieldCheck,
   ChevronLeft,
   ChevronRight,
-  Building2
+  Building2,
+  Boxes,
+  Coins,
+  Truck,
+  FileSpreadsheet,
+  FileBarChart,
+  DollarSign,
+  Briefcase,
+  CalendarCheck,
+  BadgePercent,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
@@ -24,10 +32,18 @@ interface SidebarProps {
 
 const navItems = [
   { name: 'Tổng quan điều hành', path: '/', icon: LayoutDashboard },
-  { name: 'Doanh thu ca & ngày', path: '/revenue', icon: Receipt },
+  { name: 'Doanh thu hàng ngày (TC-006)', path: '/revenue/daily', icon: DollarSign },
+  { name: 'Hồ sơ Nhân sự & Lương (P0-HR)', path: '/hr/employees', icon: Briefcase },
+  { name: 'Chấm công & Giờ làm (TC-017)', path: '/hr/timesheets', icon: CalendarCheck },
+  { name: 'Bảng lương & Phê duyệt (TC-013/014)', path: '/hr/payroll', icon: BadgePercent },
   { name: 'Chi phí & Giờ làm việc', path: '/workforce', icon: Users },
   { name: 'Quản lý Kho & WAC', path: '/inventory', icon: Package },
-  { name: 'Sổ quỹ & Dòng tiền', path: '/finance', icon: Wallet },
+  { name: 'Sổ kho & Giá vốn (TC-021)', path: '/inventory/reporting', icon: FileBarChart },
+  { name: 'Nhập kho & Nợ NCC (TC-008)', path: '/inventory/receipts', icon: Truck },
+  { name: 'Xuất kho pha chế (TC-020)', path: '/inventory/issues', icon: FileSpreadsheet },
+  { name: 'Tồn đầu kỳ & WAC TC-024', path: '/inventory/opening', icon: Coins },
+  { name: 'Danh mục & Quy vị TC-023', path: '/inventory/catalog', icon: Boxes },
+  { name: 'Sổ quỹ & Tài chính (TC-010/011)', path: '/finance', icon: Wallet },
   { name: 'Chốt sổ kỳ kinh doanh', path: '/closing', icon: FileCheck2 },
   { name: 'Báo cáo P&L quản trị', path: '/reporting', icon: PieChart },
   { name: 'Cơ cấu & Phân quyền', path: '/admin/organization', icon: Building2 },
@@ -80,15 +96,21 @@ export function Sidebar({ isMobileOpen, onCloseMobile }: SidebarProps) {
               to={item.path}
               onClick={mobile ? onCloseMobile : undefined}
               title={collapsed ? item.name : undefined}
-              className={({ isActive }) =>
-                cn(
+              className={({ isActive }) => {
+                const isRevenueActive =
+                  item.path === '/revenue/daily' &&
+                  typeof window !== 'undefined' &&
+                  window.location.pathname.startsWith('/revenue')
+                const effectiveActive = isActive || isRevenueActive
+
+                return cn(
                   'group flex items-center space-x-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all duration-150',
                   collapsed && 'justify-center px-2',
-                  isActive
+                  effectiveActive
                     ? 'bg-[#B96849] text-white shadow-sm font-semibold'
                     : 'text-[#C8CEC4] hover:bg-[#3E5747] hover:text-white'
                 )
-              }
+              }}
             >
               <item.icon className="h-4.5 w-4.5 shrink-0 transition-transform group-hover:scale-105" />
               {!collapsed && <span className="truncate">{item.name}</span>}
