@@ -87,6 +87,11 @@ const PayrollManagementPage = lazy(() =>
     default: m.PayrollManagementPage,
   }))
 )
+const AssetManagementPage = lazy(() =>
+  import('@/features/assets/pages/AssetManagementPage').then((m) => ({
+    default: m.AssetManagementPage,
+  }))
+)
 
 export const router = createBrowserRouter([
   // Public-only route (Login)
@@ -143,6 +148,10 @@ export const router = createBrowserRouter([
           {
             path: 'hr',
             element: <Navigate to="/hr/employees" replace />,
+          },
+          {
+            path: 'assets',
+            element: <AssetManagementPage />,
           },
           {
             path: 'inventory',

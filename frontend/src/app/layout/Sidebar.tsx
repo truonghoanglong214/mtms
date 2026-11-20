@@ -22,6 +22,7 @@ import {
   Briefcase,
   CalendarCheck,
   BadgePercent,
+  Wrench,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
@@ -36,6 +37,7 @@ const navItems = [
   { name: 'Hồ sơ Nhân sự & Lương (P0-HR)', path: '/hr/employees', icon: Briefcase },
   { name: 'Chấm công & Giờ làm (TC-017)', path: '/hr/timesheets', icon: CalendarCheck },
   { name: 'Bảng lương & Phê duyệt (TC-013/014)', path: '/hr/payroll', icon: BadgePercent },
+  { name: 'Tài sản & Thiết bị (TC-051)', path: '/assets', icon: Wrench },
   { name: 'Chi phí & Giờ làm việc', path: '/workforce', icon: Users },
   { name: 'Quản lý Kho & WAC', path: '/inventory', icon: Package },
   { name: 'Sổ kho & Giá vốn (TC-021)', path: '/inventory/reporting', icon: FileBarChart },
