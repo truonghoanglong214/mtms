@@ -102,6 +102,11 @@ const TransferManagementPage = lazy(() =>
     default: m.TransferManagementPage,
   }))
 )
+const StockCountManagementPage = lazy(() =>
+  import('@/features/stockcount/pages/StockCountManagementPage').then((m) => ({
+    default: m.StockCountManagementPage,
+  }))
+)
 
 export const router = createBrowserRouter([
   // Public-only route (Login)
@@ -194,6 +199,10 @@ export const router = createBrowserRouter([
           {
             path: 'movement/transfers',
             element: <TransferManagementPage />,
+          },
+          {
+            path: 'inventory/counts',
+            element: <StockCountManagementPage />,
           },
           {
             path: 'finance',

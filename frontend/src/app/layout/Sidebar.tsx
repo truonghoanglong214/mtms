@@ -24,6 +24,7 @@ import {
   BadgePercent,
   Wrench,
   ArrowRightLeft,
+  ClipboardCheck,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
@@ -45,6 +46,7 @@ const navItems = [
   { name: 'Nhập kho & Nợ NCC (TC-008)', path: '/inventory/receipts', icon: Truck },
   { name: 'Xuất kho pha chế (TC-020)', path: '/inventory/issues', icon: FileSpreadsheet },
   { name: 'Điều chuyển kho (TC-027/028)', path: '/movement/transfers', icon: ArrowRightLeft },
+  { name: 'Kiểm kê kho (TC-026)', path: '/inventory/counts', icon: ClipboardCheck },
   { name: 'Tồn đầu kỳ & WAC TC-024', path: '/inventory/opening', icon: Coins },
   { name: 'Danh mục & Quy vị TC-023', path: '/inventory/catalog', icon: Boxes },
   { name: 'Sổ quỹ & Tài chính (TC-010/011)', path: '/finance', icon: Wallet },
