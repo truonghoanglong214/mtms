@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001 through V027) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001 through V028) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(27);
-        assertThat(result.targetSchemaVersion).isIn("27", "027");
+        assertThat(result.migrationsExecuted).isEqualTo(28);
+        assertThat(result.targetSchemaVersion).isIn("28", "028");
     }
 
     @Test
@@ -3753,6 +3753,133 @@ class FlywayBaselineMigrationTest {
                     "VALUES (?, ?, 3, ?, 0.000)")) {
                 stmt.setObject(1, UUID.randomUUID());
                 stmt.setObject(2, transferId);
+                stmt.setObject(3, UUID.randomUUID());
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(31)
+    @DisplayName("Constraint verification: V028 stock counts and lines integrity (P1-INV-02, TC-026)")
+    void testStockCountsAndLinesConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+            UUID itemId = UUID.randomUUID();
+            UUID countId = UUID.randomUUID();
+            UUID lineId = UUID.randomUUID();
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, entity_name, tax_code, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_COUNT_" + entityId.toString().substring(0, 8));
+                stmt.setString(3, "Entity Count Test");
+                stmt.setString(4, "0199999028");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, branch_name, time_zone, status) VALUES (?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_COUNT_" + branchId.toString().substring(0, 8));
+                stmt.setString(4, "Branch Count Test");
+                stmt.setString(5, "Asia/Ho_Chi_Minh");
+                stmt.setString(6, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "user_count_" + userId.toString().substring(0, 8));
+                stmt.setString(3, "$2a$12$dummyhash");
+                stmt.setString(4, "Count User");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.catalog_items (id, business_entity_id, item_code, item_name, base_uom_id, item_kind, status) " +
+                    "VALUES (?, ?, ?, ?, (SELECT id FROM mtms.units WHERE unit_code = 'KG' LIMIT 1), 'INGREDIENT', 'ACTIVE')")) {
+                stmt.setObject(1, itemId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "CF_COUNT_" + itemId.toString().substring(0, 8));
+                stmt.setString(4, "Coffee Count Test");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid stock count in DRAFT status
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_counts (id, business_entity_id, branch_id, count_number, counted_on, status, count_type, created_by) " +
+                    "VALUES (?, ?, ?, ?, CURRENT_DATE, 'DRAFT', 'PERIODIC', ?)")) {
+                stmt.setObject(1, countId);
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, "KK-202611-0001");
+                stmt.setObject(5, userId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Reject duplicate count_number within the same branch
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_counts (id, business_entity_id, branch_id, count_number, counted_on, status, count_type, created_by) " +
+                    "VALUES (?, ?, ?, ?, CURRENT_DATE, 'DRAFT', 'PERIODIC', ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, "KK-202611-0001"); // duplicate
+                stmt.setObject(5, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Reject invalid status
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_counts (id, business_entity_id, branch_id, count_number, counted_on, status, count_type, created_by) " +
+                    "VALUES (?, ?, ?, ?, CURRENT_DATE, 'INVALID_STATUS', 'PERIODIC', ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branchId);
+                stmt.setString(4, "KK-202611-0002");
+                stmt.setObject(5, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Insert valid stock count line
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_count_lines (id, stock_count_id, line_number, item_id, expected_qty, counted_qty, variance_qty, snapshot_unit_cost, variance_value, discrepancy_reason) " +
+                    "VALUES (?, ?, 1, ?, 10.000, 8.000, -2.000, 100000.000000, -200000.00, 'Hao hut pha che')")) {
+                stmt.setObject(1, lineId);
+                stmt.setObject(2, countId);
+                stmt.setObject(3, itemId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 5. Reject duplicate item in the same stock count
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_count_lines (id, stock_count_id, line_number, item_id, expected_qty, counted_qty, variance_qty) " +
+                    "VALUES (?, ?, 2, ?, 10.000, 8.000, -2.000)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, countId);
+                stmt.setObject(3, itemId); // duplicate item
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 6. Reject negative counted_qty
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_count_lines (id, stock_count_id, line_number, item_id, expected_qty, counted_qty, variance_qty) " +
+                    "VALUES (?, ?, 3, ?, 10.000, -1.000, -11.000)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, countId);
                 stmt.setObject(3, UUID.randomUUID());
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
