@@ -97,6 +97,11 @@ const CapitalManagementPage = lazy(() =>
     default: m.CapitalManagementPage,
   }))
 )
+const TransferManagementPage = lazy(() =>
+  import('@/features/movement/pages/TransferManagementPage').then((m) => ({
+    default: m.TransferManagementPage,
+  }))
+)
 
 export const router = createBrowserRouter([
   // Public-only route (Login)
@@ -185,6 +190,10 @@ export const router = createBrowserRouter([
           {
             path: 'inventory/dashboard',
             element: <InventoryReportingPage />,
+          },
+          {
+            path: 'movement/transfers',
+            element: <TransferManagementPage />,
           },
           {
             path: 'finance',

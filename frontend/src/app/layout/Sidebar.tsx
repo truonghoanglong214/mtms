@@ -23,6 +23,7 @@ import {
   CalendarCheck,
   BadgePercent,
   Wrench,
+  ArrowRightLeft,
 } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
@@ -43,6 +44,7 @@ const navItems = [
   { name: 'Sổ kho & Giá vốn (TC-021)', path: '/inventory/reporting', icon: FileBarChart },
   { name: 'Nhập kho & Nợ NCC (TC-008)', path: '/inventory/receipts', icon: Truck },
   { name: 'Xuất kho pha chế (TC-020)', path: '/inventory/issues', icon: FileSpreadsheet },
+  { name: 'Điều chuyển kho (TC-027/028)', path: '/movement/transfers', icon: ArrowRightLeft },
   { name: 'Tồn đầu kỳ & WAC TC-024', path: '/inventory/opening', icon: Coins },
   { name: 'Danh mục & Quy vị TC-023', path: '/inventory/catalog', icon: Boxes },
   { name: 'Sổ quỹ & Tài chính (TC-010/011)', path: '/finance', icon: Wallet },
