@@ -1,5 +1,26 @@
 # MTMS — File changes and decisions
 
+## 2026-11-20 — P0-CLS-01 through P0-CLS-04 Monthly Closing & Managerial Provisional P&L (BR-CLS-01, BR-CLS-02, BR-FIN-01, BR-FIN-03, TC-040, TC-041, TC-016, TC-051, FE-P0-31, FE-P0-32)
+- **Authorization:** Owner explicit approval on artifact `P0-CLS-01-04-Implementation-Plan.md`.
+- **Requirements & Rules:** `BR-CLS-01`, `BR-CLS-02`, `BR-FIN-01`, `BR-FIN-03`, `TC-040`, `TC-041`, `TC-016`, `TC-051`, `ADR-023`, `FE-P0-31`, `FE-P0-32`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-CLS-01-04.md` (authoritative API contract for closing prerequisites checklist TC-040, managerial P&L calculation TC-016/TC-051, period close command with JSONB snapshot TC-041, status & history).
+  - `database/migrations/V025__create_monthly_closes_and_components.sql` (bảng `mtms.monthly_closes` lưu ngày đầu tháng `month_start` day-1 check, trạng thái `CLOSED`, snapshot dữ liệu JSONB `snapshot_data`, ràng buộc UNIQUE `(branch_id, month_start, revision)`, partial index `uq_monthly_closes_current` trên `is_current`, và bảng `mtms.close_components` lưu 12 chỉ tiêu tài chính chuẩn với ràng buộc CASCADE DELETE).
+  - `backend/src/main/java/com/mtms/closing/` (Clean Architecture: domain models `MonthlyClose`, `CloseStatus`, `CloseComponentCode`, `CloseComponent`, exceptions RFC 7807 `ClosingPrerequisiteFailedException`, `MonthAlreadyClosedException`, `ClosedPeriodLockedException`, `MonthlyCloseNotFoundException`, `InvalidMonthStartException`; repository port & JPA adapter `MonthlyCloseJpaEntity`, `CloseComponentJpaEntity`; application DTOs & `ClosingService` thực thi kiểm tra điều kiện tiên quyết **TC-040**, tính toán P&L dồn tích **TC-016**, ghi chú loại trừ khấu hao **TC-051 / ADR-023**, khóa kỳ kinh doanh bất biến và tạo 12 components **TC-041**; REST controller `ClosingController` & `ClosingExceptionHandler`).
+  - `backend/src/test/java/com/mtms/closing/MonthlyClosingIntegrationTest.java` (6 integration tests chứng minh: thiếu doanh thu hoặc bảng lương DRAFT chặn chốt kỳ **TC-040** trả về 400 Bad Request `urn:mtms:error:closing-prerequisite-failed`, tính toán P&L quản trị tạm tính với chi phí lương dồn tích **TC-016** và disclaimer khấu hao **TC-051**, Owner chốt kỳ thành công tạo snapshot JSONB bất biến và 12 components **TC-041**, chặn chốt trùng kỳ 409 Conflict `urn:mtms:error:month-already-closed`, bảo mật cô lập chi nhánh TC-001 403 Forbidden).
+  - `frontend/src/features/closing/types/closing.types.ts` (TypeScript types, badge components, 12 chỉ tiêu P&L chuẩn).
+  - `frontend/src/features/closing/api/closingApi.ts` (API client kết nối backend closing & reporting).
+  - `frontend/src/features/closing/pages/ClosingPage.tsx` (`FE-P0-32`: giao diện Chốt kỳ kinh doanh với Period Status Banner cảnh báo khóa số liệu, Checklist 4 điều kiện tiên quyết **TC-040**, Close Confirmation Modal cảnh báo tính bất biến **TC-041**, Snapshot Drawer xem chi tiết dữ liệu đóng băng, Bảng lịch sử chốt kỳ).
+  - `frontend/src/features/reporting/pages/ReportingPage.tsx` (`FE-P0-31`: Báo cáo P&L quản trị nội bộ nổi bật huy hiệu **"TẠM TÍNH / PROVISIONAL"**, Hộp cảnh báo loại trừ khấu hao **TC-051 / ADR-023**, 4 thẻ KPI tóm tắt, Bảng Báo cáo Kết quả Kinh doanh Dạng Thác nước Waterfall, Khung Đối chiếu Dồn tích vs Dòng tiền Accrual vs Cash Flow giải trình chênh lệch đối soát sổ quỹ).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 25, bổ sung test ràng buộc V025).
+  - `docs/planning/CURRENT_STATE.md` (cập nhật trạng thái P0-CLS-01..04 IMPLEMENTED / VERIFIED).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 317 tests run, 0 failures, 0 errors, 28 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 12.06s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS (39/39 checks passed).
+
 ## 2026-11-20 — P0-AST-01 Equipment Baseline Register (BR-AST-01, TC-051, ADR-023, FE-P0-30)
 - **Authorization:** Owner explicit approval on artifact `P0-AST-01-Implementation-Plan.md`.
 - **Requirements & Rules:** `BR-AST-01`, `TC-051`, `ADR-023`, `FE-P0-30`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
