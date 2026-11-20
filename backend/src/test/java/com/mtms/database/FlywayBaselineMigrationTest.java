@@ -75,14 +75,14 @@ class FlywayBaselineMigrationTest {
 
     @Test
     @Order(1)
-    @DisplayName("Clean bootstrap: Flyway applies migrations (V001 through V023) in mtms schema")
+    @DisplayName("Clean bootstrap: Flyway applies migrations (V001 through V027) in mtms schema")
     void testCleanBootstrap() {
         Flyway flyway = createFlyway();
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(26);
-        assertThat(result.targetSchemaVersion).isIn("26", "026");
+        assertThat(result.migrationsExecuted).isEqualTo(27);
+        assertThat(result.targetSchemaVersion).isIn("27", "027");
     }
 
     @Test
@@ -3618,6 +3618,142 @@ class FlywayBaselineMigrationTest {
                 stmt.setObject(1, UUID.randomUUID());
                 stmt.setObject(2, agreementId);
                 stmt.setObject(3, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(30)
+    @DisplayName("Constraint verification: V027 stock transfers and transfer lines integrity (P1-MOV-01, P1-MOV-02)")
+    void testStockTransfersAndLinesConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branch1 = UUID.randomUUID();
+            UUID branch2 = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+            UUID itemId = UUID.randomUUID();
+            UUID transferId = UUID.randomUUID();
+            UUID lineId = UUID.randomUUID();
+
+            // Insert base entity, branches, user, unit and catalog item
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_MOV");
+                stmt.setString(3, "Movement Entity Co.");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branch1);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_MOV_01");
+                stmt.setString(4, "Movement Branch 1");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+
+                stmt.setObject(1, branch2);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_MOV_02");
+                stmt.setString(4, "Movement Branch 2");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "mov_user@mtms.local");
+                stmt.setString(3, "$2a$12$dummyhash");
+                stmt.setString(4, "Movement User");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.catalog_items (id, business_entity_id, item_code, name, item_kind, base_unit, storage_uom) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, itemId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "CF_BEANS");
+                stmt.setString(4, "Coffee Beans");
+                stmt.setString(5, "RAW_MATERIAL");
+                stmt.setString(6, "KG");
+                stmt.setString(7, "KG");
+                stmt.executeUpdate();
+            }
+
+            // 1. Insert valid stock transfer
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_transfers (id, transfer_number, business_entity_id, from_branch_id, to_branch_id, requested_on, status, requested_by) " +
+                    "VALUES (?, 'CK-202611-001', ?, ?, ?, '2026-11-20', 'DRAFT', ?)")) {
+                stmt.setObject(1, transferId);
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branch1);
+                stmt.setObject(4, branch2);
+                stmt.setObject(5, userId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 2. Reject same branch transfer (from_branch_id = to_branch_id)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_transfers (id, transfer_number, business_entity_id, from_branch_id, to_branch_id, requested_on, status, requested_by) " +
+                    "VALUES (?, 'CK-SAME-BR', ?, ?, ?, '2026-11-20', 'DRAFT', ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branch1);
+                stmt.setObject(4, branch1);
+                stmt.setObject(5, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 3. Reject duplicate transfer_number within same entity
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_transfers (id, transfer_number, business_entity_id, from_branch_id, to_branch_id, requested_on, status, requested_by) " +
+                    "VALUES (?, 'CK-202611-001', ?, ?, ?, '2026-11-20', 'DRAFT', ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                stmt.setObject(3, branch1);
+                stmt.setObject(4, branch2);
+                stmt.setObject(5, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Insert valid stock transfer line
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_transfer_lines (id, transfer_id, line_number, item_id, dispatched_base_qty, received_base_qty, transit_variance_qty, sender_unit_cost, dispatched_line_cost, received_line_cost) " +
+                    "VALUES (?, ?, 1, ?, 20.000, 18.000, 2.000, 110000.000000, 2200000.00, 1980000.00)")) {
+                stmt.setObject(1, lineId);
+                stmt.setObject(2, transferId);
+                stmt.setObject(3, itemId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 5. Reject invalid quantities (received + variance > dispatched)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_transfer_lines (id, transfer_id, line_number, item_id, dispatched_base_qty, received_base_qty, transit_variance_qty) " +
+                    "VALUES (?, ?, 2, ?, 20.000, 18.000, 5.000)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, transferId);
+                stmt.setObject(3, UUID.randomUUID());
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 6. Reject non-positive dispatched_base_qty <= 0
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.stock_transfer_lines (id, transfer_id, line_number, item_id, dispatched_base_qty) " +
+                    "VALUES (?, ?, 3, ?, 0.000)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, transferId);
+                stmt.setObject(3, UUID.randomUUID());
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
             }

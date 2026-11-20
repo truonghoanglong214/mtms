@@ -183,6 +183,78 @@ public class StockMovement {
         );
     }
 
+    public static StockMovement createTransferOutMovement(
+            UUID businessEntityId,
+            UUID branchId,
+            UUID itemId,
+            UUID lotId,
+            LocalDate businessDate,
+            BigDecimal quantity,
+            BigDecimal bookedTotal,
+            BigDecimal bookedAvgCost,
+            UUID transferId,
+            String transferNumber,
+            UUID createdBy
+    ) {
+        BigDecimal signedQty = quantity.negate().setScale(3, RoundingMode.HALF_UP);
+        BigDecimal signedVal = bookedTotal.negate().setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cost = bookedAvgCost.setScale(6, RoundingMode.HALF_UP);
+
+        return new StockMovement(
+                UUID.randomUUID(),
+                businessEntityId,
+                branchId,
+                itemId,
+                lotId,
+                businessDate,
+                StockMovementType.TRANSFER_OUT,
+                signedQty,
+                signedVal,
+                cost,
+                "STOCK_TRANSFER",
+                transferId,
+                transferNumber,
+                createdBy,
+                Instant.now()
+        );
+    }
+
+    public static StockMovement createTransferInMovement(
+            UUID businessEntityId,
+            UUID branchId,
+            UUID itemId,
+            UUID lotId,
+            LocalDate businessDate,
+            BigDecimal quantity,
+            BigDecimal receivedTotal,
+            BigDecimal senderAvgCost,
+            UUID transferId,
+            String transferNumber,
+            UUID createdBy
+    ) {
+        BigDecimal signedQty = quantity.setScale(3, RoundingMode.HALF_UP);
+        BigDecimal signedVal = receivedTotal.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cost = senderAvgCost.setScale(6, RoundingMode.HALF_UP);
+
+        return new StockMovement(
+                UUID.randomUUID(),
+                businessEntityId,
+                branchId,
+                itemId,
+                lotId,
+                businessDate,
+                StockMovementType.TRANSFER_IN,
+                signedQty,
+                signedVal,
+                cost,
+                "STOCK_TRANSFER",
+                transferId,
+                transferNumber,
+                createdBy,
+                Instant.now()
+        );
+    }
+
     public UUID getId() {
         return id;
     }

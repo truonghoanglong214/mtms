@@ -8,5 +8,7 @@ public enum StockMovementType {
     OPENING_BALANCE,
     PURCHASE_RECEIPT,
     MANUAL_ISSUE,
-    ADJUSTMENT
+    ADJUSTMENT,
+    TRANSFER_OUT,
+    TRANSFER_IN
 }
