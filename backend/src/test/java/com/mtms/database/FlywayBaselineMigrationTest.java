@@ -81,8 +81,8 @@ class FlywayBaselineMigrationTest {
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(23);
-        assertThat(result.targetSchemaVersion).isIn("23", "023");
+        assertThat(result.migrationsExecuted).isEqualTo(24);
+        assertThat(result.targetSchemaVersion).isIn("24", "024");
     }
 
     @Test
@@ -3226,6 +3226,98 @@ class FlywayBaselineMigrationTest {
                 var rs = stmt.executeQuery();
                 rs.next();
                 assertThat(rs.getLong(1)).isZero();
+            }
+        }
+    }
+
+    @Test
+    @Order(27)
+    @DisplayName("P0-AST-01 / V024 Constraint verification: Equipment assets table, category/status checks and unique asset_code")
+    void testEquipmentAssetsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID assetId = UUID.randomUUID();
+            String assetCode = "AST-TEST-CF001";
+
+            // 1. Insert prerequisites
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) " +
+                    "VALUES (?, ?, 'Asset Test Entity', 'ACTIVE')")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_AST_" + UUID.randomUUID().toString().substring(0, 8));
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, branch_name, status) " +
+                    "VALUES (?, ?, ?, 'Asset Test Branch', 'ACTIVE')")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_AST_" + UUID.randomUUID().toString().substring(0, 8));
+                stmt.executeUpdate();
+            }
+
+            // 2. Insert valid equipment asset
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.equipment_assets (id, branch_id, asset_code, name, category, serial_number, model, purchased_on, acquisition_cost, warranty_until, status, location_in_branch, maintenance_note) " +
+                    "VALUES (?, ?, ?, 'Máy pha cà phê Nuova Simonelli', 'COFFEE_MACHINE', 'NS-12345', 'Appia II', '2026-01-15', 85000000.00, '2027-01-15', 'IN_USE', 'Quầy bar', 'Bảo dưỡng định kỳ')")) {
+                stmt.setObject(1, assetId);
+                stmt.setObject(2, branchId);
+                stmt.setString(3, assetCode);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 3. Reject duplicate asset_code (UNIQUE constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.equipment_assets (id, branch_id, asset_code, name, category, acquisition_cost) " +
+                    "VALUES (?, ?, ?, 'Máy pha cà phê 2', 'COFFEE_MACHINE', 50000000.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                stmt.setString(3, assetCode); // Duplicate
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Reject negative acquisition_cost (CHECK constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.equipment_assets (id, branch_id, asset_code, name, category, acquisition_cost) " +
+                    "VALUES (?, ?, 'AST-NEG-001', 'Máy xay', 'BLENDER', -100.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 5. Reject invalid category (CHECK constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.equipment_assets (id, branch_id, asset_code, name, category, acquisition_cost) " +
+                    "VALUES (?, ?, 'AST-CAT-001', 'Xe máy', 'MOTORBIKE', 20000000.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 6. Reject invalid status (CHECK constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.equipment_assets (id, branch_id, asset_code, name, category, acquisition_cost, status) " +
+                    "VALUES (?, ?, 'AST-STAT-001', 'Máy lạnh', 'REFRIGERATION', 15000000.00, 'LOST')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 7. Reject invalid branch_id (FK constraint violation)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.equipment_assets (id, branch_id, asset_code, name, category, acquisition_cost) " +
+                    "VALUES (?, ?, 'AST-FK-001', 'Bàn ghế', 'FURNITURE', 5000000.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, UUID.randomUUID()); // nonexistent branch
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
             }
         }
     }
