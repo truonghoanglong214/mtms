@@ -1,5 +1,30 @@
 # MTMS — File changes and decisions
 
+## 2026-11-20 — P1-MOV-01 & P1-MOV-02 Inter-Branch Stock Transfers, Moving WAC Snapshot & Partial Receipt Discrepancy Tracking (BR-MOV-01, BR-MOV-02, TC-027, TC-028, TC-021, FE-P1-13, FE-P1-14)
+- **Authorization:** Owner explicit approval on artifact `P1-MOV-01-02-Implementation-Plan.md`.
+- **Requirements & Rules:** `BR-MOV-01`, `BR-MOV-02`, `TC-027`, `TC-028`, `TC-021`, `TC-001`, `FE-P1-13`, `FE-P1-14`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P1-MOV-01-02.md` (authoritative API contract for draft transfers, dispatch with moving WAC snapshot, partial/full receipt with in-transit discrepancy preservation, outbound/inbound lists, summary KPIs, and cancellation).
+  - `database/migrations/V027__create_stock_transfers_and_lines.sql` (bảng `mtms.stock_transfers` lưu thông tin chuyển kho giữa các chi nhánh cùng pháp nhân với ràng buộc unique `(from_branch_id, transfer_number)` và trạng thái `DRAFT/DISPATCHED/PARTIAL_RECEIPT/COMPLETED/CANCELLED`; bảng `mtms.stock_transfer_lines` lưu chi tiết dòng hàng hóa, đơn giá snapshot `sender_unit_cost`, số lượng xuất/nhận, và số lượng chênh lệch hao hụt trên đường vận chuyển `transit_variance_qty = dispatched_base_qty - received_base_qty`).
+  - `backend/src/main/java/com/mtms/movement/` (Clean Architecture: domain models `StockTransfer`, `StockTransferLine`, `TransferStatus`; domain exceptions RFC 7807 `InterEntityTransferForbiddenException`, `SameBranchTransferForbiddenException`, `TransferNotFoundException`, `InvalidTransferStatusException`, `TransferOverReceiptException`, `TransferInsufficientStockException`; domain repository port `StockTransferRepository`; JPA entities and Spring Data repositories `StockTransferJpaEntity`, `StockTransferLineJpaEntity`, `SpringDataStockTransferRepository`, `StockTransferRepositoryAdapter`; application DTOs and `TransferService` thực thi kiểm tra cùng pháp nhân **TC-028**, khóa dòng tồn kho và chụp ảnh snapshot Moving WAC xuất kho `TRANSFER_OUT` **P1-MOV-01**, chặn âm kho **TC-021**, tiếp nhận đủ hoặc thiếu **TC-027** hạch toán `TRANSFER_IN` theo giá vốn snapshot và bảo lưu toàn vẹn lượng thiếu `transit_variance_qty` với trạng thái `PARTIAL_RECEIPT`; REST controller `TransferController` và RFC 7807 exception handler `MovementExceptionHandler`).
+  - `backend/src/test/java/com/mtms/movement/TransferAndReceiptIntegrationTest.java` (8 integration tests chứng minh: xuất chuyển kho chụp snapshot Moving WAC và trừ tồn kho gửi P1-MOV-01; cấm chuyển kho khác pháp nhân **TC-028** 400 Bad Request `urn:mtms:error:inter-entity-transfer-forbidden`; cấm chuyển kho cùng chi nhánh; cấm xuất quá tồn khả dụng **TC-021** 400 Bad Request `urn:mtms:error:insufficient-stock`; tiếp nhận đủ cập nhật Moving WAC chi nhánh nhận và hoàn tất COMPLETED; tiếp nhận thiếu **TC-027** bảo lưu chênh lệch hao hụt không cho hàng hóa biến mất với trạng thái PARTIAL_RECEIPT; cấm nhận thừa quá số lượng xuất; bảo mật phân quyền chi nhánh **TC-001** 403 Forbidden).
+  - `frontend/src/features/movement/types/movement.types.ts` (TypeScript types, enums, Vietnamese labels và DTO interfaces cho toàn bộ module Điều chuyển kho).
+  - `frontend/src/features/movement/api/movementApi.ts` (API client cho các endpoints chuyển kho: tạo, xuất, nhận, hủy, danh sách outbound/inbound, chi tiết, thống kê).
+  - `frontend/src/features/movement/pages/TransferManagementPage.tsx` (`FE-P1-13` / `FE-P1-14`: giao diện Quản lý Điều chuyển kho với 4 thẻ KPI tóm tắt, Banner Quy tắc Nghiệp vụ TC-027/028, và 3 tab chức năng: Chuyển đi - Outbound, Tiếp nhận - Inbound, Hàng hao hụt / Chênh lệch vận chuyển - Discrepancies).
+  - `frontend/src/features/movement/components/` (`CreateTransferModal.tsx` FE-P1-13 lọc chi nhánh cùng pháp nhân TC-028 và kiểm tra tồn kho khả dụng TC-021; `ReceiveTransferModal.tsx` FE-P1-14 hỗ trợ nhận đủ hoặc nhận thiếu TC-027 với tính toán chênh lệch realtime và lý do hao hụt bắt buộc; `TransferDetailModal.tsx` xem chi tiết và lịch sử audit trail; `OutboundTransfersTab.tsx`; `InboundTransfersTab.tsx`; `DiscrepanciesTab.tsx`).
+- **MODIFY:**
+  - `backend/src/main/java/com/mtms/inventory/domain/StockMovementType.java` (thêm enum `TRANSFER_OUT` và `TRANSFER_IN`).
+  - `backend/src/main/java/com/mtms/inventory/domain/StockMovement.java` (bổ sung static factory methods `createTransferOutMovement` và `createTransferInMovement`).
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 27, bổ sung test ràng buộc V027).
+  - `frontend/src/app/router.tsx` (bổ sung route lazy `/movement/transfers`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Điều chuyển kho (TC-027/028)" với biểu tượng `ArrowRightLeft`).
+  - `docs/planning/CURRENT_STATE.md` (cập nhật trạng thái P1-MOV-01..02 và FE-P1-13..14 IMPLEMENTED / VERIFIED).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 333 tests run, 0 failures, 0 errors, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 10.30s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS (39/39 checks passed).
+
 ## 2026-11-20 — P0-CAP-01 through P0-CAP-03 Founding Capital Commitments, Actual Contributions & Profit Entitlement Terms Viewer (BR-CAP-01, BR-CAP-02, BR-CAP-03, TC-032, TC-035, ADR-007, FE-P0-29)
 - **Authorization:** Owner explicit approval on artifact `P0-CAP-01-03-Implementation-Plan.md`.
 - **Requirements & Rules:** `BR-CAP-01`, `BR-CAP-02`, `BR-CAP-03`, `TC-032`, `TC-035`, `ADR-007`, `FE-P0-29`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
