@@ -81,8 +81,8 @@ class FlywayBaselineMigrationTest {
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(24);
-        assertThat(result.targetSchemaVersion).isIn("24", "024");
+        assertThat(result.migrationsExecuted).isEqualTo(25);
+        assertThat(result.targetSchemaVersion).isIn("25", "025");
     }
 
     @Test
@@ -3318,6 +3318,135 @@ class FlywayBaselineMigrationTest {
                 stmt.setObject(2, UUID.randomUUID()); // nonexistent branch
                 assertThatThrownBy(stmt::executeUpdate)
                         .isInstanceOf(SQLException.class);
+            }
+        }
+    }
+
+    @Test
+    @Order(28)
+    @DisplayName("P0-CLS-01..04 / V025 Constraint verification: Monthly closes and close components tables")
+    void testMonthlyClosesConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+            UUID closeId = UUID.randomUUID();
+            UUID componentId = UUID.randomUUID();
+
+            // 1. Insert prerequisites
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) " +
+                    "VALUES (?, ?, 'Closing Test Entity', 'ACTIVE')")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_CLS_" + UUID.randomUUID().toString().substring(0, 8));
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, branch_name, status) " +
+                    "VALUES (?, ?, ?, 'Closing Test Branch', 'ACTIVE')")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_CLS_" + UUID.randomUUID().toString().substring(0, 8));
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, username, password_hash, full_name, email, status) " +
+                    "VALUES (?, ?, 'hash', 'Closing Actor', ?, 'ACTIVE')")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "actor_" + UUID.randomUUID().toString().substring(0, 8));
+                stmt.setString(3, "actor_" + UUID.randomUUID().toString().substring(0, 8) + "@mtms.local");
+                stmt.executeUpdate();
+            }
+
+            // 2. Insert valid monthly close
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.monthly_closes (" +
+                    "id, branch_id, month_start, revision, is_current, status, managerial_profit, is_provisional, closed_by, closed_at, snapshot, note) " +
+                    "VALUES (?, ?, '2026-11-01', 1, true, 'CLOSED', 20000000.00, true, ?, CURRENT_TIMESTAMP, '{\"totalRevenue\": 125000000}'::jsonb, 'Test close')")) {
+                stmt.setObject(1, closeId);
+                stmt.setObject(2, branchId);
+                stmt.setObject(3, userId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 3. Reject month_start not starting on day 1 (CHECK constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.monthly_closes (" +
+                    "id, branch_id, month_start, revision, is_current, status) " +
+                    "VALUES (?, ?, '2026-11-15', 1, false, 'OPEN')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Reject duplicate (branch_id, month_start, revision) (UNIQUE constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.monthly_closes (" +
+                    "id, branch_id, month_start, revision, is_current, status) " +
+                    "VALUES (?, ?, '2026-11-01', 1, false, 'OPEN')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 5. Reject invalid status (CHECK constraint)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.monthly_closes (" +
+                    "id, branch_id, month_start, revision, is_current, status) " +
+                    "VALUES (?, ?, '2026-12-01', 1, true, 'INVALID_STATUS')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 6. Insert valid close component
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.close_components (id, monthly_close_id, component_code, signed_amount, provenance) " +
+                    "VALUES (?, ?, 'REVENUE_TOTAL', 125000000.00, '{\"source\": \"daily_reports\"}'::jsonb)")) {
+                stmt.setObject(1, componentId);
+                stmt.setObject(2, closeId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 7. Reject duplicate close component code for same monthly_close_id
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.close_components (id, monthly_close_id, component_code, signed_amount) " +
+                    "VALUES (?, ?, 'REVENUE_TOTAL', 5000000.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, closeId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 8. Reject invalid component_code
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.close_components (id, monthly_close_id, component_code, signed_amount) " +
+                    "VALUES (?, ?, 'ILLEGAL_CODE', 1000000.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, closeId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 9. Cascade delete verification
+            try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM mtms.monthly_closes WHERE id = ?")) {
+                stmt.setObject(1, closeId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM mtms.close_components WHERE id = ?")) {
+                stmt.setObject(1, componentId);
+                var rs = stmt.executeQuery();
+                rs.next();
+                assertThat(rs.getLong(1)).isZero();
             }
         }
     }
