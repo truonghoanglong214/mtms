@@ -46,6 +46,7 @@ const navItems = [
   { name: 'Tồn đầu kỳ & WAC TC-024', path: '/inventory/opening', icon: Coins },
   { name: 'Danh mục & Quy vị TC-023', path: '/inventory/catalog', icon: Boxes },
   { name: 'Sổ quỹ & Tài chính (TC-010/011)', path: '/finance', icon: Wallet },
+  { name: 'Vốn & Cổ đông (TC-032)', path: '/capital', icon: Coins },
   { name: 'Chốt sổ kỳ kinh doanh', path: '/closing', icon: FileCheck2 },
   { name: 'Báo cáo P&L quản trị', path: '/reporting', icon: PieChart },
   { name: 'Cơ cấu & Phân quyền', path: '/admin/organization', icon: Building2 },

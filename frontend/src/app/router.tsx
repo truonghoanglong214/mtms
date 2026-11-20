@@ -92,6 +92,11 @@ const AssetManagementPage = lazy(() =>
     default: m.AssetManagementPage,
   }))
 )
+const CapitalManagementPage = lazy(() =>
+  import('@/features/capital/pages/CapitalManagementPage').then((m) => ({
+    default: m.CapitalManagementPage,
+  }))
+)
 
 export const router = createBrowserRouter([
   // Public-only route (Login)
@@ -184,6 +189,10 @@ export const router = createBrowserRouter([
           {
             path: 'finance',
             element: <FinancePage />,
+          },
+          {
+            path: 'capital',
+            element: <CapitalManagementPage />,
           },
           {
             path: 'closing',
