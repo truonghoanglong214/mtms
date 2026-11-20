@@ -1,5 +1,28 @@
 # MTMS — File changes and decisions
 
+## 2026-11-20 — P1-INV-02 Stock Count Sessions, Snapshot Valuation & Physical Discrepancy Owner Approval Gate (BR-INV-07, TC-026, TC-021, TC-001, FE-P1-10)
+- **Authorization:** Owner explicit approval on artifact `P1-INV-02-Implementation-Plan.md`.
+- **Requirements & Rules:** `BR-INV-07`, `TC-026`, `TC-021`, `TC-001`, `FE-P1-10`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P1-INV-02.md` (authoritative API contract for stock count creation with balance & WAC snapshotting, draft count entries, submit for review, Owner approval & atomic adjustment posting, cancellation, count list, detail and summary KPIs).
+  - `database/migrations/V028__create_stock_counts_and_lines.sql` (bảng `mtms.stock_counts` lưu phiên kiểm kê với ràng buộc unique `(branch_id, count_code)` và trạng thái `DRAFT/SUBMITTED/POSTED/CANCELLED`; bảng `mtms.stock_count_lines` lưu chi tiết dòng kiểm kê với số lượng sổ sách `expected_qty`, đơn giá snapshot `snapshot_unit_cost`, số lượng đếm thực tế `counted_qty`, chênh lệch `variance_qty = counted_qty - expected_qty`, giá trị chênh lệch `variance_value`, và lý do giải trình chênh lệch `discrepancy_reason`).
+  - `backend/src/main/java/com/mtms/stockcount/` (Clean Architecture: domain models `StockCount`, `StockCountLine`, `StockCountStatus`, `StockCountType`; domain exceptions RFC 7807 `StockCountNotFoundException`, `InvalidStockCountStatusException`, `MissingDiscrepancyReasonException`, `NegativeCountedQuantityException`, `StockCountInsufficientStockException`; domain repository port `StockCountRepository`; JPA entities and Spring Data repositories `StockCountJpaEntity`, `StockCountLineJpaEntity`, `SpringDataStockCountRepository`, `StockCountRepositoryAdapter`; application DTOs and `StockCountService` thực thi chụp ảnh số dư sổ sách và Moving WAC khi tạo đợt kiểm kê, chặn triệt để biến động tồn kho khi chưa duyệt **TC-026**, kiểm tra tồn kho khả dụng tránh âm kho **TC-021**, bắt buộc giải trình lý do chênh lệch thừa/thiếu, hạch toán điều chỉnh `ADJUSTMENT` và khóa biên bản `POSTED` khi Owner duyệt; REST controller `StockCountController` và RFC 7807 exception handler `StockCountExceptionHandler`).
+  - `backend/src/test/java/com/mtms/stockcount/StockCountIntegrationTest.java` (8 integration tests chứng minh: snapshot số dư tồn và đơn giá bình quân gia quyền Moving WAC; chứng minh định lý bất biến **TC-026**: biên bản thừa/thiếu ở trạng thái DRAFT/SUBMITTED hoàn toàn không thay đổi số dư tồn kho và không sinh bút toán movement; Owner duyệt hao hụt hạch toán giảm tồn kho và bảo lưu Moving WAC; Owner duyệt thừa hạch toán tăng tồn kho; cấm duyệt hao hụt khi tồn kho thực tế bị âm **TC-021** 400 Bad Request; bắt buộc có lý do giải trình khi chênh lệch khác 0; cấm sửa biên bản đã khóa POSTED; bảo mật phân quyền chi nhánh **TC-001** 403 Forbidden).
+  - `frontend/src/features/stockcount/types/stockCount.types.ts` (TypeScript types, enums, Vietnamese labels và DTO interfaces cho toàn bộ module Kiểm kê kho).
+  - `frontend/src/features/stockcount/api/stockCountApi.ts` (API client cho các endpoints kiểm kê: tạo đợt kiểm kê, cập nhật số đếm, nộp duyệt, Owner phê duyệt, hủy đợt, danh sách, chi tiết, thống kê).
+  - `frontend/src/features/stockcount/pages/StockCountManagementPage.tsx` (`FE-P1-10`: giao diện Quản lý Kiểm kê Kho với 4 thẻ KPI tóm tắt, Banner Quy tắc Quản trị TC-026, chuyển đổi chi nhánh, bộ lọc đa tiêu chí và bảng danh sách biên bản kiểm kê).
+  - `frontend/src/features/stockcount/components/` (`CreateStockCountModal.tsx` tạo đợt kiểm kê định kỳ/đột xuất với snapshot tự động; `StockCountDetailModal.tsx` bảng nhập số đếm thực tế tương tác với tính toán chênh lệch realtime và bắt buộc giải trình; `ApproveStockCountModal.tsx` hộp thoại xác nhận phê duyệt của Chủ sở hữu với cảnh báo quản trị TC-026/021).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 28, bổ sung test ràng buộc V028).
+  - `frontend/src/app/router.tsx` (bổ sung route lazy `/inventory/counts`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Kiểm kê kho (TC-026)" với biểu tượng `ClipboardCheck`).
+  - `docs/planning/CURRENT_STATE.md` (cập nhật trạng thái P1-INV-02 và FE-P1-10 IMPLEMENTED / VERIFIED).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 341 tests run, 0 failures, 0 errors, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 9.19s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS (39/39 checks passed).
+
 ## 2026-11-20 — P1-MOV-01 & P1-MOV-02 Inter-Branch Stock Transfers, Moving WAC Snapshot & Partial Receipt Discrepancy Tracking (BR-MOV-01, BR-MOV-02, TC-027, TC-028, TC-021, FE-P1-13, FE-P1-14)
 - **Authorization:** Owner explicit approval on artifact `P1-MOV-01-02-Implementation-Plan.md`.
 - **Requirements & Rules:** `BR-MOV-01`, `BR-MOV-02`, `TC-027`, `TC-028`, `TC-021`, `TC-001`, `FE-P1-13`, `FE-P1-14`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `05-stock-moving-wac.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
