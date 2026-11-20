@@ -81,8 +81,8 @@ class FlywayBaselineMigrationTest {
         MigrateResult result = flyway.migrate();
 
         assertThat(result.success).isTrue();
-        assertThat(result.migrationsExecuted).isEqualTo(25);
-        assertThat(result.targetSchemaVersion).isIn("25", "025");
+        assertThat(result.migrationsExecuted).isEqualTo(26);
+        assertThat(result.targetSchemaVersion).isIn("26", "026");
     }
 
     @Test
@@ -3447,6 +3447,179 @@ class FlywayBaselineMigrationTest {
                 var rs = stmt.executeQuery();
                 rs.next();
                 assertThat(rs.getLong(1)).isZero();
+            }
+        }
+    }
+
+    @Test
+    @Order(29)
+    @DisplayName("P0-CAP-01..03 / V026 Constraint verification: Investors, commitments, contributions and profit terms")
+    void testInvestorsCommitmentsAndTermsConstraints() throws SQLException {
+        try (Connection conn = createConnection()) {
+            UUID entityId = UUID.randomUUID();
+            UUID branchId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
+            UUID accountId = UUID.randomUUID();
+            UUID investorId = UUID.randomUUID();
+            UUID agreementId = UUID.randomUUID();
+            UUID commitmentId = UUID.randomUUID();
+            UUID contributionId = UUID.randomUUID();
+            UUID profitTermId = UUID.randomUUID();
+
+            // 1. Seed base entity, branch, user, and financial account
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, ?, ?)")) {
+                stmt.setObject(1, entityId);
+                stmt.setString(2, "ENT_CAP");
+                stmt.setString(3, "Capital Investment Entity");
+                stmt.setString(4, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, branchId);
+                stmt.setObject(2, entityId);
+                stmt.setString(3, "BR_CAP");
+                stmt.setString(4, "Branch Capital Main");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
+                stmt.setObject(1, userId);
+                stmt.setString(2, "investor_admin@mtms.local");
+                stmt.setString(3, "hash");
+                stmt.setString(4, "Admin Cap");
+                stmt.setString(5, "ACTIVE");
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.financial_accounts (id, branch_id, account_type, account_name, current_balance, status) " +
+                    "VALUES (?, ?, 'CASH', 'Quỹ tiền mặt chính', 0.00, 'ACTIVE')")) {
+                stmt.setObject(1, accountId);
+                stmt.setObject(2, branchId);
+                stmt.executeUpdate();
+            }
+
+            // 2. Insert valid investor
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.investors (id, entity_id, display_name, contact_phone, contact_email) " +
+                    "VALUES (?, ?, 'Nguyễn Văn Đầu Tư', '0901234567', 'dautu@example.com')")) {
+                stmt.setObject(1, investorId);
+                stmt.setObject(2, entityId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 3. Duplicate investor display_name within same entity rejected
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.investors (id, entity_id, display_name) " +
+                    "VALUES (?, ?, 'Nguyễn Văn Đầu Tư')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, entityId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 4. Insert valid investor agreement
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.investor_agreements (id, investor_id, branch_id, agreement_ref, contribution_type, effective_from, status) " +
+                    "VALUES (?, ?, ?, 'TTDT-001/2026', 'CASH', '2026-01-01', 'ACTIVE')")) {
+                stmt.setObject(1, agreementId);
+                stmt.setObject(2, investorId);
+                stmt.setObject(3, branchId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 5. Duplicate agreement_ref within branch rejected
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.investor_agreements (id, investor_id, branch_id, agreement_ref, contribution_type, effective_from) " +
+                    "VALUES (?, ?, ?, 'TTDT-001/2026', 'ASSET', '2026-01-01')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, investorId);
+                stmt.setObject(3, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 6. Invalid agreement date range rejected
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.investor_agreements (id, investor_id, branch_id, agreement_ref, contribution_type, effective_from, effective_to) " +
+                    "VALUES (?, ?, ?, 'TTDT-INVALID-DATE', 'CASH', '2026-12-31', '2026-01-01')")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, investorId);
+                stmt.setObject(3, branchId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 7. Insert valid capital commitment
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.capital_commitments (id, agreement_id, committed_value, recognized_non_cash_value, status) " +
+                    "VALUES (?, ?, 100000000.00, 0.00, 'PENDING')")) {
+                stmt.setObject(1, commitmentId);
+                stmt.setObject(2, agreementId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 8. Negative committed_value rejected
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.capital_commitments (id, agreement_id, committed_value) " +
+                    "VALUES (?, ?, -500000.00)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, agreementId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 9. Insert valid capital contribution (CASH with account_id)
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.capital_contributions (id, commitment_id, contributed_on, contribution_type, recognized_value, account_id, created_by) " +
+                    "VALUES (?, ?, '2026-01-15', 'CASH', 60000000.00, ?, ?)")) {
+                stmt.setObject(1, contributionId);
+                stmt.setObject(2, commitmentId);
+                stmt.setObject(3, accountId);
+                stmt.setObject(4, userId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 10. CASH contribution without account_id rejected
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.capital_contributions (id, commitment_id, contributed_on, contribution_type, recognized_value, created_by) " +
+                    "VALUES (?, ?, '2026-01-15', 'CASH', 10000000.00, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, commitmentId);
+                stmt.setObject(3, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
+            }
+
+            // 11. Insert valid profit entitlement term
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.profit_entitlement_terms (id, agreement_id, effective_from, profit_share_ratio, approved_by) " +
+                    "VALUES (?, ?, '2026-01-01', 0.350000, ?)")) {
+                stmt.setObject(1, profitTermId);
+                stmt.setObject(2, agreementId);
+                stmt.setObject(3, userId);
+                int rows = stmt.executeUpdate();
+                assertThat(rows).isEqualTo(1);
+            }
+
+            // 12. profit_share_ratio > 1.0 or < 0.0 rejected
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "INSERT INTO mtms.profit_entitlement_terms (id, agreement_id, effective_from, profit_share_ratio, approved_by) " +
+                    "VALUES (?, ?, '2026-01-01', 1.250000, ?)")) {
+                stmt.setObject(1, UUID.randomUUID());
+                stmt.setObject(2, agreementId);
+                stmt.setObject(3, userId);
+                assertThatThrownBy(stmt::executeUpdate)
+                        .isInstanceOf(SQLException.class);
             }
         }
     }
