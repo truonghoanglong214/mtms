@@ -1,5 +1,28 @@
 # MTMS — File changes and decisions
 
+## 2026-11-20 — P0-CAP-01 through P0-CAP-03 Founding Capital Commitments, Actual Contributions & Profit Entitlement Terms Viewer (BR-CAP-01, BR-CAP-02, BR-CAP-03, TC-032, TC-035, ADR-007, FE-P0-29)
+- **Authorization:** Owner explicit approval on artifact `P0-CAP-01-03-Implementation-Plan.md`.
+- **Requirements & Rules:** `BR-CAP-01`, `BR-CAP-02`, `BR-CAP-03`, `TC-032`, `TC-035`, `ADR-007`, `FE-P0-29`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-CAP-01-03.md` (authoritative API contract for investor registration, branch agreements, capital commitments, cash/non-cash contributions with cash ledger linkage, and informational profit entitlement terms viewer with G5 provisional disclaimer).
+  - `database/migrations/V026__create_investors_commitments_and_terms.sql` (bảng `mtms.investors` lưu hồ sơ nhà đầu tư cấp entity, `mtms.investor_agreements` lưu thỏa thuận hợp tác góp vốn chi nhánh, `mtms.capital_commitments` lưu cam kết góp vốn với giá trị cam kết > 0, `mtms.capital_contributions` lưu các đợt góp vốn thực tế bằng tiền mặt hoặc tài sản phi tiền mặt liên kết sổ quỹ `cash_ledger_entries`, `mtms.profit_entitlement_terms` lưu tỷ lệ chia lợi nhuận tham chiếu hiệu lực với ràng buộc hợp lệ ngày tháng).
+  - `backend/src/main/java/com/mtms/capital/` (Clean Architecture: domain models `Investor`, `InvestorAgreement`, `CapitalCommitment`, `CapitalContribution`, `ProfitEntitlementTerm`, `ContributionType`, `AgreementStatus`, `CommitmentStatus`; domain exceptions RFC 7807; domain repository port `CapitalRepository`; JPA entities and Spring Data repositories `SpringDataInvestorRepository`, `SpringDataInvestorAgreementRepository`, `SpringDataCapitalCommitmentRepository`, `SpringDataCapitalContributionRepository`, `SpringDataProfitEntitlementTermRepository`; repository adapter `CapitalRepositoryAdapter`; application DTOs and `CapitalService` thực thi tính toán tiến độ **TC-032**, hạch toán góp vốn tiền mặt vào `CashLedgerService.postLedgerEntry` tăng số dư quỹ không tăng doanh thu P&L, đối soát độc lập tỷ lệ vốn góp và tỷ lệ chia lợi nhuận **CAP-INV-01**, và khóa chi trả tiền mặt thực tế **ADR-007 / TC-035 G5 Gate** với `isInformationalOnly: true`; REST controller `CapitalController` và exception handler `CapitalExceptionHandler`).
+  - `backend/src/test/java/com/mtms/capital/CapitalAndCommitmentIntegrationTest.java` (7 integration tests: tạo nhà đầu tư và thỏa thuận chi nhánh; kiểm chứng định lý bất biến **TC-032**: cam kết 100M, góp 60M -> còn phải thu 40M; hạch toán góp vốn tiền mặt tự động sinh bút toán `CAP_INJECTION` trong sổ quỹ và cập nhật số dư; cấu hình tỷ lệ lợi nhuận chỉ mang tính tham chiếu nội bộ với disclaimer G5; kiểm chứng nguyên tắc **CAP-INV-01**: tỷ lệ chia lợi nhuận 50/50 khác tỷ lệ vốn góp thực tế 60/40; kiểm tra bảo mật cô lập chi nhánh TC-001 403 Forbidden; và kiểm tra bắt lỗi đầu vào / trùng lặp dữ liệu).
+  - `frontend/src/features/capital/types/capital.types.ts` (TypeScript types, enums, Vietnamese labels và DTO interfaces cho toàn bộ module Vốn góp & Cổ đông).
+  - `frontend/src/features/capital/api/capitalApi.ts` (API client cho các endpoints nhà đầu tư, thỏa thuận, cam kết, đóng góp thực tế và tỷ lệ lợi nhuận).
+  - `frontend/src/features/capital/pages/CapitalManagementPage.tsx` (`FE-P0-29`: giao diện Quản lý Vốn góp & Cổ đông với 4 thẻ KPI tóm tắt, Banner Cảnh báo Cổng G5 & ADR-007, và 3 tab chức năng: Tiến độ góp vốn TC-032, Danh sách Cổ đông & Thỏa thuận, và Bảng đối soát Tỷ lệ hưởng Lợi nhuận CAP-INV-01).
+  - `frontend/src/features/capital/components/` (`CreateInvestorModal.tsx`, `CreateAgreementModal.tsx`, `CreateCommitmentModal.tsx`, `RecordContributionModal.tsx` với thông báo hạch toán tự động vào sổ quỹ, `CreateProfitTermModal.tsx`, `InvestorListTab.tsx`, `CommitmentsProgressTab.tsx`, `ProfitTermsViewerTab.tsx`).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 26, bổ sung test ràng buộc V026).
+  - `frontend/src/app/router.tsx` (bổ sung route lazy `/capital`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Vốn & Cổ đông (TC-032)" với biểu tượng `Coins`).
+  - `docs/planning/CURRENT_STATE.md` (cập nhật trạng thái P0-CAP-01..03 và FE-P0-29 IMPLEMENTED / VERIFIED).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 325 tests run, 0 failures, 0 errors, 29 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 9.18s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS (39/39 checks passed).
+
 ## 2026-11-20 — P0-CLS-01 through P0-CLS-04 Monthly Closing & Managerial Provisional P&L (BR-CLS-01, BR-CLS-02, BR-FIN-01, BR-FIN-03, TC-040, TC-041, TC-016, TC-051, FE-P0-31, FE-P0-32)
 - **Authorization:** Owner explicit approval on artifact `P0-CLS-01-04-Implementation-Plan.md`.
 - **Requirements & Rules:** `BR-CLS-01`, `BR-CLS-02`, `BR-FIN-01`, `BR-FIN-03`, `TC-040`, `TC-041`, `TC-016`, `TC-051`, `ADR-023`, `FE-P0-31`, `FE-P0-32`, `00-product-boundary.md`, `01-financial-data-safety.md`, `02-execution-gates.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
