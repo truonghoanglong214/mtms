@@ -1,5 +1,25 @@
 # MTMS — File changes and decisions
 
+## 2026-11-20 — P0-AST-01 Equipment Baseline Register (BR-AST-01, TC-051, ADR-023, FE-P0-30)
+- **Authorization:** Owner explicit approval on artifact `P0-AST-01-Implementation-Plan.md`.
+- **Requirements & Rules:** `BR-AST-01`, `TC-051`, `ADR-023`, `FE-P0-30`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
+- **ADD:**
+  - `docs/api/contracts/P0-AST-01.md` (authoritative API contract for equipment assets register, summary KPIs, and TC-051 P0 depreciation exclusion disclosure).
+  - `database/migrations/V024__create_equipment_assets.sql` (bảng `mtms.equipment_assets` lưu mã tài sản `asset_code` UNIQUE, tên, danh mục `category`, serial, model, ngày mua, nguyên giá $\ge 0$, hạn bảo hành, trạng thái, vị trí, liên kết NCC và chứng từ `evidence_files`).
+  - `backend/src/main/java/com/mtms/asset/` (Clean Architecture: domain models `EquipmentAsset`, `AssetCategory`, `AssetStatus`, exceptions RFC 7807 `AssetCodeConflictException`, `AssetNotFoundException`, `InvalidAssetCostException`; repository port & JPA adapter; application DTOs & `AssetService`; REST controller `AssetController` & `AssetExceptionHandler`).
+  - `backend/src/test/java/com/mtms/asset/AssetRegisterIntegrationTest.java` (7 integration tests chứng minh: tạo tài sản, chặn trùng mã 409 Conflict, chặn nguyên giá âm 400 Bad Request, bảo mật cô lập chi nhánh TC-001 403 Forbidden, cập nhật metadata/trạng thái, **TC-051 tính toán KPI và cam kết loại trừ khấu hao P0 trong summary**, xóa tài sản).
+  - `frontend/src/features/assets/` (`types/asset.types.ts`, `api/assetApi.ts`, `pages/AssetManagementPage.tsx` với 4 thẻ KPI và banner nghiệp vụ TC-051/ADR-023, `components/CreateAssetModal.tsx`, `components/EditAssetModal.tsx`, `components/AssetDetailModal.tsx` với đếm ngược bảo hành và xem chứng từ).
+- **MODIFY:**
+  - `backend/src/test/java/com/mtms/database/FlywayBaselineMigrationTest.java` (nâng target migration lên 24, bổ sung test ràng buộc V024).
+  - `frontend/src/app/router.tsx` (bổ sung route `/assets`).
+  - `frontend/src/app/layout/Sidebar.tsx` (thêm mục menu "Tài sản & Thiết bị (TC-051)").
+  - `docs/planning/CURRENT_STATE.md` (cập nhật trạng thái P0-AST-01 IMPLEMENTED / VERIFIED).
+- **TEST & EVIDENCE:**
+  - `mvn -f backend/pom.xml test`: 310 tests run, 0 failures, 0 errors, 27 skipped, BUILD SUCCESS.
+  - `npm --prefix frontend run lint`: 0 errors.
+  - `npm --prefix frontend run build`: build completed cleanly in 18.17s.
+  - `python scripts/validate_workspace.py`: SUMMARY: PASS.
+
 ## 2026-11-20 — P0-HR-07, P0-HR-08 & P0-HR-09 Payroll payment recording, employee statement UI & integration validation (BR-HR-03, BR-HR-05, BR-HR-06, TC-015, TC-016, TC-017, FE-P0-22, FE-P0-23)
 - **Authorization:** Owner explicit approval on artifact `P0-HR-07-09-Implementation-Plan.md` using parallel subagent coordination.
 - **Requirements & Rules:** `BR-HR-03`, `BR-HR-05`, `BR-HR-06`, `TC-015`, `TC-016`, `TC-017`, `FE-P0-22`, `FE-P0-23`, `00-product-boundary.md`, `01-financial-data-safety.md`, `03-branch-authorization.md`, `04-accounting-postings.md`, `08-sensitive-data.md`, `06-frontend-quality.md`, `07-backend-quality.md`.
