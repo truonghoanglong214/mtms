@@ -147,7 +147,7 @@ export const RecordContributionModal: React.FC<Props> = ({
               step="100000"
               value={recognizedValue}
               onChange={(e) => setRecognizedValue(e.target.value)}
-              placeholder="VD: 60000000 (TC-032)"
+              placeholder="VD: 60000000"
               className="mt-1 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm font-semibold text-emerald-600 focus:border-primary-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-emerald-400"
             />
           </div>

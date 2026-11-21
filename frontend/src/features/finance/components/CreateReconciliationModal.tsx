@@ -185,10 +185,10 @@ export const CreateReconciliationModal: React.FC<CreateReconciliationModalProps>
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    Đối Soát & Kiểm Kê Quỹ (TC-012)
+                    Đối Soát & Kiểm Kê Quỹ
                   </h3>
                   <p className="text-xs text-slate-500">
-                    {branchName ? `Chi nhánh: ${branchName}` : 'Kiểm kê số dư thực tế'} • BR-FIN-06
+                    {branchName ? `Chi nhánh: ${branchName}` : 'Kiểm kê số dư thực tế'}
                   </p>
                 </div>
               </div>
@@ -314,7 +314,7 @@ export const CreateReconciliationModal: React.FC<CreateReconciliationModalProps>
                       </Badge>
                     </div>
                     <p className="text-[11px] text-emerald-700 leading-relaxed">
-                      Tiền thực tế nhiều hơn sổ sách {formatVnd(variance)}. Hệ thống sẽ tạo bản ghi đối soát trạng thái <strong>CHỜ XỬ LÝ (OPEN)</strong> theo chuẩn BR-FIN-06.
+                      Tiền thực tế nhiều hơn sổ sách {formatVnd(variance)}. Hệ thống sẽ tạo bản ghi đối soát trạng thái <strong>CHỜ XỬ LÝ (OPEN)</strong> để xử lý.
                     </p>
                   </div>
                 ) : (
@@ -331,7 +331,7 @@ export const CreateReconciliationModal: React.FC<CreateReconciliationModalProps>
                     <div className="p-2 rounded-lg bg-rose-100/70 border border-rose-200 text-[11px] text-rose-800 flex items-start gap-1.5">
                       <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5" />
                       <span>
-                        <strong>Cảnh báo (TC-012):</strong> Chênh lệch thiếu {formatVnd(Math.abs(variance))} sẽ tạo bản ghi đối soát trạng thái <strong>CHỜ XỬ LÝ</strong>. Không biến mất âm thầm và yêu cầu giải trình hoặc duyệt điều chỉnh sổ sách.
+                        <strong>Cảnh báo chênh lệch:</strong> Chênh lệch thiếu {formatVnd(Math.abs(variance))} sẽ tạo bản ghi đối soát trạng thái <strong>CHỜ XỬ LÝ</strong>. Không biến mất âm thầm và yêu cầu giải trình hoặc duyệt điều chỉnh sổ sách.
                       </span>
                     </div>
                   </div>

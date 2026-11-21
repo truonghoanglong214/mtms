@@ -93,7 +93,7 @@ export const CalculationDetailModal: React.FC<CalculationDetailModalProps> = ({
                     variant="outline"
                     className="border-stone-300 text-stone-600 bg-white font-mono text-[11px]"
                   >
-                    {isHourly ? 'TC-013 Đa lát giờ' : 'TC-014 Quy đổi công'}
+                    {isHourly ? 'Đa lát giờ' : 'Quy đổi công'}
                   </Badge>
                 </div>
                 <p className="text-xs text-stone-500">
@@ -151,7 +151,7 @@ export const CalculationDetailModal: React.FC<CalculationDetailModalProps> = ({
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4 text-[#304638]" />
                     <h4 className="text-sm font-bold text-stone-900">
-                      Phân rã đa lát thời gian điều chỉnh mức lương (TC-013)
+                      Phân rã đa lát thời gian điều chỉnh mức lương
                     </h4>
                   </div>
                   <span className="text-xs text-stone-500">
@@ -192,7 +192,7 @@ export const CalculationDetailModal: React.FC<CalculationDetailModalProps> = ({
                       <tfoot className="bg-stone-50 border-t border-stone-200 font-semibold">
                         <tr>
                           <td colSpan={3} className="px-4 py-2.5 text-stone-700 text-right">
-                            Tổng Lương cơ bản theo giờ (TC-013):
+                            Tổng Lương cơ bản theo giờ:
                           </td>
                           <td className="px-4 py-2.5 text-right font-mono font-bold text-[#304638] text-sm">
                             {formatVND(line.baseSalary)}
@@ -216,7 +216,7 @@ export const CalculationDetailModal: React.FC<CalculationDetailModalProps> = ({
                 <div className="flex items-start space-x-2 text-[11px] text-stone-500 bg-stone-50 p-3 rounded-lg border border-stone-200">
                   <Info className="h-4 w-4 text-[#819B78] shrink-0 mt-0.5" />
                   <p>
-                    <strong>Quy tắc TC-013:</strong> Mỗi ca làm việc trong tháng được áp giá theo chính sách lương có hiệu lực tại ngày làm việc đó. Khi có quyết định tăng lương giữa tháng, hệ thống tự động chẻ các ca làm việc thành từng lát tương ứng mà không làm xáo trộn các ca trước.
+                    <strong>Quy tắc tính lương theo giờ:</strong> Mỗi ca làm việc trong tháng được áp giá theo chính sách lương có hiệu lực tại ngày làm việc đó. Khi có quyết định tăng lương giữa tháng, hệ thống tự động chẻ các ca làm việc thành từng lát tương ứng mà không làm xáo trộn các ca trước.
                   </p>
                 </div>
               </div>
@@ -228,7 +228,7 @@ export const CalculationDetailModal: React.FC<CalculationDetailModalProps> = ({
                 <div className="flex items-center space-x-2">
                   <Calendar className="h-4 w-4 text-[#304638]" />
                   <h4 className="text-sm font-bold text-stone-900">
-                    Công thức quy đổi ngày công chuẩn (TC-014)
+                    Công thức quy đổi ngày công chuẩn
                   </h4>
                 </div>
 
@@ -287,7 +287,7 @@ export const CalculationDetailModal: React.FC<CalculationDetailModalProps> = ({
                 <div className="flex items-start space-x-2 text-[11px] text-stone-500 bg-stone-50 p-3 rounded-lg border border-stone-200">
                   <Info className="h-4 w-4 text-[#819B78] shrink-0 mt-0.5" />
                   <p>
-                    <strong>Quy tắc TC-014:</strong> Nhân viên lương tháng làm việc không đủ 26 ngày công chuẩn (do vào giữa tháng hoặc nghỉ có/không phép) sẽ được tính lương theo tỷ lệ ngày công thực tế đã được quản lý phê duyệt từ bảng chấm công.
+                    <strong>Quy tắc tính lương theo tháng:</strong> Nhân viên lương tháng làm việc không đủ 26 ngày công chuẩn (do vào giữa tháng hoặc nghỉ có/không phép) sẽ được tính lương theo tỷ lệ ngày công thực tế đã được quản lý phê duyệt từ bảng chấm công.
                   </p>
                 </div>
               </div>

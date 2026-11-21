@@ -56,7 +56,7 @@ export const IMPORT_KIND_CONFIGS: Record<ImportKind, ImportKindConfig> = {
     kind: 'OPENING_INVENTORY',
     title: 'Tồn kho đầu kỳ',
     description: 'Nhập số dư tồn kho ban đầu (Opening stock cutover) và đơn giá bình quân gia quyền WAC cho chi nhánh',
-    badgeText: 'P0-INV-02',
+    badgeText: 'Tồn Đầu Kỳ',
     columns: [
       { key: 'item_code', label: 'Mã NVL', required: true, example: 'CF-ROB-01', description: 'Mã định danh duy nhất của vật tư' },
       { key: 'item_name', label: 'Tên nguyên vật liệu', required: true, example: 'Cà phê Robusta hạt rang', description: 'Tên hiển thị' },

@@ -344,7 +344,7 @@ export const StockCountDetailModal: React.FC<StockCountDetailModalProps> = ({
                 className="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 rounded-lg shadow-lg shadow-blue-600/20 transition-all flex items-center gap-1.5"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>{isSubmitting ? 'Đang nộp...' : 'Nộp duyệt (TC-026)'}</span>
+                <span>{isSubmitting ? 'Đang nộp...' : 'Nộp duyệt'}</span>
               </button>
             )}
 

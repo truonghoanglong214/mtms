@@ -149,7 +149,7 @@ export const PayablesLedgerTab: React.FC<PayablesLedgerTabProps> = ({
         <Info className="h-4 w-4 shrink-0 text-emerald-700 mt-0.5" />
         <div className="space-y-1">
           <span className="font-bold text-emerald-950">
-            Nguyên tắc bảo toàn dòng tiền & chi phí giá vốn (TC-008 / BR-INV-05):
+            Nguyên tắc bảo toàn dòng tiền & chi phí giá vốn:
           </span>
           <p className="text-emerald-900 leading-relaxed text-[11px]">
             Khi chi nhánh nhận hàng trực tiếp và chọn hình thức <strong>Chưa thanh toán (Ghi nợ NCC)</strong>, hệ thống tự động ghi nhận số nợ vào sổ cái này và tăng tài sản tồn kho.

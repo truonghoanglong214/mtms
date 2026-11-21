@@ -146,9 +146,6 @@ export const FinancialCategoryModal: React.FC<FinancialCategoryModalProps> = ({
                   <h2 className="text-lg font-bold text-slate-900">
                     Bảng Danh Mục Thu Chi & Kế Toán (Chart of Categories)
                   </h2>
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    P0-FIN-01 / BR-FIN-01
-                  </Badge>
                 </div>
                 <p className="text-xs text-slate-500">
                   Phân định rõ ràng giữa Doanh thu, Chi phí vận hành, Vốn góp, Nợ NCC và Chuyển quỹ nội bộ.
@@ -322,7 +319,7 @@ export const FinancialCategoryModal: React.FC<FinancialCategoryModalProps> = ({
                   <ShieldCheck className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-semibold block text-amber-950">
-                      Quy chuẩn phân loại danh mục (BR-FIN-01):
+                      Quy chuẩn phân loại danh mục:
                     </strong>
                     Các danh mục do người dùng tạo mới bắt buộc thuộc nhóm <strong>Chi phí vận hành (OPERATING_EXPENSE)</strong> và dòng tiền <strong>Chi ra (OUTFLOW)</strong>. Các nhóm Doanh thu, Vốn chủ sở hữu và Chuyển nội bộ là chuẩn hệ thống bất biến.
                   </div>

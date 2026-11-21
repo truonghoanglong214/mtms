@@ -163,7 +163,7 @@ export const CogsReconciliationTab: React.FC<CogsReconciliationTabProps> = ({
                 <ShieldCheck className="h-4 w-4" />
               </span>
               <h3 className="text-sm font-bold text-slate-900">
-                Nguyên tắc đối soát Giá vốn (COGS) & Không trùng chi phí (TC-020)
+                Nguyên tắc đối soát Giá vốn (COGS) & Không trùng chi phí
               </h3>
               {data?.noDoubleCostVerified && (
                 <Badge className="bg-emerald-700 text-white font-medium text-xs gap-1 py-0.5">
@@ -209,7 +209,7 @@ export const CogsReconciliationTab: React.FC<CogsReconciliationTabProps> = ({
             </span>
           </div>
           <Badge variant="outline" className="text-[10px] font-mono border-slate-200">
-            TC-020 Read Model
+            Read Model Đối Soát
           </Badge>
         </div>
 

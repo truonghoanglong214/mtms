@@ -138,8 +138,8 @@ export const EmployeeListTab: React.FC<EmployeeListTabProps> = ({
                   <th className="py-3 px-3">Vị trí công việc</th>
                   <th className="py-3 px-3">Liên hệ</th>
                   <th className="py-3 px-3">Ngày tuyển dụng</th>
-                  <th className="py-3 px-3">Mức lương hiện hành (TC-013)</th>
-                  <th className="py-3 px-3">Phân bổ (TC-015)</th>
+                  <th className="py-3 px-3">Mức lương hiện hành</th>
+                  <th className="py-3 px-3">Phân bổ</th>
                   <th className="py-3 px-3 text-center">Trạng thái</th>
                   <th className="py-3 px-4 text-right">Thao tác</th>
                 </tr>
@@ -289,7 +289,7 @@ export const EmployeeListTab: React.FC<EmployeeListTabProps> = ({
                           </button>
                           <button
                             type="button"
-                            title="Thiết lập chính sách lương (TC-013)"
+                            title="Thiết lập chính sách lương"
                             onClick={() => onManageSalary(emp)}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
                           >
@@ -297,7 +297,7 @@ export const EmployeeListTab: React.FC<EmployeeListTabProps> = ({
                           </button>
                           <button
                             type="button"
-                            title="Điều chuyển / Phân bổ chi nhánh (TC-015)"
+                            title="Điều chuyển / Phân bổ chi nhánh"
                             onClick={() => onAssignBranch(emp)}
                             className="p-1.5 rounded-lg text-slate-500 hover:text-blue-700 hover:bg-blue-50 transition-colors"
                           >

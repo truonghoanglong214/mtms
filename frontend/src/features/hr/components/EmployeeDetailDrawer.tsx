@@ -152,7 +152,7 @@ export const EmployeeDetailDrawer: React.FC<EmployeeDetailDrawerProps> = ({
                   : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
-              <span>Phân bổ chi nhánh (TC-015)</span>
+              <span>Phân bổ chi nhánh</span>
               {detail?.assignments && (
                 <span className="px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">
                   {detail.assignments.length}
@@ -168,7 +168,7 @@ export const EmployeeDetailDrawer: React.FC<EmployeeDetailDrawerProps> = ({
                   : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
-              <span>Lịch sử lương (TC-013)</span>
+              <span>Lịch sử lương</span>
               {detail?.salaryPolicies && (
                 <span className="px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full text-[10px]">
                   {detail.salaryPolicies.length}
@@ -351,7 +351,7 @@ export const EmployeeDetailDrawer: React.FC<EmployeeDetailDrawerProps> = ({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <p className="text-xs text-slate-600">
-                        Lịch sử phân bổ các chi nhánh công tác (TC-015)
+                        Lịch sử phân bổ các chi nhánh công tác
                       </p>
                       <Button
                         type="button"
@@ -367,7 +367,7 @@ export const EmployeeDetailDrawer: React.FC<EmployeeDetailDrawerProps> = ({
                     <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
                       <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                       <p className="text-[11px] leading-relaxed">
-                        Theo quy chuẩn <strong>TC-015</strong>, chi nhánh có cờ <strong>Chi nhánh chính</strong> vào ngày cuối tháng sẽ chịu trách nhiệm thanh toán và ghi nhận chi phí lương của nhân viên.
+                        Theo quy chuẩn phân bổ, chi nhánh có cờ <strong>Chi nhánh chính</strong> vào ngày cuối tháng sẽ chịu trách nhiệm thanh toán và ghi nhận chi phí lương của nhân viên.
                       </p>
                     </div>
 
@@ -422,7 +422,7 @@ export const EmployeeDetailDrawer: React.FC<EmployeeDetailDrawerProps> = ({
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <p className="text-xs text-slate-600">
-                        Lịch sử thay đổi đơn giá lương theo mốc hiệu lực (TC-013)
+                        Lịch sử thay đổi đơn giá lương theo mốc hiệu lực
                       </p>
                       <Button
                         type="button"

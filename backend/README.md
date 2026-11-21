@@ -14,5 +14,6 @@
 mvn -f backend/pom.xml test
 
 # Khởi chạy server development (yêu cầu PostgreSQL đang chạy)
-mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev
+# Chú ý: Trên Windows PowerShell, cần bọc tham số -D trong dấu ngoặc kép:
+mvn -f backend/pom.xml spring-boot:run "-Dspring-boot.run.profiles=dev"
 ```

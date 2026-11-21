@@ -191,7 +191,6 @@ export const TimesheetManagementPage: React.FC = () => {
               </h1>
               <p className="text-xs text-stone-500">
                 Hạch toán giờ công độc lập GPS · Kiểm soát bất biến cấm tự duyệt
-                (P0-HR-03, P0-HR-04 / TC-017 / FE-P0-19)
               </p>
             </div>
           </div>
@@ -255,7 +254,7 @@ export const TimesheetManagementPage: React.FC = () => {
         <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
         <div className="space-y-1">
           <div className="font-bold flex items-center gap-2">
-            <span>Ràng buộc Kiểm soát Bất biến & Quy tắc An toàn TC-017</span>
+            <span>Ràng buộc Kiểm soát Bất biến & Quy tắc An toàn</span>
             <span className="px-2 py-0.5 text-[10px] rounded-full bg-amber-200/80 font-mono text-amber-900 uppercase">
               Immutability & Segregation
             </span>
@@ -309,7 +308,7 @@ export const TimesheetManagementPage: React.FC = () => {
               {totalApprovedHours.toFixed(1)}h
             </div>
             <p className="text-[11px] text-stone-500 mt-0.5">
-              Đủ điều kiện tính lương P0-HR-05
+              Đủ điều kiện tính lương
             </p>
           </div>
         </div>

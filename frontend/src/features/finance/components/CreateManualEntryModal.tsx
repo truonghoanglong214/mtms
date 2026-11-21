@@ -205,15 +205,6 @@ export const CreateManualEntryModal: React.FC<CreateManualEntryModalProps> = ({
                   <h2 className="text-lg font-bold text-slate-900">
                     Ghi Sổ Dòng Tiền Trực Tiếp
                   </h2>
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    P0-FIN-02
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono"
-                  >
-                    TC-011
-                  </Badge>
                 </div>
                 <p className="text-xs text-slate-500">
                   Chi nhánh: <span className="font-semibold text-slate-700">{branchName || branchId}</span> · Ghi nhận chi phí vận hành trực tiếp hoặc điều chỉnh vốn.
@@ -238,7 +229,7 @@ export const CreateManualEntryModal: React.FC<CreateManualEntryModalProps> = ({
             <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
               <div className="flex items-center gap-1.5 font-semibold text-slate-800">
                 <ShieldCheck className="w-4 h-4 text-[#819B78]" />
-                <span>Quy định ghi sổ trực tiếp (BR-FIN-01 / BR-FIN-09):</span>
+                <span>Quy định ghi sổ trực tiếp:</span>
               </div>
               <p className="leading-relaxed">
                 Mọi bút toán ghi trực tiếp đều có tính bất biến. Giao dịch vốn góp / rút vốn chủ sở hữu không được tính vào doanh thu bán hàng hay chi phí vận hành P&L.

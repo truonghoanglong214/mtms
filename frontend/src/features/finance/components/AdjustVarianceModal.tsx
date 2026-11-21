@@ -101,7 +101,7 @@ export const AdjustVarianceModal: React.FC<AdjustVarianceModalProps> = ({
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    Duyệt Điều Chỉnh Sổ Quỹ (TC-012)
+                    Duyệt Điều Chỉnh Sổ Quỹ
                   </h3>
                   <p className="text-xs text-slate-500">
                     Quyền hạn Owner / Manager • Đồng bộ số dư sổ sách về số kiểm đếm thực tế

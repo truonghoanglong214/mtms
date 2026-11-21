@@ -75,7 +75,7 @@ export const OpeningInventoryStatusBanner: React.FC<OpeningInventoryStatusBanner
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold text-slate-900">
-                  Tồn kho đầu kỳ đã được thiết lập & Khóa sổ (TC-024)
+                  Tồn kho đầu kỳ đã được thiết lập & Khóa sổ
                 </h3>
                 <Badge className="bg-emerald-700 text-white hover:bg-emerald-800 text-xs gap-1">
                   <CheckCircle2 className="h-3 w-3" />
@@ -90,7 +90,7 @@ export const OpeningInventoryStatusBanner: React.FC<OpeningInventoryStatusBanner
           </div>
 
           <Badge variant="outline" className="border-emerald-600 text-emerald-900 bg-emerald-50/80 font-mono text-xs">
-            TC-024 POST-ONCE GUARD
+            POST-ONCE GUARD
           </Badge>
         </div>
 
@@ -187,7 +187,7 @@ export const OpeningInventoryStatusBanner: React.FC<OpeningInventoryStatusBanner
             </p>
             <div className="flex items-center gap-2 pt-1 text-[11px] text-amber-800 font-medium">
               <ShieldAlert className="h-3.5 w-3.5 text-amber-600" />
-              <span>Quy tắc TC-024: Mở sổ chỉ được thực hiện 01 lần duy nhất cho mỗi chi nhánh.</span>
+              <span>Quy tắc: Mở sổ chỉ được thực hiện 01 lần duy nhất cho mỗi chi nhánh.</span>
             </div>
           </div>
         </div>

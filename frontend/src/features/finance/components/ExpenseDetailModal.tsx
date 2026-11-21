@@ -257,7 +257,7 @@ export const ExpenseDetailModal: React.FC<ExpenseDetailModalProps> = ({
                 <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <p className="font-bold text-amber-950 flex items-center gap-1.5">
-                    <span>CẢNH BÁO CHI PHÍ LỚN CẦN RÀ SOÁT (BR-FIN-07)</span>
+                    <span>CẢNH BÁO CHI PHÍ LỚN CẦN RÀ SOÁT</span>
                     <Badge className="bg-amber-600 text-white text-[10px]">
                       review_flag = true
                     </Badge>
@@ -310,7 +310,7 @@ export const ExpenseDetailModal: React.FC<ExpenseDetailModalProps> = ({
                 ) : (
                   <div className="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold flex items-center gap-1.5">
                     <CreditCard className="w-4 h-4 text-amber-600" />
-                    <span>Ghi nợ chi phí (TC-009)</span>
+                    <span>Ghi nợ chi phí</span>
                   </div>
                 )}
               </div>
@@ -452,7 +452,7 @@ export const ExpenseDetailModal: React.FC<ExpenseDetailModalProps> = ({
                 </div>
                 <p className="text-[11px] text-rose-800 leading-normal">
                   {displayData.isPaid && displayData.status === 'CONFIRMED'
-                    ? 'Khi hủy phiếu chi đã thanh toán, hệ thống sẽ tự động tạo bút toán đảo (REVERSED) hoàn lại số tiền vào quỹ và chuyển trạng thái phiếu chi thành ĐÃ HỦY (BR-FIN-07).'
+                    ? 'Khi hủy phiếu chi đã thanh toán, hệ thống sẽ tự động tạo bút toán đảo (REVERSED) hoàn lại số tiền vào quỹ và chuyển trạng thái phiếu chi thành ĐÃ HỦY.'
                     : 'Phiếu chi này sẽ chuyển sang trạng thái ĐÃ HỦY và không thể chỉnh sửa.'}
                 </p>
                 <div className="space-y-1">

@@ -210,7 +210,7 @@ export const BranchEvidenceManagerModal: React.FC<BranchEvidenceManagerModalProp
                     <p className="leading-relaxed">
                       Chứng từ được tải lên sẽ gắn liền với chi nhánh{' '}
                       <span className="font-semibold text-stone-200">{branch.name}</span> và tự động
-                      tính toán mã băm SHA-256 để bảo đảm tính toàn vẹn dữ liệu. Quyền truy cập tuân thủ ranh giới bảo mật đa chi nhánh (TC-043).
+                      tính toán mã băm SHA-256 để bảo đảm tính toàn vẹn dữ liệu. Quyền truy cập tuân thủ ranh giới bảo mật đa chi nhánh.
                     </p>
                   </div>
 

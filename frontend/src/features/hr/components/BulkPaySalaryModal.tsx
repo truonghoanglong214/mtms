@@ -17,7 +17,6 @@ import {
   CheckCircle2,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { Input } from '@/shared/components/ui/input'
 import { financeApi } from '@/features/finance/api/financeApi'
 import type { FinancialAccountDto } from '@/features/finance/types/finance.types'
@@ -271,9 +270,6 @@ export const BulkPaySalaryModal: React.FC<BulkPaySalaryModalProps> = ({
                   <h3 className="font-bold text-stone-900 text-base">
                     Chi trả lương hàng loạt (Bulk Payment)
                   </h3>
-                  <Badge variant="outline" className="border-emerald-300 text-emerald-800 text-[10px]">
-                    TC-016 Invariant
-                  </Badge>
                 </div>
                 <p className="text-xs text-stone-500">
                   Thanh toán đồng loạt cho nhân viên còn nợ lương tại {branchName || 'chi nhánh'}
@@ -564,7 +560,7 @@ export const BulkPaySalaryModal: React.FC<BulkPaySalaryModalProps> = ({
             <div className="p-3 bg-emerald-50/80 border border-emerald-200 rounded-xl flex items-start space-x-2 text-emerald-900 text-xs">
               <ShieldCheck className="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
               <div className="text-[11px] leading-relaxed">
-                <strong>Bảo toàn hạch toán TC-016:</strong> Toàn bộ các khoản chi trên sẽ sinh bút toán
+                <strong>Bảo toàn hạch toán:</strong> Toàn bộ các khoản chi trên sẽ sinh bút toán
                 xuất quỹ vào ngày <strong>{paidOn}</strong> và cập nhật lũy kế đã trả của bảng lương mà
                 không làm biến động số dư quỹ của tháng trước.
               </div>

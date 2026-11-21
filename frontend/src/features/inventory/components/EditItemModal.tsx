@@ -85,7 +85,7 @@ export const EditItemModal: React.FC<EditItemModalProps> = ({
     }
 
     if (expirationTrackingRequired && !lotTrackingRequired) {
-      setError('Quy tắc BR-INV-04: Theo dõi hạn sử dụng bắt buộc phải theo dõi số lô.')
+      setError('Theo dõi hạn sử dụng bắt buộc phải theo dõi số lô.')
       return
     }
 

@@ -224,12 +224,6 @@ export const AccountSummaryCards: React.FC<AccountSummaryCardsProps> = ({
                 <span className="text-xs font-semibold uppercase tracking-wider text-[#C8CEC4]">
                   Tổng Tiền Lưu Động
                 </span>
-                <Badge
-                  variant="outline"
-                  className="bg-[#25372C] text-[#819B78] border-[#3E5747] text-[10px] font-mono px-1.5 py-0"
-                >
-                  TC-010
-                </Badge>
               </div>
               <div className="text-2xl font-bold tracking-tight text-white font-mono">
                 {isLoading ? (

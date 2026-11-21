@@ -144,7 +144,7 @@ export const InvestorListTab: React.FC<Props> = ({
       <div className="flex items-start gap-2 rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-xs text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-400">
         <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
         <p>
-          <strong>Ranh giới bảo mật (TC-001):</strong> Hợp đồng thỏa thuận đầu tư được quản lý biệt lập theo từng chi nhánh. Nhà đầu tư tại chi nhánh này không tự động có quyền sở hữu hoặc quyền xem số liệu ở chi nhánh khác.
+          <strong>Ranh giới bảo mật:</strong> Hợp đồng thỏa thuận đầu tư được quản lý biệt lập theo từng chi nhánh. Nhà đầu tư tại chi nhánh này không tự động có quyền sở hữu hoặc quyền xem số liệu ở chi nhánh khác.
         </p>
       </div>
     </div>

@@ -152,7 +152,7 @@ export const PayablesLedgerTab: React.FC<PayablesLedgerTabProps> = ({
 
   const handlePaymentSuccess = (payment: PayablePaymentDto) => {
     setSuccessToast(
-      `Đã ghi nhận thanh toán nợ thành công số tiền ${formatVnd(payment.amount)}. Giảm tiền quỹ và giảm nợ phải trả (TC-009).`
+      `Đã ghi nhận thanh toán nợ thành công số tiền ${formatVnd(payment.amount)}. Giảm tiền quỹ và giảm nợ phải trả.`
     )
     setTimeout(() => setSuccessToast(null), 6000)
     fetchPayables()
@@ -255,7 +255,7 @@ export const PayablesLedgerTab: React.FC<PayablesLedgerTabProps> = ({
       <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-3">
         <ShieldCheck className="w-4 h-4 text-[#304638] shrink-0 mt-0.5" />
         <div className="text-xs text-slate-700 leading-relaxed">
-          <strong>TC-009 Invariant (Không tính trùng chi phí):</strong> Nghiệp vụ thanh toán công nợ nhà cung cấp là sự hoán đổi tài sản và nghĩa vụ nợ (giảm tiền quỹ - giảm nợ phải trả). Giá vốn nguyên vật liệu được tính khi tiêu hao/pha chế, do đó bút toán trả nợ không ghi nhận thêm chi phí vào báo cáo P&L.
+          <strong>Nguyên tắc kế toán (Không tính trùng chi phí):</strong> Nghiệp vụ thanh toán công nợ nhà cung cấp là sự hoán đổi tài sản và nghĩa vụ nợ (giảm tiền quỹ - giảm nợ phải trả). Giá vốn nguyên vật liệu được tính khi tiêu hao/pha chế, do đó bút toán trả nợ không ghi nhận thêm chi phí vào báo cáo P&L.
         </div>
       </div>
 

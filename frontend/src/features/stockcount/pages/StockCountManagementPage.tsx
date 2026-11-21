@@ -207,7 +207,7 @@ export const StockCountManagementPage: React.FC = () => {
                 Kiểm Kê Kho & Đối Soát Thực Tế
               </h1>
               <p className="text-xs text-slate-400 mt-0.5">
-                Chi nhánh: <span className="text-blue-400 font-semibold">{activeBranchName}</span> • Tuân thủ rào cản phê duyệt Chủ sở hữu (TC-026)
+                Chi nhánh: <span className="text-blue-400 font-semibold">{activeBranchName}</span> • Tuân thủ rào cản phê duyệt Chủ sở hữu
               </p>
             </div>
           </div>
@@ -249,14 +249,14 @@ export const StockCountManagementPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Governance Banner TC-026 */}
+      {/* Governance Banner */}
       <div className="p-4 bg-slate-800/40 border border-slate-700/80 rounded-xl flex items-start gap-3.5">
         <div className="p-2 bg-blue-500/10 text-blue-400 rounded-lg shrink-0 mt-0.5">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div className="text-xs space-y-1">
           <span className="font-semibold text-slate-200">
-            Nguyên tắc Quản trị Kho Hàng TC-026 (Discrepancy Without Owner Approval $\rightarrow$ No Posted Stock Change):
+            Nguyên tắc Quản trị Kho Hàng (Chênh lệch cần Chủ sở hữu duyệt mới hạch toán):
           </span>
           <p className="text-slate-400 leading-relaxed">
             Việc lập phiếu kiểm kê hoặc nộp biên bản đếm thừa/thiếu là bước ghi nhận hiện trạng thực tế.
@@ -276,7 +276,7 @@ export const StockCountManagementPage: React.FC = () => {
           </div>
 
           <div className="p-4 bg-slate-800/50 border border-slate-700/60 rounded-xl">
-            <span className="text-xs text-amber-400 font-medium block mb-1">Chờ duyệt (TC-026)</span>
+            <span className="text-xs text-amber-400 font-medium block mb-1">Chờ duyệt</span>
             <div className="text-2xl font-extrabold text-amber-400">{summary.pendingApprovalCount}</div>
             <span className="text-[11px] text-slate-500 mt-1 block">Bản nháp & Đang chờ duyệt</span>
           </div>
@@ -322,7 +322,7 @@ export const StockCountManagementPage: React.FC = () => {
           >
             <option value="">Tất cả trạng thái</option>
             <option value="DRAFT">Bản nháp</option>
-            <option value="SUBMITTED">Chờ duyệt (TC-026)</option>
+            <option value="SUBMITTED">Chờ duyệt</option>
             <option value="POSTED">Đã chốt sổ (POSTED)</option>
             <option value="CANCELLED">Đã hủy</option>
           </select>

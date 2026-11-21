@@ -116,7 +116,7 @@ export function ReportingPage() {
             <Badge variant="provisional">TẠM TÍNH / PROVISIONAL</Badge>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Báo cáo kết quả kinh doanh theo cơ sở dồn tích (Accrual) và đối chiếu dòng tiền Sổ quỹ (TC-016).
+            Báo cáo kết quả kinh doanh theo cơ sở dồn tích (Accrual) và đối chiếu dòng tiền Sổ quỹ.
           </p>
         </div>
 
@@ -158,16 +158,16 @@ export function ReportingPage() {
         <Info className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
         <div className="text-xs space-y-1">
           <div className="font-semibold text-sm text-amber-800 dark:text-amber-300">
-            Lưu Ý Quản Trị Rủi Ro &amp; Nguyên Tắc Kế Toán P0 (TC-051 / ADR-023)
+            Lưu Ý Quản Trị Rủi Ro &amp; Nguyên Tắc Kế Toán
           </div>
           <p>
-            • <strong>TC-051 / ADR-023</strong>: Báo cáo P&amp;L quản trị giai đoạn P0 <strong>chưa trích khấu hao tài sản thiết bị vào chi phí</strong> (P0 P&amp;L excludes depreciation).
+            • <strong>Khấu hao tài sản</strong>: Báo cáo P&amp;L quản trị giai đoạn hiện tại <strong>chưa trích khấu hao tài sản thiết bị vào chi phí</strong>.
           </p>
           <p>
-            • <strong>TC-016</strong>: Chi phí lương được ghi nhận theo <strong>tháng phát sinh công (Service Month Accrual)</strong>, bất kể ngày thực chi tiền mặt hay chuyển khoản ngân hàng.
+            • <strong>Chi phí lương</strong>: Chi phí lương được ghi nhận theo <strong>tháng phát sinh công (Service Month Accrual)</strong>, bất kể ngày thực chi tiền mặt hay chuyển khoản ngân hàng.
           </p>
           <p>
-            • <strong>ADR-007</strong>: Lợi nhuận quản trị mang nhãn <strong>TẠM TÍNH</strong> phục vụ điều hành nội bộ, <strong>tuyệt đối không áp dụng để chi trả lợi nhuận thực tế cho nhà đầu tư</strong> trước khi hoàn tất kiểm toán chuyên gia Gate G5.
+            • <strong>Nguyên tắc phân phối lợi nhuận</strong>: Lợi nhuận quản trị mang nhãn <strong>TẠM TÍNH</strong> phục vụ điều hành nội bộ, <strong>tuyệt đối không áp dụng để chi trả lợi nhuận thực tế cho nhà đầu tư</strong> khi chưa hoàn tất kiểm toán chuyên gia.
           </p>
         </div>
       </div>
@@ -345,7 +345,7 @@ export function ReportingPage() {
                   </span>
                 </div>
                 <div className="py-2 pl-8 pr-3 text-xs text-muted-foreground flex justify-between">
-                  <span>• Chi phí nhân sự dồn tích theo tháng công (Payroll Accrual — TC-016)</span>
+                  <span>• Chi phí nhân sự dồn tích theo tháng công (Payroll Accrual)</span>
                   <span className="font-medium text-foreground">
                     {formatCurrency(pnl.operatingExpenses.payrollAccrual)}
                   </span>
@@ -388,7 +388,7 @@ export function ReportingPage() {
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base flex items-center gap-2">
                   <Wallet className="h-5 w-5 text-emerald-600" />
-                  Đối Chiếu Cơ Sở Dồn Tích vs Dòng Tiền Thực Tế Sổ Quỹ (TC-016)
+                  Đối Chiếu Cơ Sở Dồn Tích vs Dòng Tiền Thực Tế Sổ Quỹ
                 </CardTitle>
                 <span className="text-xs text-muted-foreground">Cash Flow Comparison</span>
               </div>

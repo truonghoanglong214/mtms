@@ -151,7 +151,7 @@ export const CreateTransferModal: React.FC<Props> = ({
       if (qty > l.availableQty) {
         const item = stockItems.find((s) => s.itemId === l.itemId);
         setError(
-          `Số lượng xuất cho mặt hàng "${item?.itemName || 'Đã chọn'}" (${qty}) vượt quá tồn kho khả dụng (${l.availableQty}) (TC-021)`
+          `Số lượng xuất cho mặt hàng "${item?.itemName || 'Đã chọn'}" (${qty}) vượt quá tồn kho khả dụng (${l.availableQty})`
         );
         return;
       }
@@ -193,7 +193,7 @@ export const CreateTransferModal: React.FC<Props> = ({
               <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
                 Tạo Phiếu Điều Chuyển Hàng Nội Bộ
               </h3>
-              <p className="text-xs text-neutral-500">Chuyển nguyên vật liệu giữa các chi nhánh cùng pháp nhân (TC-028)</p>
+              <p className="text-xs text-neutral-500">Chuyển nguyên vật liệu giữa các chi nhánh cùng pháp nhân</p>
             </div>
           </div>
           <button
@@ -209,7 +209,7 @@ export const CreateTransferModal: React.FC<Props> = ({
           <div className="flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50 p-3.5 text-xs text-blue-900 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
             <ShieldAlert className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
             <span>
-              <strong>QUY ĐỊNH PHÁP NHÂN (TC-028):</strong> Điều chuyển kho nội bộ chỉ áp dụng cho các chi nhánh thuộc cùng pháp nhân kinh doanh. Đơn giá Moving WAC tại thời điểm xuất sẽ được chụp ảnh snapshot và chuyển sang chi nhánh nhận.
+              <strong>QUY ĐỊNH PHÁP NHÂN:</strong> Điều chuyển kho nội bộ chỉ áp dụng cho các chi nhánh thuộc cùng pháp nhân kinh doanh. Đơn giá Moving WAC tại thời điểm xuất sẽ được chụp ảnh snapshot và chuyển sang chi nhánh nhận.
             </span>
           </div>
 

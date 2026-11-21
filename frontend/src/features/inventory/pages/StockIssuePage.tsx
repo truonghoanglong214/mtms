@@ -8,7 +8,6 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { organizationApi } from '@/features/organization/organizationApi'
 import { useAuthStore } from '@/features/auth/authStore'
 import { catalogApi } from '../api/catalogApi'
@@ -128,15 +127,6 @@ export function StockIssuePage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Xuất Kho Thủ Công & Định Giá Vốn Moving WAC
             </h1>
-            <Badge variant="secondary" className="font-mono text-xs">
-              P0-INV-04 / 05
-            </Badge>
-            <Badge
-              variant="outline"
-              className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono"
-            >
-              TC-020 / TC-021 / TC-022
-            </Badge>
           </div>
           <p className="text-sm text-slate-500 mt-1">
             Lập phiếu xuất quầy bar pha chế hoặc tiêu hủy hao hụt. Giá vốn được chốt theo đơn giá bình quân di động (Moving WAC) và khóa chặt không cho phép xuất âm.

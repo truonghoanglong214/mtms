@@ -260,7 +260,7 @@ export const OpeningInventoryWizardModal: React.FC<OpeningInventoryWizardModalPr
         apiErr.response?.data?.type?.includes('opening-inventory-already-posted')
       ) {
         setCommitError(
-          'Quy tắc TC-024: Chi nhánh này đã được mở sổ trước đó! Không thể mở sổ lần 2 để tránh nhân đôi số dư tồn kho.'
+          'Chi nhánh này đã được mở sổ trước đó! Không thể mở sổ lần 2 để tránh nhân đôi số dư tồn kho.'
         )
       } else {
         setCommitError(
@@ -293,9 +293,6 @@ export const OpeningInventoryWizardModal: React.FC<OpeningInventoryWizardModalPr
                 <h2 className="text-base font-bold text-slate-900">
                   Khởi Tạo Tồn Kho Đầu Kỳ & Giá Vốn WAC
                 </h2>
-                <Badge variant="outline" className="border-emerald-600 text-emerald-800 bg-emerald-50 text-[10px] font-mono">
-                  TC-024
-                </Badge>
               </div>
               <p className="text-xs text-slate-500">
                 Chi nhánh: <strong className="text-slate-800">{branchName}</strong>
@@ -323,7 +320,7 @@ export const OpeningInventoryWizardModal: React.FC<OpeningInventoryWizardModalPr
                 Chi nhánh đã Khóa Mở Sổ Tồn Kho Đầu Kỳ
               </h3>
               <p className="text-xs text-slate-600 leading-relaxed">
-                Theo quy chuẩn kiểm toán <strong>TC-024</strong> và nguyên tắc an toàn dữ liệu tài chính, mỗi chi nhánh
+                Theo quy chuẩn kiểm toán và nguyên tắc an toàn dữ liệu tài chính, mỗi chi nhánh
                 chỉ được phép mở sổ số dư đầu kỳ một lần duy nhất.
               </p>
               <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-mono text-left space-y-1 mt-3">
@@ -708,7 +705,7 @@ export const OpeningInventoryWizardModal: React.FC<OpeningInventoryWizardModalPr
                   <div className="p-5 rounded-2xl border border-amber-200 bg-amber-50/70 text-slate-800 space-y-3">
                     <div className="flex items-center gap-2.5 text-amber-900 font-bold text-sm">
                       <ShieldCheck className="h-5 w-5 text-amber-700" />
-                      <span>Xác nhận Ký duyệt Mở Sổ Tồn Kho Đầu Kỳ (TC-024)</span>
+                      <span>Xác nhận Ký duyệt Mở Sổ Tồn Kho Đầu Kỳ</span>
                     </div>
                     <p className="text-xs text-slate-700 leading-relaxed">
                       Bạn đang chuẩn bị chốt số dư tồn kho ban đầu cho chi nhánh <strong>{branchName}</strong>:

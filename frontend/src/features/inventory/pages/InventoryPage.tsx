@@ -14,12 +14,6 @@ export function InventoryPage() {
             Danh mục nguyên vật liệu, số dư đầu kỳ, phiếu nhập xuất kho thủ công và kiểm kê định kỳ.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="secondary">BR-INV-01 / BR-INV-05 / BR-INV-08</Badge>
-          <Badge variant="outline" className="border-emerald-600 text-emerald-800 bg-emerald-50">
-            TC-008 / TC-023 / TC-024
-          </Badge>
-        </div>
       </div>
 
       {/* Quick Launch Cards Grid */}
@@ -32,11 +26,8 @@ export function InventoryPage() {
                 <BarChart3 className="h-4 w-4" />
               </span>
               <h3 className="text-base font-bold text-slate-900">
-                Báo Cáo Kho, Sổ Chuyển Động & Đối Soát Giá Vốn (TC-020, TC-021)
+                Báo Cáo Kho, Sổ Chuyển Động & Đối Soát Giá Vốn
               </h3>
-              <Badge className="bg-[#304638] text-white text-[10px] font-mono">
-                P0-INV-06 / 07
-              </Badge>
               <Badge variant="outline" className="border-emerald-600 text-emerald-800 bg-white text-[10px] font-mono">
                 Mới
               </Badge>
@@ -48,17 +39,17 @@ export function InventoryPage() {
             <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-500">
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <BarChart3 className="h-3.5 w-3.5 text-emerald-700" />
-                KPI & Top Valued Items (INV-06)
+                KPI & Mặt hàng giá trị cao
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <FileSpreadsheet className="h-3.5 w-3.5 text-emerald-700" />
-                Sổ biến động kho chi tiết (TC-021)
+                Sổ biến động kho chi tiết
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <ShieldCheck className="h-3.5 w-3.5 text-emerald-700" />
-                Đối soát COGS không trùng chi phí (TC-020)
+                Đối soát COGS không trùng chi phí
               </span>
             </div>
           </div>
@@ -78,20 +69,17 @@ export function InventoryPage() {
                 <Receipt className="h-4 w-4" />
               </span>
               <h3 className="text-base font-bold text-slate-900">
-                Nhập Kho Mua Hàng & Công Nợ NCC (TC-008)
+                Nhập Kho Mua Hàng & Công Nợ NCC
               </h3>
-              <Badge className="bg-emerald-700 text-white text-[10px] font-mono">
-                P0-INV-03
-              </Badge>
             </div>
             <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
-              Nhập hàng trực tiếp từ nhà cung cấp không cần PO, hỗ trợ quy đổi quy cách đóng gói thùng/bao (TC-023),
-              tự động cập nhật Moving WAC, theo dõi số lô & ghi nhận nợ NCC mà không trừ quỹ tiền mặt (TC-008).
+              Nhập hàng trực tiếp từ nhà cung cấp không cần PO, hỗ trợ quy đổi quy cách đóng gói thùng/bao,
+              tự động cập nhật Moving WAC, theo dõi số lô & ghi nhận nợ NCC mà không trừ quỹ tiền mặt.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-500">
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <CreditCard className="h-3.5 w-3.5 text-emerald-700" />
-                Ghi nợ NCC (TC-008)
+                Ghi nợ NCC
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-emerald-900">
@@ -122,30 +110,27 @@ export function InventoryPage() {
                 <FileSpreadsheet className="h-4 w-4" />
               </span>
               <h3 className="text-base font-bold text-slate-900">
-                Xuất Kho Thủ Công & Định Giá Vốn Moving WAC (TC-020, TC-021, TC-022)
+                Xuất Kho Thủ Công & Định Giá Vốn Moving WAC
               </h3>
-              <Badge className="bg-emerald-700 text-white text-[10px] font-mono">
-                P0-INV-04 / 05
-              </Badge>
             </div>
             <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
               Lập phiếu xuất quầy bar pha chế, hủy hỏng hao hụt hoặc điều chỉnh kiểm kê âm.
-              Đơn giá xuất kho tự động chốt theo Giá vốn bình quân di động (TC-020) và khóa chặt không cho phép xuất âm (TC-021, TC-022).
+              Đơn giá xuất kho tự động chốt theo Giá vốn bình quân di động và khóa chặt không cho phép xuất âm.
             </p>
             <div className="flex flex-wrap items-center gap-3 pt-1 text-[11px] text-slate-500">
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <Coins className="h-3.5 w-3.5 text-emerald-700" />
-                Snapshot Moving WAC (TC-020)
+                Snapshot Moving WAC
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-rose-800">
                 <ShieldAlert className="h-3.5 w-3.5 text-rose-600" />
-                Khóa chặt chống tồn âm (TC-021)
+                Khóa chặt chống tồn âm
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" />
-                An toàn tranh chấp đồng thời (TC-022)
+                An toàn tranh chấp đồng thời
               </span>
             </div>
           </div>
@@ -165,11 +150,8 @@ export function InventoryPage() {
                 <Coins className="h-4 w-4" />
               </span>
               <h3 className="text-base font-bold text-slate-900">
-                Tồn kho Đầu kỳ & Khóa Sổ Chi Nhánh (TC-024)
+                Tồn kho Đầu kỳ & Khóa Sổ Chi Nhánh
               </h3>
-              <Badge className="bg-emerald-700 text-white text-[10px] font-mono">
-                P0-INV-02
-              </Badge>
             </div>
             <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
               Khởi tạo số dư ban đầu từ biên bản kiểm kê, nạp danh sách bằng file CSV/Excel mẫu,
@@ -183,7 +165,7 @@ export function InventoryPage() {
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-emerald-900">
                 <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" />
-                Chống trùng lặp số dư (TC-024)
+                Chống trùng lặp số dư
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-emerald-900">
@@ -209,11 +191,8 @@ export function InventoryPage() {
                 <Package className="h-4 w-4" />
               </span>
               <h3 className="text-base font-bold text-slate-900">
-                Danh mục Mặt hàng, Quy cách & Công cụ tính TC-023
+                Danh mục Mặt hàng, Quy cách & Công cụ quy đổi
               </h3>
-              <Badge variant="outline" className="text-[10px] font-mono border-slate-200">
-                P0-INV-01
-              </Badge>
             </div>
             <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
               Khai báo danh mục nguyên vật liệu, đơn vị tính chuẩn (Base Units), danh sách nhà cung cấp
@@ -227,7 +206,7 @@ export function InventoryPage() {
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-slate-700">
                 <Calculator className="h-3.5 w-3.5 text-slate-500" />
-                Bộ tính TC-023 (1 Thùng 24 lon → 48 Lon)
+                Bộ tính quy đổi (1 Thùng 24 lon → 48 Lon)
               </span>
               <span>•</span>
               <span className="flex items-center gap-1 font-medium text-slate-700">
@@ -244,7 +223,7 @@ export function InventoryPage() {
 
           <Link to="/inventory/catalog" className="shrink-0">
             <Button variant="outline" className="text-xs font-semibold gap-2 border-slate-300">
-              <span>Mở danh mục & TC-023</span>
+              <span>Mở danh mục & Quy cách</span>
               <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>

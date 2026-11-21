@@ -275,7 +275,7 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
       if (problemType === 'urn:mtms:error:insufficient-stock') {
         setError(
           detail ||
-            'Tồn kho không đủ để đáp ứng yêu cầu xuất kho. Hệ thống đã từ chối giao dịch để ngăn tồn âm (TC-021).'
+            'Tồn kho không đủ để đáp ứng yêu cầu xuất kho. Hệ thống đã từ chối giao dịch để ngăn tồn âm.'
         )
       } else {
         setError(detail || message || title || 'Đã xảy ra lỗi khi tạo phiếu xuất kho.')
@@ -306,9 +306,6 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
                   <span>Lập phiếu xuất kho thủ công (Manual Stock Issue)</span>
-                  <Badge variant="outline" className="bg-emerald-950/60 text-emerald-200 border-emerald-700/50 text-[10px]">
-                    TC-020 / TC-021 / TC-022
-                  </Badge>
                 </h3>
                 <p className="text-xs text-emerald-200/80">
                   {branchName ? `Chi nhánh: ${branchName}` : 'Quản lý xuất dùng quầy bar pha chế & tiêu hủy hao hụt'}
@@ -334,8 +331,8 @@ export const CreateIssueModal: React.FC<CreateIssueModalProps> = ({
                   Quy tắc giá vốn & An toàn tồn kho:
                 </div>
                 <p className="text-emerald-800 leading-relaxed">
-                  Đơn giá xuất kho được chốt tự động theo <strong>Giá vốn bình quân di động (Moving WAC)</strong> hiện hành tại chi nhánh (TC-020).
-                  Hệ thống khóa chặt và <strong>từ chối tức thì nếu số lượng xuất vượt quá tồn kho khả dụng</strong> để đảm bảo không bao giờ tồn kho âm (TC-021, TC-022).
+                  Đơn giá xuất kho được chốt tự động theo <strong>Giá vốn bình quân di động (Moving WAC)</strong> hiện hành tại chi nhánh.
+                  Hệ thống khóa chặt và <strong>từ chối tức thì nếu số lượng xuất vượt quá tồn kho khả dụng</strong> để đảm bảo không bao giờ tồn kho âm.
                 </p>
               </div>
             </div>

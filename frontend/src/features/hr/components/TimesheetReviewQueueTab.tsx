@@ -386,7 +386,7 @@ export const TimesheetReviewQueueTab: React.FC<TimesheetReviewQueueTabProps> = (
                 <th className="p-3 font-semibold">Giờ & Công</th>
                 <th className="p-3 font-semibold">Nguồn & Ghi chú</th>
                 <th className="p-3 font-semibold">Trạng thái</th>
-                <th className="p-3 font-semibold">Thông tin Duyệt (TC-017)</th>
+                <th className="p-3 font-semibold">Thông tin Duyệt</th>
                 <th className="p-3 font-semibold text-right">Hành động</th>
               </tr>
             </thead>
@@ -453,7 +453,7 @@ export const TimesheetReviewQueueTab: React.FC<TimesheetReviewQueueTabProps> = (
                         </div>
                         {isSelfRecord && (
                           <span className="inline-block mt-1 text-[9px] font-bold px-1.5 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-700">
-                            Bản ghi của bạn (Cấm tự duyệt TC-017)
+                            Bản ghi của bạn (Cấm tự duyệt)
                           </span>
                         )}
                       </td>
@@ -562,7 +562,7 @@ export const TimesheetReviewQueueTab: React.FC<TimesheetReviewQueueTabProps> = (
                                 disabled={isSelfRecord}
                                 title={
                                   isSelfRecord
-                                    ? 'Cấm tự duyệt giờ làm của chính mình (TC-017)'
+                                    ? 'Cấm tự duyệt giờ làm của chính mình'
                                     : 'Phê duyệt giờ công'
                                 }
                                 className={`p-1.5 rounded-lg transition-colors ${

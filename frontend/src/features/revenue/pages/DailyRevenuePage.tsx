@@ -7,7 +7,6 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { useAuthStore } from '@/features/auth/authStore'
 import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/types'
@@ -83,29 +82,14 @@ export function DailyRevenuePage() {
             <h1 className="text-2xl font-extrabold tracking-tight text-[#352D26]">
               Doanh thu hàng ngày
             </h1>
-            <Badge className="bg-[#B96849]/15 text-[#B96849] border-[#B96849]/30 font-mono text-[10px]">
-              P0-REV-04
-            </Badge>
           </div>
           <p className="text-xs sm:text-sm text-[#786C60] mt-1">
             Ghi nhận doanh thu tổng hợp cuối ca/ngày, đối soát kênh thanh toán và quản lý lịch kinh doanh chi nhánh.
           </p>
         </div>
 
-        {/* Badges & Action */}
+        {/* Action */}
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className="text-[10px] bg-white border-[#E5DED4]">
-            BR-REV-01
-          </Badge>
-          <Badge variant="outline" className="text-[10px] bg-white border-[#E5DED4]">
-            TC-004
-          </Badge>
-          <Badge variant="outline" className="text-[10px] bg-white border-[#E5DED4]">
-            TC-006
-          </Badge>
-          <Badge variant="outline" className="text-[10px] bg-white border-[#E5DED4]">
-            TC-007
-          </Badge>
           <Button
             type="button"
             disabled={!selectedBranchId}

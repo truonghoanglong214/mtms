@@ -219,9 +219,6 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
               <div>
                 <h3 className="text-base font-bold tracking-tight text-white flex items-center gap-2">
                   <span>Thanh Toán Công Nợ Nhà Cung Cấp</span>
-                  <Badge variant="outline" className="border-amber-400 text-amber-300 bg-amber-950/40 font-mono text-[10px]">
-                    TC-009
-                  </Badge>
                 </h3>
                 <p className="text-xs text-slate-300 mt-0.5">
                   Chi trả nợ NCC ({payable.counterpartyLabel}) từ quỹ tiền mặt hoặc ngân hàng
@@ -244,7 +241,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
             <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
               <div className="text-xs text-emerald-900 leading-relaxed">
-                <span className="font-bold">Quy tắc TC-009 (No Double Cost): </span>
+                <span className="font-bold">Quy tắc không tính trùng chi phí: </span>
                 Thanh toán nợ NCC làm giảm tiền quỹ và giảm nghĩa vụ nợ phải trả. Bút toán này{' '}
                 <span className="font-semibold text-emerald-950 underline">không tính trùng chi phí</span> vào báo cáo lãi lỗ P&L vì giá vốn nguyên vật liệu đã hoặc sẽ được ghi nhận khi xuất kho nấu/pha chế.
               </div>

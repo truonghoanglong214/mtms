@@ -134,7 +134,7 @@ export const ReceiptDetailModal: React.FC<ReceiptDetailModalProps> = ({
                   )}
                 </div>
                 <p className="text-xs text-slate-500">
-                  Chứng từ nhập kho mua hàng trực tiếp từ nhà cung cấp (BR-INV-05 / TC-008)
+                  Chứng từ nhập kho mua hàng trực tiếp từ nhà cung cấp
                 </p>
               </div>
             </div>
@@ -257,7 +257,7 @@ export const ReceiptDetailModal: React.FC<ReceiptDetailModalProps> = ({
                       <div className="flex items-center gap-2">
                         <CreditCard className="h-4 w-4 text-amber-700" />
                         <h4 className="font-bold text-amber-950">
-                          Khoản Công Nợ Nhà Cung Cấp Liên Kết (TC-008)
+                          Khoản Công Nợ Nhà Cung Cấp Liên Kết
                         </h4>
                       </div>
                       <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[10px]">

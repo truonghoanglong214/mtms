@@ -158,7 +158,7 @@ export const PAYROLL_STATUS_CONFIG: Record<
     dotClass: 'bg-emerald-500',
     bgLight: 'bg-emerald-50/70',
     textColor: 'text-emerald-800',
-    description: 'Bảng lương đã khóa vĩnh viễn (TC-017 / Invariant snapshot).',
+    description: 'Bảng lương đã khóa vĩnh viễn (Bản lưu snapshot bảo toàn dữ liệu).',
   },
   SUPERSEDED: {
     label: 'Đã thay thế (SUPERSEDED)',

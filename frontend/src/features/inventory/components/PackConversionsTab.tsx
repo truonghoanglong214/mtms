@@ -265,7 +265,7 @@ export const PackConversionsTab: React.FC<PackConversionsTabProps> = ({
                       {/* Snapshot Invariant */}
                       <td className="py-3 px-4 text-center">
                         <Badge variant="outline" className="border-emerald-300 text-emerald-800 bg-emerald-50 text-[10px]">
-                          TC-023 Immutable
+                          Snapshot cố định
                         </Badge>
                       </td>
                     </motion.tr>
@@ -282,7 +282,7 @@ export const PackConversionsTab: React.FC<PackConversionsTabProps> = ({
             Hiển thị <strong>{filteredConversions.length}</strong> quy cách đóng gói
           </span>
           <span className="font-mono text-[11px] text-slate-400">
-            BR-INV-04 · Supplier Pack Conversions
+            Supplier Pack Conversions
           </span>
         </div>
       </div>

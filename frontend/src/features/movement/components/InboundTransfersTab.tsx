@@ -63,7 +63,7 @@ export const InboundTransfersTab: React.FC<Props> = ({
               <th className="px-4 py-3">Ngày gửi</th>
               <th className="px-4 py-3 text-right">SL Gửi</th>
               <th className="px-4 py-3 text-right">SL Thực nhận</th>
-              <th className="px-4 py-3 text-right">Hao hụt (TC-027)</th>
+              <th className="px-4 py-3 text-right">Hao hụt</th>
               <th className="px-4 py-3 text-center">Trạng thái</th>
               <th className="px-4 py-3 text-right">Thao tác</th>
             </tr>

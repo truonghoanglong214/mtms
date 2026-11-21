@@ -200,15 +200,6 @@ export const InternalTransferModal: React.FC<InternalTransferModalProps> = ({
                   <h2 className="text-lg font-bold text-slate-900">
                     Chuyển Tiền Nội Bộ Chi Nhánh
                   </h2>
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    TC-010
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono"
-                  >
-                    BR-FIN-09
-                  </Badge>
                 </div>
                 <p className="text-xs text-slate-500">
                   Chi nhánh: <span className="font-semibold text-slate-700">{branchName || branchId}</span> · Cân đối tiền mặt két và ngân hàng.
@@ -234,7 +225,7 @@ export const InternalTransferModal: React.FC<InternalTransferModalProps> = ({
               <ShieldCheck className="w-5 h-5 text-emerald-700 shrink-0 mt-0.5" />
               <div>
                 <strong className="font-semibold block text-emerald-950">
-                  Quy định kế toán bất biến (TC-010):
+                  Quy định kế toán bất biến:
                 </strong>
                 Chuyển quỹ nội bộ cân đối tiền giữa két và ngân hàng, bảo toàn tổng tài sản tiền và không làm thay đổi doanh thu hay chi phí trên báo cáo lãi lỗ (P&L).
               </div>

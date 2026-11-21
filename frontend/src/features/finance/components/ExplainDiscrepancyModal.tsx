@@ -124,7 +124,7 @@ export const ExplainDiscrepancyModal: React.FC<ExplainDiscrepancyModalProps> = (
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900">
-                    Giải Trình Chênh Lệch Quỹ (TC-012)
+                    Giải Trình Chênh Lệch Quỹ
                   </h3>
                   <p className="text-xs text-slate-500">
                     Cập nhật lý do và chứng từ đính kèm để chuyển trạng thái sang <strong>ĐÃ GIẢI TRÌNH</strong>

@@ -207,14 +207,8 @@ export const PayrollManagementPage: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2.5">
             <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900">
-              Bảng lương & Chi trả (TC-013/TC-016)
+              Bảng lương & Chi trả
             </h1>
-            <Badge
-              variant="outline"
-              className="border-[#819B78] text-[#304638] bg-[#819B78]/10 font-mono text-xs"
-            >
-              P0-HR-05 / 07 / 08
-            </Badge>
           </div>
           <p className="text-xs sm:text-sm text-stone-500 mt-1">
             Động cơ tính lương đa lát, chốt khóa snapshot bất biến & xuất quỹ chi trả liên kết sổ quỹ
@@ -240,14 +234,14 @@ export const PayrollManagementPage: React.FC = () => {
             </Button>
           )}
 
-          {/* Bulk Pay button (P0-HR-07: Available when APPROVED and unpaid lines exist) */}
+          {/* Bulk Pay button */}
           {isApproved && hasUnpaidLines && (
             <Button
               onClick={() => setIsBulkPayModalOpen(true)}
               className="bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs h-9 text-xs font-semibold"
             >
               <Wallet className="h-4 w-4 mr-1.5" />
-              <span>Chi trả lương hàng loạt (TC-016)</span>
+              <span>Chi trả lương hàng loạt</span>
             </Button>
           )}
 
@@ -364,7 +358,7 @@ export const PayrollManagementPage: React.FC = () => {
           <ShieldCheck className="h-5 w-5 text-emerald-700 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <h4 className="font-bold text-xs uppercase tracking-wide text-emerald-800">
-              Bảng lương đã chốt duyệt & Khóa bất biến (TC-017 / Invariant Snapshot)
+              Bảng lương đã chốt duyệt & Khóa bất biến
             </h4>
             <p className="text-xs text-emerald-800 leading-relaxed">
               Bảng lương Tháng {selectedMonth}/{selectedYear} tại chi nhánh{' '}
@@ -574,7 +568,7 @@ export const PayrollManagementPage: React.FC = () => {
         onClose={() => setSelectedLineForPay(null)}
         onSuccess={() => {
           fetchPayrollPeriod()
-          setSuccessMessage('Đã xuất quỹ chi trả lương thành công (TC-016).')
+          setSuccessMessage('Đã xuất quỹ chi trả lương thành công.')
           setTimeout(() => setSuccessMessage(null), 5000)
         }}
       />

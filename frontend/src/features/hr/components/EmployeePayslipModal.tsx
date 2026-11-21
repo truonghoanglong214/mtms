@@ -282,7 +282,7 @@ export const EmployeePayslipModal: React.FC<EmployeePayslipModalProps> = ({
               {isHourly && slices.length > 0 && (
                 <div className="border border-stone-200 rounded-xl overflow-hidden mt-2 text-xs">
                   <div className="bg-stone-100/80 px-3 py-1.5 font-semibold text-[11px] text-stone-600 border-b border-stone-200">
-                    Chi tiết các lát đơn giá giữa tháng (TC-013)
+                    Chi tiết các lát đơn giá giữa tháng
                   </div>
                   <table className="w-full text-xs text-left">
                     <thead className="bg-stone-50 text-stone-500 border-b border-stone-200 text-[10px] uppercase font-semibold">
@@ -454,7 +454,7 @@ export const EmployeePayslipModal: React.FC<EmployeePayslipModalProps> = ({
           {/* Modal Footer (No-print) */}
           <div className="px-6 py-3 border-t border-stone-200 bg-stone-50 flex items-center justify-between no-print">
             <span className="text-xs text-stone-500">
-              Chế độ bảo mật TC-017: Dữ liệu phân quyền theo nhân sự & chi nhánh
+              Chế độ bảo mật: Dữ liệu phân quyền theo nhân sự & chi nhánh
             </span>
 
             <div className="flex items-center space-x-2">

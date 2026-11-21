@@ -21,7 +21,6 @@ import {
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
-import { Badge } from '@/shared/components/ui/badge'
 import { useAuthStore } from '@/features/auth/authStore'
 import { apiClient } from '@/shared/api/apiClient'
 import type { ApiResponse } from '@/shared/types'
@@ -322,18 +321,6 @@ export function FinancePage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Sổ Quỹ & Công Nợ Chi Nhánh
             </h1>
-            <Badge variant="secondary" className="font-mono text-xs">
-              P0-FIN-01 / P0-FIN-02 / P0-FIN-04 / P0-FIN-05 / P0-FIN-06 / P0-FIN-07 / P0-FIN-08
-            </Badge>
-            <Badge
-              variant="outline"
-              className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono"
-            >
-              TC-009 / TC-010 / TC-011 / TC-012 / TC-017
-            </Badge>
-            <Badge variant="outline" className="text-xs font-mono text-slate-500">
-              FE-P0-11 / FE-P0-12 / FE-P0-13 / FE-P0-14 / FE-P0-15 / FE-P0-16
-            </Badge>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Theo dõi dòng tiền mặt, ngân hàng, công nợ nhà cung cấp và các khoản phải thu chi nhánh.
@@ -404,12 +391,9 @@ export function FinancePage() {
           >
             <Wallet className="w-4 h-4" />
             <span>Sổ quỹ Tiền mặt & Ngân hàng</span>
-            <Badge variant="secondary" className="text-[10px] font-mono">
-              TC-010/011
-            </Badge>
           </button>
 
-          {/* Tab 2: Operating Expenses (FE-P0-12 / BR-FIN-07) */}
+          {/* Tab 2: Operating Expenses */}
           <button
             type="button"
             onClick={() => setActiveTab('EXPENSES')}
@@ -421,12 +405,6 @@ export function FinancePage() {
           >
             <Receipt className="w-4 h-4" />
             <span>Chi phí Vận hành (OPEX)</span>
-            <Badge
-              variant="outline"
-              className="border-emerald-600 text-emerald-800 bg-emerald-50 text-[10px] font-mono"
-            >
-              FE-P0-12
-            </Badge>
           </button>
 
           {/* Tab 3: Supplier Payables Ledger */}
@@ -441,12 +419,6 @@ export function FinancePage() {
           >
             <CreditCard className="w-4 h-4" />
             <span>Sổ Công nợ Phải trả NCC</span>
-            <Badge
-              variant="outline"
-              className="border-amber-500 text-amber-700 bg-amber-50 text-[10px] font-mono"
-            >
-              TC-009 / FE-P0-13
-            </Badge>
           </button>
 
           {/* Tab 4: Other Receivables Ledger */}
@@ -463,7 +435,7 @@ export function FinancePage() {
             <span>Sổ Quản lý Phải thu khác</span>
           </button>
 
-          {/* Tab 5: Cash & Bank Reconciliation (FE-P0-14 / BR-FIN-06 / TC-012) */}
+          {/* Tab 5: Cash & Bank Reconciliation */}
           <button
             type="button"
             onClick={() => setActiveTab('RECONCILIATION')}
@@ -475,15 +447,9 @@ export function FinancePage() {
           >
             <Scale className="w-4 h-4" />
             <span>Kiểm kê & Đối soát quỹ</span>
-            <Badge
-              variant="outline"
-              className="border-blue-500 text-blue-700 bg-blue-50 text-[10px] font-mono"
-            >
-              TC-012 / FE-P0-14
-            </Badge>
           </button>
 
-          {/* Tab 6: Tax Manual Obligations (FE-P0-15 / BR-FIN-04 / TC-012) */}
+          {/* Tab 6: Tax Manual Obligations */}
           <button
             type="button"
             onClick={() => setActiveTab('TAX')}
@@ -495,15 +461,9 @@ export function FinancePage() {
           >
             <Landmark className="w-4 h-4" />
             <span>Nghĩa vụ thuế & Ngân sách</span>
-            <Badge
-              variant="outline"
-              className="border-emerald-600 text-emerald-800 bg-emerald-50 text-[10px] font-mono"
-            >
-              BR-FIN-04 / FE-P0-15
-            </Badge>
           </button>
 
-          {/* Tab 7: Opening Balances Import & Cutover Batch (FE-P0-16 / BR-FIN-08 / GAP-01) */}
+          {/* Tab 7: Opening Balances Import & Cutover Batch */}
           <button
             type="button"
             onClick={() => setActiveTab('OPENING_BALANCES')}
@@ -515,12 +475,6 @@ export function FinancePage() {
           >
             <FolderOpen className="w-4 h-4" />
             <span>Số dư đầu kỳ</span>
-            <Badge
-              variant="outline"
-              className="border-emerald-600 text-emerald-800 bg-emerald-50 text-[10px] font-mono"
-            >
-              BR-FIN-08 / GAP-01
-            </Badge>
           </button>
         </nav>
       </div>
@@ -554,7 +508,7 @@ export function FinancePage() {
                 className="bg-[#304638] hover:bg-[#25372C] text-white text-xs font-semibold px-3.5 py-2 rounded-xl flex items-center gap-2 shadow-xs cursor-pointer"
               >
                 <ArrowRightLeft className="w-4 h-4" />
-                <span>Chuyển tiền nội bộ (TC-010)</span>
+                <span>Chuyển tiền nội bộ</span>
               </Button>
 
               {/* Action 2: Direct Manual Cash Entry */}
@@ -670,8 +624,8 @@ export function FinancePage() {
                 >
                   <option value="ALL">Tất cả nguồn nghiệp vụ</option>
                   <option value="DAILY_REVENUE">Doanh thu bán hàng</option>
-                  <option value="SUPPLIER_PAYMENT">Chi trả nợ NCC (TC-009)</option>
-                  <option value="INTERNAL_TRANSFER">Chuyển quỹ nội bộ (TC-010)</option>
+                  <option value="SUPPLIER_PAYMENT">Chi trả nợ NCC</option>
+                  <option value="INTERNAL_TRANSFER">Chuyển quỹ nội bộ</option>
                   <option value="CAPITAL_FLOW">Vốn góp / Rút vốn CSH</option>
                   <option value="MANUAL_EXPENSE">Chi phí vận hành trực tiếp</option>
                   <option value="PAYROLL_PAYMENT">Chi lương nhân sự</option>

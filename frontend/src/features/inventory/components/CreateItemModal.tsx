@@ -87,7 +87,7 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
 
     // Double-check invariant before sending
     if (expirationTrackingRequired && !lotTrackingRequired) {
-      setError('Quy tắc BR-INV-04: Theo dõi hạn sử dụng bắt buộc phải theo dõi số lô.')
+      setError('Theo dõi hạn sử dụng bắt buộc phải theo dõi số lô.')
       return
     }
 
@@ -164,7 +164,7 @@ export const CreateItemModal: React.FC<CreateItemModalProps> = ({
                   Thêm Mặt Hàng / Nguyên Vật Liệu
                 </h3>
                 <p className="text-xs text-slate-500 font-mono">
-                  BR-INV-04 · Đơn vị tính gốc và kiểm soát tồn kho
+                  Đơn vị tính gốc và kiểm soát tồn kho
                 </p>
               </div>
             </div>

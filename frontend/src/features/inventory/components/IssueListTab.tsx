@@ -137,7 +137,7 @@ export const IssueListTab: React.FC<IssueListTabProps> = ({
       if (problemType === 'urn:mtms:error:insufficient-stock') {
         alert(
           detail ||
-            'Tồn kho hiện tại không đủ để xuất mặt hàng trong phiếu này. Hệ thống không cho phép xuất âm (TC-021)!'
+            'Tồn kho hiện tại không đủ để xuất mặt hàng trong phiếu này. Hệ thống không cho phép xuất âm!'
         )
       } else {
         alert(detail || 'Có lỗi xảy ra khi chốt ghi sổ phiếu xuất.')
@@ -219,7 +219,7 @@ export const IssueListTab: React.FC<IssueListTabProps> = ({
           </div>
           <div>
             <div className="font-semibold text-emerald-950 flex items-center gap-2">
-              <span>Cơ chế xuất kho thủ công & Định giá vốn di động Moving WAC (TC-020, TC-021, TC-022)</span>
+              <span>Cơ chế xuất kho thủ công & Định giá vốn di động Moving WAC</span>
             </div>
             <p className="text-emerald-800 text-[11px]">
               Giá vốn ghi nhận được chốt tự động theo đơn giá bình quân di động hiện hành tại chi nhánh.

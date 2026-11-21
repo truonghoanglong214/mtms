@@ -92,7 +92,7 @@ export const STOCK_COUNT_STATUS_META: Record<
     border: 'border-slate-500/20'
   },
   SUBMITTED: {
-    label: 'Chờ duyệt (TC-026)',
+    label: 'Chờ duyệt',
     bg: 'bg-amber-500/10',
     text: 'text-amber-400',
     border: 'border-amber-500/20'

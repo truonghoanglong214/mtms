@@ -188,7 +188,7 @@ export const ReconciliationTab: React.FC<ReconciliationTabProps> = ({
   // Handle successful adjustment
   const handleAdjustSuccess = (updated: CashReconciliationDto) => {
     setSuccessToast(
-      `Đã duyệt điều chỉnh số dư ngày ${updated.reconciliationDate} thành công. Bút toán đã hạch toán vào sổ quỹ chi nhánh (TC-012).`
+      `Đã duyệt điều chỉnh số dư ngày ${updated.reconciliationDate} thành công. Bút toán đã hạch toán vào sổ quỹ chi nhánh.`
     )
     setTimeout(() => setSuccessToast(null), 5000)
     fetchReconciliations()
@@ -299,7 +299,7 @@ export const ReconciliationTab: React.FC<ReconciliationTabProps> = ({
               ? 'bg-amber-100/70 border-amber-400 ring-2 ring-amber-400/50'
               : 'bg-white border-slate-200 hover:border-amber-300'
           }`}
-          title="Nhấp để lọc nhanh các đợt đối soát chờ xử lý (TC-012)"
+          title="Nhấp để lọc nhanh các đợt đối soát chờ xử lý"
         >
           <div className="flex items-center justify-between text-slate-500 mb-1.5">
             <div className="flex items-center gap-1.5">
@@ -665,7 +665,7 @@ export const ReconciliationTab: React.FC<ReconciliationTabProps> = ({
                                 type="button"
                                 onClick={() => setAdjustingItem(item)}
                                 className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-300 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1"
-                                title="Hạch toán điều chỉnh vào sổ quỹ chi nhánh (TC-012)"
+                                title="Hạch toán điều chỉnh vào sổ quỹ chi nhánh"
                               >
                                 <Scale className="w-3 h-3" />
                                 <span>Duyệt điều chỉnh</span>

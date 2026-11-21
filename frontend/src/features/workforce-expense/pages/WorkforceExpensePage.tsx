@@ -1,5 +1,4 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/ui/card'
-import { Badge } from '@/shared/components/ui/badge'
 
 export function WorkforceExpensePage() {
   return (
@@ -11,7 +10,6 @@ export function WorkforceExpensePage() {
             Danh bạ nhân viên, phân bổ chi nhánh chính và ghi nhận chi phí lương tháng.
           </p>
         </div>
-        <Badge variant="secondary">BR-HR-01 / ADR-014</Badge>
       </div>
 
       <Card>

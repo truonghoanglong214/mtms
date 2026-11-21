@@ -147,7 +147,7 @@ export const CapitalManagementPage: React.FC = () => {
             </h1>
           </div>
           <p className="mt-1 text-sm text-neutral-500">
-            Theo dõi cam kết góp vốn, tiến độ thu tiền thực tế (TC-032) và tỷ lệ hưởng lợi nhuận tham chiếu (G5 Gate)
+            Theo dõi cam kết góp vốn, tiến độ thu tiền thực tế và tỷ lệ hưởng lợi nhuận tham chiếu
           </p>
         </div>
 
@@ -183,7 +183,7 @@ export const CapitalManagementPage: React.FC = () => {
       <div className="flex items-center gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 shadow-sm dark:border-amber-900 dark:bg-amber-950/40">
         <ShieldAlert className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
         <div className="text-xs text-amber-900 dark:text-amber-200">
-          <span className="font-semibold">GIỚI HẠN GIAI ĐOẠN 0 (G5 SPECIALIST GATE & ADR-007):</span> Dữ liệu tỷ lệ chia lợi nhuận hiển thị dưới đây là thông tin thiết lập tham chiếu nội bộ. Hệ thống không thực hiện chi trả lợi nhuận thực tế cho cổ đông trong Pha 0.
+          <span className="font-semibold">GIỚI HẠN GIAI ĐOẠN HIỆN TẠI:</span> Dữ liệu tỷ lệ chia lợi nhuận hiển thị dưới đây là thông tin thiết lập tham chiếu nội bộ. Hệ thống không thực hiện chi trả lợi nhuận thực tế cho cổ đông trong Pha 0.
         </div>
       </div>
 
@@ -254,7 +254,7 @@ export const CapitalManagementPage: React.FC = () => {
         {/* Card 3: Outstanding (TC-032 Invariant) */}
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-neutral-500">Vốn Còn Phải Thu (TC-032)</span>
+            <span className="text-sm font-medium text-neutral-500">Vốn Còn Phải Thu</span>
             <div className="rounded-lg bg-amber-100 p-2 text-amber-600 dark:bg-amber-950 dark:text-amber-400">
               <Coins className="h-5 w-5" />
             </div>
@@ -299,7 +299,7 @@ export const CapitalManagementPage: React.FC = () => {
           }`}
         >
           <HandCoins className="h-4 w-4" />
-          Tiến độ góp vốn (TC-032)
+          Tiến độ góp vốn
           <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
             {commitments.length}
           </span>
@@ -329,7 +329,7 @@ export const CapitalManagementPage: React.FC = () => {
           }`}
         >
           <FileCheck2 className="h-4 w-4" />
-          Tỷ lệ hưởng Lợi nhuận (CAP-INV-01)
+          Tỷ lệ hưởng Lợi nhuận
           <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300">
             {profitTerms.length}
           </span>

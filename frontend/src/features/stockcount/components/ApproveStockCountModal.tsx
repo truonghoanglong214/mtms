@@ -72,7 +72,7 @@ export const ApproveStockCountModal: React.FC<ApproveStockCountModalProps> = ({
           <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl space-y-2">
             <div className="flex items-center gap-2 text-amber-300 font-semibold text-sm">
               <ShieldAlert className="w-4 h-4 shrink-0 text-amber-400" />
-              <span>Rào cản Nghiệp vụ Cốt lõi TC-026 & TC-021</span>
+              <span>Nguyên tắc Quản trị & Phê duyệt Kho Hàng</span>
             </div>
             <p className="text-xs text-amber-200/90 leading-relaxed">
               Hành động này thực thi quyền phê duyệt của <strong>Chủ sở hữu (Owner)</strong>:

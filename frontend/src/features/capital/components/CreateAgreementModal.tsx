@@ -71,7 +71,7 @@ export const CreateAgreementModal: React.FC<Props> = ({
             </div>
             <div>
               <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Ký hợp đồng thỏa thuận đầu tư</h3>
-              <p className="text-xs text-neutral-500">Xác lập thỏa thuận góp vốn gắn chặt theo chi nhánh (TC-001)</p>
+              <p className="text-xs text-neutral-500">Xác lập thỏa thuận góp vốn gắn chặt theo chi nhánh</p>
             </div>
           </div>
           <button onClick={onClose} className="rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:hover:bg-neutral-800">

@@ -3118,20 +3118,20 @@ class FlywayBaselineMigrationTest {
 
             // 1. Setup prerequisite entities
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.business_entities (id, code, name, tax_code) VALUES (?, 'ENT_V23', 'Entity V23', '0100000023')")) {
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, 'ENT_V23', 'Entity V23', 'ACTIVE')")) {
                 stmt.setObject(1, entityId);
                 stmt.executeUpdate();
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.branches (id, business_entity_id, code, name) VALUES (?, ?, 'BR_V23', 'Branch V23')")) {
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, 'BR_V23', 'Branch V23', 'ACTIVE')")) {
                 stmt.setObject(1, branchId);
                 stmt.setObject(2, entityId);
                 stmt.executeUpdate();
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.users (id, username, password_hash, full_name) VALUES (?, 'user_v23', 'hash', 'User V23')")) {
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, 'user_v23@mtms.local', 'hash', 'User V23', 'ACTIVE')")) {
                 stmt.setObject(1, userId);
                 stmt.executeUpdate();
             }
@@ -3250,7 +3250,7 @@ class FlywayBaselineMigrationTest {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, branch_name, status) " +
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) " +
                     "VALUES (?, ?, ?, 'Asset Test Branch', 'ACTIVE')")) {
                 stmt.setObject(1, branchId);
                 stmt.setObject(2, entityId);
@@ -3343,7 +3343,7 @@ class FlywayBaselineMigrationTest {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, branch_name, status) " +
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) " +
                     "VALUES (?, ?, ?, 'Closing Test Branch', 'ACTIVE')")) {
                 stmt.setObject(1, branchId);
                 stmt.setObject(2, entityId);
@@ -3352,11 +3352,10 @@ class FlywayBaselineMigrationTest {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.users (id, username, password_hash, full_name, email, status) " +
-                    "VALUES (?, ?, 'hash', 'Closing Actor', ?, 'ACTIVE')")) {
+                    "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) " +
+                    "VALUES (?, ?, 'hash', 'Closing Actor', 'ACTIVE')")) {
                 stmt.setObject(1, userId);
-                stmt.setString(2, "actor_" + UUID.randomUUID().toString().substring(0, 8));
-                stmt.setString(3, "actor_" + UUID.randomUUID().toString().substring(0, 8) + "@mtms.local");
+                stmt.setString(2, "actor_" + UUID.randomUUID().toString().substring(0, 8) + "@mtms.local");
                 stmt.executeUpdate();
             }
 
@@ -3497,7 +3496,7 @@ class FlywayBaselineMigrationTest {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.financial_accounts (id, branch_id, account_type, account_name, current_balance, status) " +
+                    "INSERT INTO mtms.financial_accounts (id, branch_id, account_kind, account_name, current_balance, status) " +
                     "VALUES (?, ?, 'CASH', 'Quỹ tiền mặt chính', 0.00, 'ACTIVE')")) {
                 stmt.setObject(1, accountId);
                 stmt.setObject(2, branchId);
@@ -3675,14 +3674,9 @@ class FlywayBaselineMigrationTest {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.catalog_items (id, business_entity_id, item_code, name, item_kind, base_unit, storage_uom) VALUES (?, ?, ?, ?, ?, ?, ?)")) {
+                    "INSERT INTO mtms.catalog_items (id, business_entity_id, item_code, name, item_kind, base_unit_id) VALUES (?, ?, 'CF_BEANS', 'Coffee Beans', 'INGREDIENT', (SELECT id FROM mtms.units WHERE unit_code = 'KG' LIMIT 1))")) {
                 stmt.setObject(1, itemId);
                 stmt.setObject(2, entityId);
-                stmt.setString(3, "CF_BEANS");
-                stmt.setString(4, "Coffee Beans");
-                stmt.setString(5, "RAW_MATERIAL");
-                stmt.setString(6, "KG");
-                stmt.setString(7, "KG");
                 stmt.executeUpdate();
             }
 
@@ -3773,30 +3767,24 @@ class FlywayBaselineMigrationTest {
             UUID lineId = UUID.randomUUID();
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.business_entities (id, entity_code, entity_name, tax_code, status) VALUES (?, ?, ?, ?, ?)")) {
+                    "INSERT INTO mtms.business_entities (id, entity_code, registered_name, status) VALUES (?, ?, 'Entity Count Test', 'ACTIVE')")) {
                 stmt.setObject(1, entityId);
                 stmt.setString(2, "ENT_COUNT_" + entityId.toString().substring(0, 8));
-                stmt.setString(3, "Entity Count Test");
-                stmt.setString(4, "0199999028");
-                stmt.setString(5, "ACTIVE");
                 stmt.executeUpdate();
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, branch_name, time_zone, status) VALUES (?, ?, ?, ?, ?, ?)")) {
+                    "INSERT INTO mtms.branches (id, business_entity_id, branch_code, name, status) VALUES (?, ?, ?, 'Branch Count Test', 'ACTIVE')")) {
                 stmt.setObject(1, branchId);
                 stmt.setObject(2, entityId);
                 stmt.setString(3, "BR_COUNT_" + branchId.toString().substring(0, 8));
-                stmt.setString(4, "Branch Count Test");
-                stmt.setString(5, "Asia/Ho_Chi_Minh");
-                stmt.setString(6, "ACTIVE");
                 stmt.executeUpdate();
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
                     "INSERT INTO mtms.users (id, login_identifier, password_hash, display_name, status) VALUES (?, ?, ?, ?, ?)")) {
                 stmt.setObject(1, userId);
-                stmt.setString(2, "user_count_" + userId.toString().substring(0, 8));
+                stmt.setString(2, "user_count_" + userId.toString().substring(0, 8) + "@mtms.local");
                 stmt.setString(3, "$2a$12$dummyhash");
                 stmt.setString(4, "Count User");
                 stmt.setString(5, "ACTIVE");
@@ -3804,7 +3792,7 @@ class FlywayBaselineMigrationTest {
             }
 
             try (PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO mtms.catalog_items (id, business_entity_id, item_code, item_name, base_uom_id, item_kind, status) " +
+                    "INSERT INTO mtms.catalog_items (id, business_entity_id, item_code, name, base_unit_id, item_kind, status) " +
                     "VALUES (?, ?, ?, ?, (SELECT id FROM mtms.units WHERE unit_code = 'KG' LIMIT 1), 'INGREDIENT', 'ACTIVE')")) {
                 stmt.setObject(1, itemId);
                 stmt.setObject(2, entityId);

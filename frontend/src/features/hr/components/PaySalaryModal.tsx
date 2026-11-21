@@ -220,11 +220,8 @@ export const PaySalaryModal: React.FC<PaySalaryModalProps> = ({
               <div>
                 <div className="flex items-center space-x-2">
                   <h3 className="font-bold text-stone-900 text-base">
-                    Lập phiếu chi trả lương (P0-HR-07)
+                    Lập phiếu chi trả lương
                   </h3>
-                  <Badge variant="outline" className="border-emerald-300 text-emerald-800 text-[10px]">
-                    TC-016 Invariant
-                  </Badge>
                 </div>
                 <p className="text-xs text-stone-500">
                   Xuất quỹ tiền mặt/ngân hàng & liên kết bút toán sổ quỹ bất biến
@@ -495,7 +492,7 @@ export const PaySalaryModal: React.FC<PaySalaryModalProps> = ({
               <ShieldCheck className="h-4.5 w-4.5 text-emerald-700 shrink-0 mt-0.5" />
               <div className="space-y-0.5 leading-relaxed">
                 <span className="font-bold text-emerald-800 block">
-                  Kiểm soát hạch toán bất biến TC-016 (Accrual vs Cash Flow)
+                  Kiểm soát hạch toán bất biến (Dồn tích vs Dòng tiền)
                 </span>
                 <span className="text-emerald-700 text-[11px] block">
                   Dòng tiền xuất quỹ sẽ được ghi nhận vào ngày thực chi (<strong>{paidOn}</strong>).

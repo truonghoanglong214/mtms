@@ -80,7 +80,7 @@ export const TimesheetApprovalModal: React.FC<TimesheetApprovalModalProps> = ({
 
     if (!isRejectMode && hasPotentialSelfApproval && isManagerOnly) {
       setErrorMessage(
-        'Quy tắc an toàn TC-017: Quản lý không thể tự phê duyệt giờ làm của chính mình. Vui lòng bỏ chọn bản ghi của bạn.'
+        'Quy tắc an toàn: Quản lý không thể tự phê duyệt giờ làm của chính mình. Vui lòng bỏ chọn bản ghi của bạn.'
       )
       return
     }
@@ -121,7 +121,7 @@ export const TimesheetApprovalModal: React.FC<TimesheetApprovalModalProps> = ({
         problem?.message?.includes('self-approval')
       ) {
         setErrorMessage(
-          'Quy tắc an toàn TC-017: Quản lý không thể tự phê duyệt giờ làm của chính mình! Bản ghi của Quản lý phải do Chủ quán (Owner) duyệt.'
+          'Quy tắc an toàn: Quản lý không thể tự phê duyệt giờ làm của chính mình! Bản ghi của Quản lý phải do Chủ quán (Owner) duyệt.'
         )
       } else {
         setErrorMessage(
@@ -172,7 +172,7 @@ export const TimesheetApprovalModal: React.FC<TimesheetApprovalModalProps> = ({
                 <p className="text-xs text-white/80">
                   {isRejectMode
                     ? 'Yêu cầu nhân viên hoặc quản lý nhập lại thông tin ca'
-                    : 'Kiểm soát bất biến và xác nhận tính lương theo TC-017'}
+                    : 'Kiểm soát bất biến và xác nhận tính lương'}
                 </p>
               </div>
             </div>
@@ -187,12 +187,12 @@ export const TimesheetApprovalModal: React.FC<TimesheetApprovalModalProps> = ({
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-5">
-            {/* TC-017 Warning Banner */}
+            {/* Warning Banner */}
             <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4 flex gap-3 text-amber-900 text-xs leading-relaxed">
               <ShieldAlert className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div>
                 <p className="font-semibold text-amber-950">
-                  Quy tắc an toàn TC-017 & Bất biến Quản lý:
+                  Quy tắc an toàn & Bất biến Quản lý:
                 </p>
                 <p className="mt-0.5 text-amber-800">
                   Quản lý cửa hàng không thể tự phê duyệt giờ làm của chính
@@ -220,7 +220,7 @@ export const TimesheetApprovalModal: React.FC<TimesheetApprovalModalProps> = ({
               <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-900 text-xs flex gap-2.5 items-start font-medium">
                 <AlertTriangle className="h-4 w-4 text-red-600 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold">Cảnh báo vi phạm TC-017:</span> Danh
+                  <span className="font-bold">Cảnh báo vi phạm an toàn:</span> Danh
                   sách đang chứa bản ghi chấm công của chính bạn. Với vai trò Quản lý,
                   bạn không có thẩm quyền tự duyệt công của mình.
                 </div>

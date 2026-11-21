@@ -307,7 +307,7 @@ export const PayrollLinesTable: React.FC<PayrollLinesTableProps> = ({
                               size="sm"
                               onClick={() => onPaySalary?.(line)}
                               className="h-7 px-2 text-[11px] border-emerald-300 text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100 flex items-center space-x-1 shadow-2xs"
-                              title="Xuất quỹ chi trả lương (TC-016)"
+                              title="Xuất quỹ chi trả lương"
                             >
                               <DollarSign className="h-3 w-3 text-emerald-700" />
                               <span>Chi lương</span>
@@ -332,7 +332,7 @@ export const PayrollLinesTable: React.FC<PayrollLinesTableProps> = ({
                             size="sm"
                             onClick={() => onViewPayslip?.(line)}
                             className="h-7 px-2 text-[11px] border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center space-x-1"
-                            title="Xem và in phiếu lương nhân viên (P0-HR-08 / FE-P0-23)"
+                            title="Xem và in phiếu lương nhân viên"
                           >
                             <FileText className="h-3 w-3 text-[#304638]" />
                             <span>Phiếu</span>
@@ -344,7 +344,7 @@ export const PayrollLinesTable: React.FC<PayrollLinesTableProps> = ({
                             size="sm"
                             onClick={() => onViewCalculation(line)}
                             className="h-7 px-2 text-[11px] border-stone-300 text-stone-700 hover:bg-stone-100 flex items-center space-x-1"
-                            title="Xem chi tiết phân rã công thức (TC-013/TC-014)"
+                            title="Xem chi tiết phân rã công thức"
                           >
                             <Calculator className="h-3 w-3 text-stone-500" />
                             <span>Công thức</span>

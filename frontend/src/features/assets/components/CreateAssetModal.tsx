@@ -152,7 +152,7 @@ export const CreateAssetModal: React.FC<CreateAssetModalProps> = ({
                   Đăng ký thiết bị & tài sản mới
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  Chuẩn hóa danh mục thiết bị, số serial và hồ sơ bảo hành (TC-051)
+                  Chuẩn hóa danh mục thiết bị, số serial và hồ sơ bảo hành
                 </p>
               </div>
             </div>
@@ -382,9 +382,9 @@ export const CreateAssetModal: React.FC<CreateAssetModalProps> = ({
               />
             </div>
 
-            {/* TC-051 Boundary Notice */}
+            {/* Boundary Notice */}
             <div className="p-3 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-xs text-amber-800 dark:text-amber-300">
-              <span className="font-semibold">Lưu ý nghiệp vụ P0 (TC-051 / ADR-023):</span> Giai đoạn P0 ghi nhận nguyên giá và bảo hành để quản lý hiện vật, <strong>chưa tự động trích chi phí khấu hao</strong> vào Báo cáo P&L tạm tính.
+              <span className="font-semibold">Lưu ý nghiệp vụ:</span> Giai đoạn hiện tại ghi nhận nguyên giá và bảo hành để quản lý hiện vật, <strong>chưa tự động trích chi phí khấu hao</strong> vào Báo cáo P&L tạm tính.
             </div>
 
             {/* Footer Buttons */}

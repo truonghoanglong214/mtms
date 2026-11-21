@@ -438,15 +438,6 @@ export const CreateReceiptModal: React.FC<CreateReceiptModalProps> = ({
                   <h2 className="text-lg font-bold text-slate-900">
                     Lập Phiếu Nhập Kho Mua Hàng
                   </h2>
-                  <Badge variant="secondary" className="font-mono text-xs">
-                    P0-INV-03 / BR-INV-05
-                  </Badge>
-                  <Badge
-                    variant="outline"
-                    className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono"
-                  >
-                    TC-008
-                  </Badge>
                 </div>
                 <p className="text-xs text-slate-500">
                   Chi nhánh: <span className="font-semibold text-slate-700">{branchName || branchId}</span> · Nhập hàng trực tiếp, tự động quy đổi quy cách và ghi nhận công nợ.
@@ -542,7 +533,7 @@ export const CreateReceiptModal: React.FC<CreateReceiptModalProps> = ({
                   }}
                   className="w-full text-xs rounded-lg border border-slate-300 bg-white px-3 py-2 font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-700"
                 >
-                  <option value="UNPAID">Chưa thanh toán (Ghi nợ NCC) - TC-008</option>
+                  <option value="UNPAID">Chưa thanh toán (Ghi nợ NCC)</option>
                   <option value="PAID">Đã thanh toán ngay (Tiền mặt / Chuyển khoản)</option>
                 </select>
               </div>
@@ -582,7 +573,7 @@ export const CreateReceiptModal: React.FC<CreateReceiptModalProps> = ({
                 <Info className="h-4 w-4 shrink-0 text-amber-600 mt-0.5" />
                 <div>
                   <span className="font-semibold text-amber-950">
-                    Quy tắc kế toán TC-008 (Ghi nhận công nợ):
+                    Quy tắc kế toán ghi nhận công nợ:
                   </span>{' '}
                   Khi chọn &ldquo;Chưa thanh toán (Ghi nợ)&rdquo;, hệ thống sẽ tự động ghi nhận công nợ NCC vào sổ cái và tăng tồn kho. Quỹ tiền mặt/ngân hàng của quán sẽ{' '}
                   <strong className="underline">KHÔNG</strong> bị trừ và chi phí giá vốn (COGS) trong kỳ{' '}
@@ -612,7 +603,7 @@ export const CreateReceiptModal: React.FC<CreateReceiptModalProps> = ({
                     </Badge>
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Hỗ trợ chọn quy cách thùng/bao (TC-023) để tự động quy đổi sang số lượng đơn vị gốc.
+                    Hỗ trợ chọn quy cách thùng/bao để tự động quy đổi sang số lượng đơn vị gốc.
                   </p>
                 </div>
 
@@ -635,7 +626,7 @@ export const CreateReceiptModal: React.FC<CreateReceiptModalProps> = ({
                       <tr>
                         <th className="py-2.5 px-3 w-10 text-center">#</th>
                         <th className="py-2.5 px-3 min-w-[220px]">Mặt hàng</th>
-                        <th className="py-2.5 px-3 min-w-[150px]">Quy cách (TC-023)</th>
+                        <th className="py-2.5 px-3 min-w-[150px]">Quy cách</th>
                         <th className="py-2.5 px-3 min-w-[100px]">Số lượng đóng gói</th>
                         <th className="py-2.5 px-3 min-w-[110px]">SL Đơn vị gốc</th>
                         <th className="py-2.5 px-3 min-w-[120px]">Đơn giá vốn gốc (₫)</th>

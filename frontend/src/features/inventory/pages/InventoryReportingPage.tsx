@@ -12,7 +12,6 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { organizationApi } from '@/features/organization/organizationApi'
 import { useAuthStore } from '@/features/auth/authStore'
 import { InventoryDashboardTab } from '../components/InventoryDashboardTab'
@@ -118,12 +117,6 @@ export function InventoryReportingPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Báo Cáo Kho & Đối Soát Giá Vốn (COGS)
             </h1>
-            <Badge variant="secondary" className="font-mono text-xs">
-              P0-INV-06 / 07
-            </Badge>
-            <Badge variant="outline" className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono">
-              TC-020 / TC-021
-            </Badge>
           </div>
           <p className="text-sm text-slate-500 mt-1">
             Tổng quan tài sản kho, sổ chi tiết chuyển động xuất nhập và kiểm chứng không trùng chi phí giá vốn pha chế.
@@ -212,9 +205,6 @@ export function InventoryReportingPage() {
         >
           <FileSpreadsheet className="h-4 w-4" />
           <span>Sổ chi tiết biến động (Movements Ledger)</span>
-          <Badge variant="outline" className="text-[10px] font-mono border-slate-200 ml-1">
-            TC-021
-          </Badge>
         </button>
 
         <button
@@ -228,9 +218,6 @@ export function InventoryReportingPage() {
         >
           <ShieldCheck className="h-4 w-4" />
           <span>Đối soát Giá vốn (COGS Reconciliation)</span>
-          <Badge className="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-mono ml-1">
-            TC-020
-          </Badge>
         </button>
 
         <button

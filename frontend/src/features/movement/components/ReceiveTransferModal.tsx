@@ -85,7 +85,7 @@ export const ReceiveTransferModal: React.FC<Props> = ({
       }
       if (rec < l.dispatchedQty && !l.receiverNote.trim()) {
         setError(
-          `Vui lòng nhập lý do hao hụt / nhận thiếu cho mặt hàng "${l.itemName}" (TC-027).`
+          `Vui lòng nhập lý do hao hụt / nhận thiếu cho mặt hàng "${l.itemName}".`
         );
         return;
       }
@@ -143,7 +143,7 @@ export const ReceiveTransferModal: React.FC<Props> = ({
             <div className="flex items-start gap-2.5 rounded-xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300">
               <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
               <span>
-                <strong>CẢNH BÁO TIẾP NHẬN THIẾU (TC-027 / NO VANISH):</strong> Hệ thống phát hiện có mặt hàng nhận thiếu so với số lượng xuất. Số lượng thiếu sẽ được lưu trữ vào chênh lệch trên đường vận chuyển (<code>transit_variance_qty</code>) để giải quyết đối soát, tuyệt đối không tự động biến mất. Vui lòng ghi rõ lý do hao hụt.
+                <strong>CẢNH BÁO TIẾP NHẬN THIẾU:</strong> Hệ thống phát hiện có mặt hàng nhận thiếu so với số lượng xuất. Số lượng thiếu sẽ được lưu trữ vào chênh lệch trên đường vận chuyển (<code>transit_variance_qty</code>) để giải quyết đối soát, tuyệt đối không tự động biến mất. Vui lòng ghi rõ lý do hao hụt.
               </span>
             </div>
           ) : (

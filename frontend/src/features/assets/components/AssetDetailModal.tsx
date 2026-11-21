@@ -224,9 +224,9 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
               </div>
             )}
 
-            {/* TC-051 Boundary Notice */}
+            {/* Boundary Notice */}
             <div className="p-3.5 rounded-xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/40 text-xs text-amber-800 dark:text-amber-300">
-              <span className="font-semibold">Quy định hạch toán P0 (TC-051 / ADR-023):</span> Thiết bị được ghi nhận với nguyên giá phục vụ quản lý hiện vật điểm bán, <strong>không trích khấu hao vào Báo cáo P&L tạm tính</strong>.
+              <span className="font-semibold">Quy định hạch toán:</span> Thiết bị được ghi nhận với nguyên giá phục vụ quản lý hiện vật điểm bán, <strong>không trích khấu hao vào Báo cáo P&L tạm tính</strong>.
             </div>
 
             {/* Footer Buttons */}

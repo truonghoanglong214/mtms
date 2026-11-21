@@ -7,6 +7,8 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -41,6 +43,7 @@ public class SalaryPolicyJpaEntity {
     @Column(name = "standard_workdays", precision = 7, scale = 2)
     private BigDecimal standardWorkdays;
 
+    @JdbcTypeCode(SqlTypes.SMALLINT)
     @Column(name = "paid_minutes_rounding_block")
     private Integer paidMinutesRoundingBlock;
 

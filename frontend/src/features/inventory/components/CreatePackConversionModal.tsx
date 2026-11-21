@@ -149,7 +149,7 @@ export const CreatePackConversionModal: React.FC<CreatePackConversionModalProps>
                   Thiết Lập Quy Cách Nhà Cung Cấp
                 </h3>
                 <p className="text-xs text-slate-500 font-mono">
-                  BR-INV-04 / TC-023 · Quy đổi đóng gói & Snapshot nhập kho
+                  Quy đổi đóng gói & Snapshot nhập kho
                 </p>
               </div>
             </div>
@@ -279,7 +279,7 @@ export const CreatePackConversionModal: React.FC<CreatePackConversionModalProps>
             {/* Invariant Explanation Box */}
             <div className="rounded-xl border border-emerald-100 bg-emerald-50/60 p-3 text-[11px] text-emerald-800 space-y-1">
               <p className="font-semibold">
-                * Quy định TC-023 & Bất biến nhập kho (Receipt Snapshot Invariant):
+                * Nguyên tắc quy đổi & Bất biến nhập kho:
               </p>
               <p>
                 Khi lập phiếu nhập kho theo quy cách nhà cung cấp (ví dụ: nhập 2 thùng), hệ thống sẽ

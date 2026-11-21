@@ -334,7 +334,7 @@ export const DailyRevenueDetailModal: React.FC<DailyRevenueDetailModalProps> = (
                   </div>
                   <div>
                     <h3 className="text-xs font-bold text-[#352D26] uppercase tracking-wider">
-                      Liên kết Sổ quỹ tiền mặt & Ngân hàng (BR-REV-04 / TC-007)
+                      Liên kết Sổ quỹ tiền mặt & Ngân hàng
                     </h3>
                     <p className="text-[11px] text-[#786C60]">
                       Đối soát tự động giữa dòng tiền thực tế và doanh thu ghi nhận
@@ -398,7 +398,7 @@ export const DailyRevenueDetailModal: React.FC<DailyRevenueDetailModalProps> = (
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <Badge className="bg-purple-200 text-purple-900 border-purple-300 text-[10px] font-bold px-1.5 py-0">
-                      TC-007 BẢO VỆ DÒNG TIỀN
+                      BẢO VỆ DÒNG TIỀN
                     </Badge>
                     <span className="font-bold text-purple-950 text-xs">
                       Doanh thu App giao hàng NET: {formatVnd(report.deliveryAppNetAmount)}

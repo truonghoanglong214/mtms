@@ -182,7 +182,7 @@ export const CreateTimesheetModal: React.FC<CreateTimesheetModalProps> = ({
                   {initialEntry ? 'Cập nhật Giờ làm việc' : 'Ghi nhận Giờ làm việc (Đơn lẻ)'}
                 </h2>
                 <p className="text-xs text-white/80">
-                  Nhập số giờ làm và ngày công tính lương (P0-HR-03 / FE-P0-19)
+                  Nhập số giờ làm và ngày công tính lương
                 </p>
               </div>
             </div>
@@ -334,7 +334,7 @@ export const CreateTimesheetModal: React.FC<CreateTimesheetModalProps> = ({
                   className="w-full text-xs p-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-[#304638] focus:border-transparent font-bold text-emerald-800"
                 />
                 <span className="text-[10px] text-stone-400 mt-0.5 block">
-                  Công tính lương P0-HR-05
+                  Công tính lương
                 </span>
               </div>
             </div>

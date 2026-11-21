@@ -23,7 +23,7 @@ const getErrorMeta = (errorCode: string) => {
   const code = (errorCode || '').toUpperCase()
   if (code.includes('DUPLICATE')) {
     return {
-      label: 'TC-045: Trùng lặp mã',
+      label: 'Trùng lặp mã định danh',
       colorClass: 'bg-red-950/80 text-red-300 border-red-500/40',
       isDuplicate: true,
     }
@@ -160,12 +160,12 @@ export const ImportRowErrorReport: React.FC<ImportRowErrorReportProps> = ({
                 Phát hiện {errorRows.length} dòng dữ liệu không hợp lệ
               </h4>
               <p className="mt-1 text-xs text-red-300/80 leading-relaxed">
-                Hệ thống MTMS tuân thủ nguyên tắc kiểm soát dữ liệu nghiêm ngặt (BR-SEC-02).
+                Hệ thống MTMS tuân thủ nguyên tắc kiểm soát dữ liệu nghiêm ngặt.
                 Quá trình nhập dữ liệu (Commit) bị chặn cho đến khi toàn bộ lỗi được sửa trên file gốc và tải lên lại.
               </p>
               {duplicateErrorsCount > 0 && (
                 <div className="mt-2 inline-flex items-center space-x-1.5 rounded bg-red-900/60 px-2 py-0.5 text-[11px] font-mono text-red-200 border border-red-500/40">
-                  <span className="font-bold">TC-045:</span>
+                  <span className="font-bold">Lưu ý:</span>
                   <span>Có {duplicateErrorsCount} dòng trùng lặp mã định danh</span>
                 </div>
               )}

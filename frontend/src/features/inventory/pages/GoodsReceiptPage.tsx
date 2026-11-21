@@ -10,7 +10,6 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { organizationApi } from '@/features/organization/organizationApi'
 import { useAuthStore } from '@/features/auth/authStore'
 import { catalogApi } from '../api/catalogApi'
@@ -144,18 +143,9 @@ export function GoodsReceiptPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Nhập Kho Mua Hàng & Công Nợ NCC
             </h1>
-            <Badge variant="secondary" className="font-mono text-xs">
-              P0-INV-03 / BR-INV-05
-            </Badge>
-            <Badge
-              variant="outline"
-              className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono"
-            >
-              TC-008
-            </Badge>
           </div>
           <p className="text-sm text-slate-500 mt-1">
-            Nhập hàng trực tiếp từ nhà cung cấp, quy đổi quy cách đóng gói (TC-023), tự động cập nhật WAC và theo dõi công nợ chi nhánh.
+            Nhập hàng trực tiếp từ nhà cung cấp, quy đổi quy cách đóng gói, tự động cập nhật WAC và theo dõi công nợ chi nhánh.
           </p>
         </div>
 
@@ -241,7 +231,7 @@ export function GoodsReceiptPage() {
           }`}
         >
           <CreditCard className="h-4 w-4 text-emerald-700" />
-          <span>Sổ công nợ nhà cung cấp (TC-008)</span>
+          <span>Sổ công nợ nhà cung cấp</span>
         </button>
       </div>
 

@@ -229,12 +229,6 @@ export const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
                   <span>Lập Phiếu Chi Vận Hành (OPEX)</span>
-                  <Badge
-                    variant="outline"
-                    className="border-emerald-500/50 text-emerald-300 text-[10px] font-mono"
-                  >
-                    BR-FIN-07
-                  </Badge>
                 </h3>
                 <p className="text-xs text-slate-400">
                   {branchName ? `Chi nhánh: ${branchName}` : 'Ghi nhận chi phí hoạt động trực tiếp'}
@@ -274,7 +268,7 @@ export const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
                 <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
                 <div className="space-y-0.5">
                   <p className="font-bold text-amber-950 flex items-center gap-1.5">
-                    <span>Khoản chi lớn cần Chủ quán phê duyệt (BR-FIN-07)</span>
+                    <span>Khoản chi lớn cần Chủ quán phê duyệt</span>
                     <Badge className="bg-amber-500 text-white text-[10px] py-0 px-1.5">
                       review_flag = true
                     </Badge>
@@ -460,7 +454,7 @@ export const CreateExpenseModal: React.FC<CreateExpenseModalProps> = ({
                 <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-start gap-2">
                   <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                   <p className="text-[11px] leading-relaxed">
-                    Khoản chi này sẽ tự động tạo một khoản nợ phải trả trong <strong>Sổ Công nợ NCC (TC-009)</strong> và chưa trừ tiền quỹ ngay tại thời điểm này.
+                    Khoản chi này sẽ tự động tạo một khoản nợ phải trả trong <strong>Sổ Công nợ NCC</strong> và chưa trừ tiền quỹ ngay tại thời điểm này.
                   </p>
                 </div>
               )}

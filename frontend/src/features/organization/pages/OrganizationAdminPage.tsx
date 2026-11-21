@@ -374,9 +374,6 @@ export const OrganizationAdminPage: React.FC = () => {
         >
           <FileSpreadsheet className="h-4 w-4" />
           <span>Nhập dữ liệu Excel</span>
-          <span className="ml-1 rounded-full bg-emerald-950 px-2 py-0.5 text-[10px] text-emerald-400 font-mono border border-emerald-500/30">
-            BR-SEC-02
-          </span>
         </button>
       </div>
 
@@ -783,12 +780,9 @@ export const OrganizationAdminPage: React.FC = () => {
                     <h3 className="text-base font-bold text-stone-100">
                       Cổng nhập dữ liệu Excel & CSV (Staging Wizard)
                     </h3>
-                    <Badge variant="outline" className="border-emerald-500/30 text-emerald-400 bg-emerald-950/60 text-[10px] font-mono">
-                      BR-SEC-02 / TC-045
-                    </Badge>
                   </div>
                   <p className="mt-1 text-xs text-stone-400 max-w-2xl leading-relaxed">
-                    Hỗ trợ tải lên, kiểm tra quy tắc toàn vẹn nghiệp vụ theo chi nhánh, phát hiện trùng lặp mã định danh (TC-045) và khử độc công thức CSV trước khi cam kết chính thức vào hệ thống.
+                    Hỗ trợ tải lên, kiểm tra quy tắc toàn vẹn nghiệp vụ theo chi nhánh, phát hiện trùng lặp mã định danh và khử độc công thức CSV trước khi cam kết chính thức vào hệ thống.
                   </p>
                 </div>
               </div>

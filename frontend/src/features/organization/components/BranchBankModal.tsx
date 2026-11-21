@@ -304,7 +304,7 @@ export const BranchBankModal: React.FC<BranchBankModalProps> = ({
           <div className="rounded-lg border border-stone-800 bg-stone-950/60 p-4 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-stone-300 uppercase tracking-wider font-mono">
-                Điều kiện kích hoạt chi nhánh (BR-ORG-03 / TC-003)
+                Điều kiện kích hoạt chi nhánh
               </span>
 
               {isLoading ? (
@@ -330,7 +330,7 @@ export const BranchBankModal: React.FC<BranchBankModalProps> = ({
             ) : isActive ? (
               <p className="text-xs text-stone-300 leading-relaxed">
                 Chi nhánh đang ở trạng thái <strong className="text-emerald-400">ACTIVE</strong>. Đã
-                có tài khoản ngân hàng chuyên dụng hoạt động hợp lệ theo chuẩn BR-ORG-03.
+                có tài khoản ngân hàng chuyên dụng hoạt động hợp lệ theo quy định.
               </p>
             ) : isDraft && isReady ? (
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-emerald-950/30 border border-emerald-500/20 rounded-md p-3">
@@ -373,8 +373,7 @@ export const BranchBankModal: React.FC<BranchBankModalProps> = ({
                     readiness.missingRequirements.map((req, i) => <li key={i}>{req}</li>)
                   ) : (
                     <li>
-                      Cần ít nhất 1 tài khoản ngân hàng hoạt động để chi nhánh có thể mở bán
-                      (BR-ORG-03).
+                      Cần ít nhất 1 tài khoản ngân hàng hoạt động để chi nhánh có thể mở bán.
                     </li>
                   )}
                 </ul>

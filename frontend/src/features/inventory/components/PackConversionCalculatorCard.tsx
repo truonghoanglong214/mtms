@@ -130,7 +130,7 @@ export const PackConversionCalculatorCard: React.FC<PackConversionCalculatorCard
                 Công Cụ Tính Toán Quy Cách Đóng Gói (Live Calculator)
               </h3>
               <Badge variant="outline" className="border-emerald-600 text-emerald-700 bg-emerald-50 font-mono text-[10px]">
-                TC-023 Verified
+                Đã xác thực
               </Badge>
             </div>
             <p className="text-xs text-slate-600 mt-0.5">
@@ -147,7 +147,7 @@ export const PackConversionCalculatorCard: React.FC<PackConversionCalculatorCard
           className="text-xs border-emerald-300 text-emerald-800 hover:bg-emerald-50 gap-1.5 h-8 shrink-0"
         >
           <Sparkles className="h-3.5 w-3.5 text-emerald-600" />
-          <span>Nạp kịch bản mẫu TC-023</span>
+          <span>Nạp kịch bản mẫu</span>
         </Button>
       </div>
 
@@ -241,7 +241,7 @@ export const PackConversionCalculatorCard: React.FC<PackConversionCalculatorCard
             ) : (
               <>
                 <Calculator className="h-4 w-4" />
-                <span>Tính toán quy đổi TC-023</span>
+                <span>Tính toán quy đổi</span>
               </>
             )}
           </Button>
@@ -280,7 +280,7 @@ export const PackConversionCalculatorCard: React.FC<PackConversionCalculatorCard
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2 text-emerald-800 font-semibold text-sm">
                 <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                <span>Kết Quả Quy Đổi Hợp Lệ (TC-023 Verified Snapshot)</span>
+                <span>Kết Quả Quy Đổi Hợp Lệ (Snapshot xác thực)</span>
               </div>
               <Badge variant="default" className="bg-emerald-700 text-white font-mono text-xs">
                 Snapshot: {result.conversionSnapshot} {result.baseUnitCode}/{result.packName}
@@ -339,7 +339,7 @@ export const PackConversionCalculatorCard: React.FC<PackConversionCalculatorCard
               <div className="p-3 rounded-lg bg-blue-50/60 border border-blue-100 text-blue-900 space-y-1">
                 <div className="flex items-center gap-1.5 font-semibold">
                   <ShieldCheck className="h-3.5 w-3.5 text-blue-600" />
-                  <span>Bảo đảm tính bất biến (TC-023 Invariant):</span>
+                  <span>Bảo đảm tính bất biến:</span>
                 </div>
                 <p className="text-[11px] text-blue-800 leading-relaxed">
                   Tỷ lệ quy đổi <strong>{result.conversionSnapshot}</strong> được snapshot cố định

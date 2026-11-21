@@ -4,6 +4,8 @@ import com.mtms.asset.domain.model.AssetCategory;
 import com.mtms.asset.domain.model.AssetStatus;
 import com.mtms.asset.domain.model.EquipmentAsset;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -62,7 +64,8 @@ public class EquipmentAssetJpaEntity {
     @Column(name = "maintenance_note", columnDefinition = "TEXT")
     private String maintenanceNote;
 
-    @Column(name = "depreciation_policy", columnDefinition = "TEXT")
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "depreciation_policy")
     private String depreciationPolicy;
 
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -12,7 +12,6 @@ import {
   Store,
   FileSpreadsheet,
 } from 'lucide-react'
-import { Badge } from '@/shared/components/ui/badge'
 import { organizationApi } from '@/features/organization/organizationApi'
 import { useAuthStore } from '@/features/auth/authStore'
 import { catalogApi } from '../api/catalogApi'
@@ -190,12 +189,6 @@ export function InventoryCatalogPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Danh Mục Hàng Hóa & Quy Đổi Quy Cách
             </h1>
-            <Badge variant="secondary" className="font-mono text-xs">
-              P0-INV-01 / BR-INV-04
-            </Badge>
-            <Badge variant="outline" className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono">
-              TC-023
-            </Badge>
           </div>
           <p className="text-sm text-slate-500 mt-1">
             Quản lý nguyên vật liệu, đơn vị tính gốc, nhà cung cấp và hệ số quy đổi đóng gói snapshot nhập kho.
@@ -277,7 +270,7 @@ export function InventoryCatalogPage() {
           }`}
         >
           <Calculator className="h-4 w-4 text-emerald-700" />
-          <span>Quy cách & Tính toán TC-023</span>
+          <span>Quy cách & Tính toán</span>
         </button>
 
         <button
@@ -329,7 +322,7 @@ export function InventoryCatalogPage() {
           }`}
         >
           <Receipt className="h-4 w-4 text-emerald-700" />
-          <span>Nhập kho mua hàng (TC-008)</span>
+          <span>Nhập kho mua hàng</span>
         </button>
 
         <button
@@ -355,7 +348,7 @@ export function InventoryCatalogPage() {
           }`}
         >
           <FileSpreadsheet className="h-4 w-4 text-emerald-700" />
-          <span>Xuất kho pha chế (TC-020/022)</span>
+          <span>Xuất kho pha chế</span>
         </button>
       </div>
 

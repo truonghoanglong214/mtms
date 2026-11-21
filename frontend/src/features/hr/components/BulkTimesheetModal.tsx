@@ -204,7 +204,6 @@ export const BulkTimesheetModal: React.FC<BulkTimesheetModalProps> = ({
                 </h2>
                 <p className="text-xs text-white/80">
                   Ghi nhận bảng công cho nhiều nhân viên trong cùng một ngày
-                  (P0-HR-03 / TC-013)
                 </p>
               </div>
             </div>

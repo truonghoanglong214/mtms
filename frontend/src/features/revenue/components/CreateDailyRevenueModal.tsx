@@ -158,7 +158,7 @@ export const CreateDailyRevenueModal: React.FC<CreateDailyRevenueModalProps> = (
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white tracking-tight">
-                  Nhập doanh thu ngày (P0-REV-04)
+                  Nhập doanh thu ngày
                 </h2>
                 <p className="text-xs text-[#C8CEC4]">
                   {branchName ? `Chi nhánh: ${branchName}` : 'Ghi nhận doanh thu tổng hợp cuối ca/ngày'}
@@ -300,7 +300,7 @@ export const CreateDailyRevenueModal: React.FC<CreateDailyRevenueModalProps> = (
             <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 flex items-start space-x-2.5 text-xs">
               <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <span className="font-bold text-amber-950">Quy định hạch toán App NET (TC-007):</span>
+                <span className="font-bold text-amber-950">Quy định hạch toán App NET:</span>
                 <p className="text-amber-800 text-[11px] leading-relaxed">
                   Doanh thu App NET được ghi nhận vào kết quả kinh doanh ngày nhưng <strong>tuyệt đối không tự động cộng vào tài khoản ngân hàng</strong>. Tiền thực tế ứng dụng chuyển về sẽ được đối soát riêng.
                 </p>
@@ -311,7 +311,7 @@ export const CreateDailyRevenueModal: React.FC<CreateDailyRevenueModalProps> = (
             <div className="p-4 rounded-xl bg-gradient-to-br from-[#304638] to-[#25372C] text-[#F7F3EC] shadow-md flex items-center justify-between">
               <div>
                 <span className="text-[11px] uppercase tracking-wider text-[#C8CEC4] font-medium block">
-                  Tổng doanh thu thực tính (TC-006)
+                  Tổng doanh thu thực tính
                 </span>
                 <span className="text-xs text-[#819B78]">
                   = Tiền mặt + Chuyển khoản + App NET + Điều chỉnh

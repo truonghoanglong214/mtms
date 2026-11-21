@@ -253,7 +253,7 @@ export const ReceiptListTab: React.FC<ReceiptListTabProps> = ({
                 <th className="py-3 px-4 min-w-[100px]">Ngày nhận</th>
                 <th className="py-3 px-4 min-w-[120px]">Số hóa đơn</th>
                 <th className="py-3 px-4 min-w-[140px] text-right">Tổng tiền</th>
-                <th className="py-3 px-4 min-w-[140px]">Thanh toán (TC-008)</th>
+                <th className="py-3 px-4 min-w-[140px]">Thanh toán</th>
                 <th className="py-3 px-4 min-w-[110px]">Trạng thái</th>
                 <th className="py-3 px-4 min-w-[130px] text-right">Thao tác</th>
               </tr>

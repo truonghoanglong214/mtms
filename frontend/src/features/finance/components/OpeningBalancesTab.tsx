@@ -345,9 +345,6 @@ export const OpeningBalancesTab: React.FC<OpeningBalancesTabProps> = ({
                     <Badge className="bg-emerald-600 hover:bg-emerald-600 text-white font-mono text-[11px] px-2.5 py-0.5">
                       POSTED / ĐÃ CHỐT SỔ
                     </Badge>
-                    <Badge variant="outline" className="border-emerald-600 text-emerald-800 text-[10px] font-mono bg-white/70">
-                      ADR-009 / BR-FIN-08
-                    </Badge>
                   </div>
                   <p className="text-xs text-emerald-800 leading-relaxed">
                     Hồ sơ chốt sổ đầu kỳ chuyển giao hệ thống đã được phê duyệt và ghi nhận đầy đủ vào sổ quỹ kế toán.
@@ -451,7 +448,7 @@ export const OpeningBalancesTab: React.FC<OpeningBalancesTabProps> = ({
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                 <FolderOpen className="w-4 h-4 text-[#304638]" />
-                Bảng Cân Đối Vốn & Số Dư Đầu Kỳ (BR-FIN-08)
+                Bảng Cân Đối Vốn & Số Dư Đầu Kỳ
               </h3>
               <Badge variant="outline" className="text-[10px] font-mono text-slate-500">
                 7 Trụ cột tài chính
@@ -505,9 +502,6 @@ export const OpeningBalancesTab: React.FC<OpeningBalancesTabProps> = ({
                     <Package className="w-4 h-4 text-purple-600" />
                     Tồn kho ban đầu
                   </span>
-                  <Badge variant="secondary" className="text-[10px] font-mono bg-purple-50 text-purple-800">
-                    P0-INV-02
-                  </Badge>
                 </div>
                 <div className="text-lg font-bold text-slate-900">
                   {formatVnd(activeBatch.totalInventoryValuation)}
@@ -692,12 +686,12 @@ export const OpeningBalancesTab: React.FC<OpeningBalancesTabProps> = ({
             <Lock className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
             <div className="space-y-1">
               <span className="font-semibold text-slate-800">
-                Khóa sổ bất biến theo chuẩn kiểm toán MTMS (ADR-009 / BR-FIN-08):
+                Khóa sổ bất biến theo chuẩn kiểm toán MTMS:
               </span>
               <p>
                 Đợt chốt sổ đầu kỳ này đã được ghi nhận vào cơ sở dữ liệu và khóa vĩnh viễn. Không cho phép xóa,
                 sửa hoặc chốt sổ lại. Bất kỳ chênh lệch số dư nào phát sinh sau thời điểm này đều phải được giải trình
-                và điều chỉnh thông qua tab <strong>Kiểm kê & Đối soát quỹ (TC-012)</strong>.
+                và điều chỉnh thông qua tab <strong>Kiểm kê & Đối soát quỹ</strong>.
               </p>
             </div>
           </div>
@@ -732,13 +726,10 @@ export const OpeningBalancesTab: React.FC<OpeningBalancesTabProps> = ({
                       ? OPENING_BATCH_STATUS_BADGES[activeBatch.status]?.label || activeBatch.status
                       : 'CHƯA KHỞI TẠO'}
                   </Badge>
-                  <Badge variant="outline" className="border-amber-400 text-amber-800 text-[10px] font-mono bg-white/70">
-                    GAP-01 / BR-FIN-08 / ADR-009
-                  </Badge>
                 </div>
                 <p className="text-xs text-amber-900 leading-relaxed">
                   Chi nhánh chưa chốt số dư đầu kỳ. Thiết lập số dư tiền mặt, tiền gửi ngân hàng và chứng từ chốt sổ
-                  để khởi tạo sổ sách kế toán. MTMS áp dụng nguyên tắc <strong>Cutover Batch (ADR-009)</strong>:
+                  để khởi tạo sổ sách kế toán. MTMS áp dụng nguyên tắc chốt sổ đầu kỳ:
                   Không nhập lại lịch sử giao dịch cũ, chỉ chốt số dư thực tế tại ngày bắt đầu vận hành hệ thống.
                 </p>
               </div>

@@ -158,8 +158,8 @@ export interface CashLedgerFilterParams {
 export const CATEGORY_GROUP_LABELS: Record<CategoryGroup, string> = {
   OPERATING_EXPENSE: 'Chi phí vận hành',
   CAPITAL_FLOW: 'Dòng vốn chủ sở hữu',
-  INTERNAL_TRANSFER: 'Chuyển quỹ nội bộ (TC-010)',
-  DEBT_SETTLEMENT: 'Thanh toán nợ NCC (TC-009)',
+  INTERNAL_TRANSFER: 'Chuyển quỹ nội bộ',
+  DEBT_SETTLEMENT: 'Thanh toán nợ NCC',
   REVENUE: 'Doanh thu bán hàng',
   PAYROLL: 'Chi trả lương nhân sự',
   OTHER: 'Khác',
@@ -173,13 +173,13 @@ export const FLOW_DIRECTION_LABELS: Record<FlowDirection, string> = {
 
 export const SOURCE_TYPE_LABELS: Record<SourceType, string> = {
   DAILY_REVENUE: 'Doanh thu bán hàng',
-  SUPPLIER_PAYMENT: 'Chi trả nợ NCC (TC-009)',
-  INTERNAL_TRANSFER: 'Chuyển quỹ nội bộ (TC-010)',
+  SUPPLIER_PAYMENT: 'Chi trả nợ NCC',
+  INTERNAL_TRANSFER: 'Chuyển quỹ nội bộ',
   MANUAL_EXPENSE: 'Chi phí vận hành trực tiếp',
   CAPITAL_FLOW: 'Vốn góp / Rút vốn CSH',
   PAYROLL_PAYMENT: 'Chi trả lương nhân viên',
   MANUAL_ADJUSTMENT: 'Điều chỉnh sổ quỹ',
-  TAX_PAYMENT: 'Chi nộp thuế / Ngân sách (BR-FIN-04)',
+  TAX_PAYMENT: 'Chi nộp thuế / Ngân sách',
 }
 
 // ============================================================================

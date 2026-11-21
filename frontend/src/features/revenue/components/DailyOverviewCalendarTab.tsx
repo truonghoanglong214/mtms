@@ -253,13 +253,13 @@ export const DailyOverviewCalendarTab: React.FC<DailyOverviewCalendarTabProps> =
           <div className="text-xl sm:text-2xl font-extrabold text-blue-700 tracking-tight">
             {formatVnd(monthlyTotals.totalApp)}
           </div>
-          <div className="mt-1 text-[11px] text-blue-700 font-medium truncate" title="TC-007: Đối soát chuyển khoản riêng">
-            TC-007: Đối soát NH sau
+          <div className="mt-1 text-[11px] text-blue-700 font-medium truncate" title="Đối soát chuyển khoản riêng">
+            Đối soát NH sau
           </div>
         </div>
       </div>
 
-      {/* TC-004 Missing Dates Warning Box */}
+      {/* Missing Dates Warning Box */}
       {missingDates.length > 0 && (
         <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-start space-x-3">
@@ -268,7 +268,7 @@ export const DailyOverviewCalendarTab: React.FC<DailyOverviewCalendarTabProps> =
             </div>
             <div>
               <h4 className="text-sm font-bold text-red-950 flex items-center gap-1.5">
-                Cảnh báo thiếu báo cáo doanh thu (TC-004)
+                Cảnh báo thiếu báo cáo doanh thu
               </h4>
               <p className="text-xs text-red-800 mt-0.5">
                 Có <strong>{missingDates.length} ngày</strong> mở cửa trong quá khứ chưa nộp báo cáo doanh thu. Kỳ kế toán sẽ bị chặn chốt sổ tháng nếu còn ngày thiếu!
@@ -370,11 +370,11 @@ export const DailyOverviewCalendarTab: React.FC<DailyOverviewCalendarTabProps> =
           </div>
           <div className="flex items-center space-x-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-            <span>Chưa nộp (TC-004)</span>
+            <span>Chưa nộp</span>
           </div>
           <div className="flex items-center space-x-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-zinc-400" />
-            <span>Đóng cửa (TC-005)</span>
+            <span>Đóng cửa</span>
           </div>
         </div>
       </div>
@@ -439,7 +439,7 @@ export const DailyOverviewCalendarTab: React.FC<DailyOverviewCalendarTabProps> =
                     type="button"
                     onClick={(e) => handleOpenStatusModal(e, cell)}
                     className="opacity-0 group-hover:opacity-100 p-1 text-[#786C60] hover:text-[#352D26] hover:bg-zinc-200/60 rounded-md transition-opacity"
-                    title="Đổi trạng thái ngày (Mở/Đóng cửa - TC-005)"
+                    title="Đổi trạng thái ngày (Mở/Đóng cửa)"
                   >
                     <Settings2 className="w-3.5 h-3.5" />
                   </button>

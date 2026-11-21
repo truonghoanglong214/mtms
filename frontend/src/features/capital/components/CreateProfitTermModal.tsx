@@ -70,7 +70,7 @@ export const CreateProfitTermModal: React.FC<Props> = ({
               <Percent className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Cấu hình tỷ lệ chia lợi nhuận (CAP-INV-01)</h3>
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Cấu hình tỷ lệ chia lợi nhuận</h3>
               <p className="text-xs text-neutral-500">Xác lập tỷ lệ hưởng lợi nhuận theo kỳ hiệu lực của hợp đồng</p>
             </div>
           </div>
@@ -83,7 +83,7 @@ export const CreateProfitTermModal: React.FC<Props> = ({
         <div className="mt-3 flex items-start gap-2.5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200">
           <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
           <div>
-            <strong className="font-semibold">LƯU Ý QUAN TRỌNG (G5 GATE / ADR-007):</strong>
+            <strong className="font-semibold">LƯU Ý QUAN TRỌNG:</strong>
             <p className="mt-0.5 leading-relaxed">
               Tỷ lệ này chỉ mang tính <strong>tham chiếu nội bộ</strong>. Phase 0 tuyệt đối <strong>chưa thực hiện chi trả lợi nhuận thực tế</strong> cho đến khi có xác nhận của chuyên gia độc lập tại cổng kiểm soát G5.
             </p>

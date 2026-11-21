@@ -362,7 +362,7 @@ export const OperatingExpensesTab: React.FC<OperatingExpensesTabProps> = ({
             {formatVnd(kpiData.totalReviewFlagAmount)}
           </div>
           <p className="text-[11px] text-amber-700 mt-1">
-            Khoản chi ≥ 2.000.000 ₫ (BR-FIN-07)
+            Khoản chi ≥ 2.000.000 ₫
           </p>
         </div>
       </div>

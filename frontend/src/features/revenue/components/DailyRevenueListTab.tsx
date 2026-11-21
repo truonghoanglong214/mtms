@@ -203,7 +203,7 @@ export const DailyRevenueListTab: React.FC<DailyRevenueListTabProps> = ({
                 <th className="py-3 px-3 text-center">Rev</th>
                 <th className="py-3 px-4 text-right">Tiền mặt tại quầy</th>
                 <th className="py-3 px-4 text-right">Chuyển khoản QR</th>
-                <th className="py-3 px-4 text-right">App NET (TC-007)</th>
+                <th className="py-3 px-4 text-right">App NET</th>
                 <th className="py-3 px-3 text-right">Điều chỉnh</th>
                 <th className="py-3 px-4 text-right">Tổng doanh thu</th>
                 <th className="py-3 px-3 text-center">Trạng thái</th>
@@ -260,7 +260,7 @@ export const DailyRevenueListTab: React.FC<DailyRevenueListTabProps> = ({
                         {report.status === 'CONFIRMED' && (
                           <span
                             className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-1.5 py-0.5 rounded font-medium whitespace-nowrap"
-                            title="Đã liên kết sổ quỹ tiền mặt & ngân hàng (BR-REV-04)"
+                            title="Đã liên kết sổ quỹ tiền mặt & ngân hàng"
                           >
                             <Link2 className="w-2.5 h-2.5 text-emerald-600" />
                             Đã liên kết sổ quỹ
@@ -327,7 +327,7 @@ export const DailyRevenueListTab: React.FC<DailyRevenueListTabProps> = ({
                     {report.status === 'CONFIRMED' && (
                       <span
                         className="inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded font-medium"
-                        title="Đã liên kết sổ quỹ tiền mặt & ngân hàng (BR-REV-04)"
+                        title="Đã liên kết sổ quỹ tiền mặt & ngân hàng"
                       >
                         <Link2 className="w-2.5 h-2.5 text-emerald-600" />
                         Đã liên kết sổ quỹ

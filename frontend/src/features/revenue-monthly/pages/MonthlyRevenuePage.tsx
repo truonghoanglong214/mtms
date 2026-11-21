@@ -1,5 +1,4 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components/ui/card'
-import { Badge } from '@/shared/components/ui/badge'
 
 export function MonthlyRevenuePage() {
   return (
@@ -11,7 +10,6 @@ export function MonthlyRevenuePage() {
             Quản lý doanh thu tổng hợp NET theo chi nhánh và tháng kinh doanh.
           </p>
         </div>
-        <Badge variant="secondary">BR-REV-01 / ADR-005</Badge>
       </div>
 
       <Card>

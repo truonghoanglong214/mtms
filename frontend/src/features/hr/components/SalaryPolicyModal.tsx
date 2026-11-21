@@ -197,7 +197,7 @@ export const SalaryPolicyModal: React.FC<SalaryPolicyModalProps> = ({
               </div>
               <div>
                 <h2 className="text-base font-bold tracking-tight">
-                  Chính sách lương theo mốc hiệu lực (P0-HR-02 / TC-013)
+                  Chính sách lương theo mốc hiệu lực
                 </h2>
                 <p className="text-xs text-[#C8CEC4]">
                   Nhân viên: <span className="font-semibold">{employee.fullName}</span> ({employee.staffCode}) • {employee.positionName}
@@ -233,10 +233,10 @@ export const SalaryPolicyModal: React.FC<SalaryPolicyModalProps> = ({
             <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-blue-950">
                 <ShieldCheck className="w-4 h-4 text-blue-700 shrink-0" />
-                <span>Bất biến chính sách lương mốc hiệu lực (TC-013)</span>
+                <span>Bất biến chính sách lương mốc hiệu lực</span>
               </div>
               <p className="text-[11px] leading-relaxed text-blue-800">
-                Khi tăng/giảm lương giữa tháng, chính sách mới được lưu trữ bất biến với mốc <code>effective_from</code>. Hệ thống <strong>không hồi tố</strong> làm thay đổi đơn giá các giờ đã làm trước đó (Ví dụ TC-013: 40 giờ mức cũ + 50 giờ mức mới).
+                Khi tăng/giảm lương giữa tháng, chính sách mới được lưu trữ bất biến với mốc <code>effective_from</code>. Hệ thống <strong>không hồi tố</strong> làm thay đổi đơn giá các giờ đã làm trước đó.
               </p>
             </div>
 
@@ -254,7 +254,7 @@ export const SalaryPolicyModal: React.FC<SalaryPolicyModalProps> = ({
                   className="bg-[#304638] hover:bg-[#25372C] text-white text-xs h-8 px-3"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" />
-                  <span>Thêm mức lương mới (TC-013)</span>
+                  <span>Thêm mức lương mới</span>
                 </Button>
               )}
             </div>
@@ -390,7 +390,7 @@ export const SalaryPolicyModal: React.FC<SalaryPolicyModalProps> = ({
                   {rateType === 'MONTHLY' && (
                     <div className="space-y-1.5 sm:col-span-2">
                       <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
-                        <span>Số ngày công chuẩn của tháng (TC-014)</span>
+                        <span>Số ngày công chuẩn của tháng</span>
                         <span className="text-[10px] text-slate-400">
                           Mặc định 26.00 ngày
                         </span>
@@ -545,7 +545,7 @@ export const SalaryPolicyModal: React.FC<SalaryPolicyModalProps> = ({
             <div className="pt-3 border-t border-slate-200 space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
                 <Search className="w-3.5 h-3.5 text-blue-600" />
-                <span>Kiểm tra mức lương áp dụng tại một ngày bất kỳ (TC-013 Engine Check)</span>
+                <span>Kiểm tra mức lương áp dụng tại một ngày bất kỳ</span>
               </h4>
 
               <div className="flex items-center gap-2">

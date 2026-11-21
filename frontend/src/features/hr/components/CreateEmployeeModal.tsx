@@ -209,12 +209,12 @@ export const CreateEmployeeModal: React.FC<CreateEmployeeModalProps> = ({
               </div>
               <div>
                 <h2 className="text-base font-bold tracking-tight">
-                  Thêm nhân sự mới (P0-HR-01)
+                  Thêm nhân sự mới
                 </h2>
                 <p className="text-xs text-[#C8CEC4]">
                   {branchName
                     ? `Phân bổ làm chi nhánh chính: ${branchName}`
-                    : 'Tạo hồ sơ nhân viên và phân bổ chi nhánh ban đầu (TC-015)'}
+                    : 'Tạo hồ sơ nhân viên và phân bổ chi nhánh ban đầu'}
                 </p>
               </div>
             </div>
@@ -391,7 +391,7 @@ export const CreateEmployeeModal: React.FC<CreateEmployeeModalProps> = ({
                   />
                   <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
                     <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>2. Thiết lập chính sách lương khởi điểm ngay (P0-HR-02 / TC-013)</span>
+                    <span>2. Thiết lập chính sách lương khởi điểm ngay</span>
                   </span>
                 </label>
                 {withInitialSalary && (
@@ -507,7 +507,7 @@ export const CreateEmployeeModal: React.FC<CreateEmployeeModalProps> = ({
                     {rateType === 'MONTHLY' && (
                       <div className="space-y-1.5 sm:col-span-2">
                         <label className="text-xs font-semibold text-slate-700 flex items-center justify-between">
-                          <span>Ngày công chuẩn của tháng (TC-014)</span>
+                          <span>Ngày công chuẩn của tháng</span>
                           <span className="text-[10px] text-slate-400">
                             Dùng để tính lương ngày công lẻ
                           </span>
@@ -528,7 +528,7 @@ export const CreateEmployeeModal: React.FC<CreateEmployeeModalProps> = ({
                   <p className="text-[11px] text-slate-500 italic bg-white p-2.5 rounded-lg border border-slate-100 flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     <span>
-                      Chính sách lương sẽ được áp dụng cho nhân viên tại chi nhánh hiện hành. Theo quy tắc <strong>TC-013</strong>, đơn giá mới không hồi tố cho các giờ làm trước mốc hiệu lực.
+                      Chính sách lương sẽ được áp dụng cho nhân viên tại chi nhánh hiện hành. Đơn giá mới không hồi tố cho các giờ làm trước mốc hiệu lực.
                     </span>
                   </p>
                 </div>

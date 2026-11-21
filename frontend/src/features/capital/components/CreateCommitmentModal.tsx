@@ -69,7 +69,7 @@ export const CreateCommitmentModal: React.FC<Props> = ({
               <HandCoins className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Đăng ký cam kết vốn (TC-032)</h3>
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Đăng ký cam kết vốn</h3>
               <p className="text-xs text-neutral-500">Xác lập hạn mức và hạn chót góp vốn theo hợp đồng</p>
             </div>
           </div>

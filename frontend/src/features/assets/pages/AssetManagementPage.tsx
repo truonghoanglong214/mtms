@@ -192,7 +192,7 @@ export const AssetManagementPage: React.FC = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                Sổ Tài sản & Thiết bị (TC-051)
+                Sổ Tài sản & Thiết bị
               </h1>
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 Đăng ký danh mục máy móc, số serial, bảo hành và nguyên giá ban đầu
@@ -236,10 +236,10 @@ export const AssetManagementPage: React.FC = () => {
         </div>
         <div className="space-y-1">
           <h4 className="text-sm font-bold text-amber-900 dark:text-amber-200">
-            Ranh giới nghiệp vụ Phase 0 (ADR-023 & TC-051)
+            Lưu ý nghiệp vụ tài sản & khấu hao
           </h4>
           <p className="text-xs text-amber-800/90 dark:text-amber-300/90 leading-relaxed">
-            Hệ thống MTMS giai đoạn P0 quản lý nguyên giá và hồ sơ bảo hành thiết bị phục vụ kiểm kê hiện vật. Theo quyết định <strong>ADR-023</strong> và test case <strong>TC-051</strong>, <strong>chi phí khấu hao tài sản chưa được trích vào Báo cáo P&L quản trị tạm tính</strong> (P0 P&L clearly excludes depreciation). Chính sách khấu hao tự động sẽ được kích hoạt ở Phase 1 (P1-AST-02 / TC-054) sau khi có phê duyệt quy chế kế toán.
+            Hệ thống MTMS giai đoạn hiện tại quản lý nguyên giá và hồ sơ bảo hành thiết bị phục vụ kiểm kê hiện vật. <strong>Chi phí khấu hao tài sản chưa được trích vào Báo cáo P&L quản trị tạm tính</strong>. Chính sách khấu hao tự động sẽ được kích hoạt sau khi có phê duyệt quy chế kế toán chính thức.
           </p>
         </div>
       </div>

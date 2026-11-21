@@ -219,12 +219,6 @@ export const CreateTaxObligationModal: React.FC<CreateTaxObligationModalProps> =
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
                   <span>Khai Báo Nghĩa Vụ Thuế & Lệ Phí</span>
-                  <Badge
-                    variant="outline"
-                    className="border-emerald-500/50 text-emerald-300 text-[10px] font-mono"
-                  >
-                    BR-FIN-04 / TC-012
-                  </Badge>
                 </h3>
                 <p className="text-xs text-slate-400">
                   {branchName ? `Chi nhánh: ${branchName}` : 'Ghi nhận nghĩa vụ nộp ngân sách nhà nước'}
@@ -247,7 +241,7 @@ export const CreateTaxObligationModal: React.FC<CreateTaxObligationModalProps> =
             <div className="p-3 rounded-xl bg-amber-50/80 border border-amber-200 text-amber-900 text-xs flex items-start gap-2.5">
               <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <span className="font-semibold">Quy chuẩn kế toán thuế (BR-FIN-04):</span> Nghĩa vụ thuế
+                <span className="font-semibold">Quy chuẩn kế toán thuế:</span> Nghĩa vụ thuế
                 được ghi nhận thủ công theo số liệu tờ khai hoặc thông báo chính thức từ cơ quan thuế,
                 không sử dụng công thức tự động tính toán sai quy định.
               </div>

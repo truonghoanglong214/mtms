@@ -153,7 +153,7 @@ export const TransferManagementPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <ArrowRightLeft className="h-6 w-6 text-primary-600" />
             <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100">
-              Điều Chuyển Hàng Nội Bộ (TC-027 / TC-028)
+              Điều Chuyển Hàng Nội Bộ
             </h1>
           </div>
           <p className="mt-1 text-sm text-neutral-500">
@@ -256,7 +256,7 @@ export const TransferManagementPage: React.FC = () => {
         {/* Card 4: Discrepancies */}
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-neutral-500">Hao Hụt / Chênh Lệch (TC-027)</span>
+            <span className="text-sm font-medium text-neutral-500">Hao Hụt / Chênh Lệch</span>
             <div className="rounded-lg bg-rose-100 p-2 text-rose-600 dark:bg-rose-950 dark:text-rose-400">
               <AlertTriangle className="h-5 w-5" />
             </div>
@@ -313,7 +313,7 @@ export const TransferManagementPage: React.FC = () => {
           }`}
         >
           <AlertTriangle className="h-4 w-4" />
-          Đối soát Hao hụt (TC-027)
+          Đối soát Hao hụt
           <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700 dark:bg-rose-950 dark:text-rose-300">
             {summary?.discrepancyCount || 0}
           </span>

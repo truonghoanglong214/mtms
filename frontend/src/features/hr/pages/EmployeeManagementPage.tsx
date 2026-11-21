@@ -237,7 +237,7 @@ export const EmployeeManagementPage: React.FC = () => {
                 Hồ sơ Nhân sự & Chính sách Lương
               </h1>
               <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-0.5">
-                <span>P0-HR-01 & P0-HR-02 • Phân bổ chi nhánh (TC-015) • Mốc lương hiệu lực (TC-013)</span>
+                <span>Quản lý danh sách nhân viên, phân bổ chi nhánh và mốc lương hiệu lực</span>
               </p>
             </div>
           </div>
@@ -412,7 +412,7 @@ export const EmployeeManagementPage: React.FC = () => {
           setActiveEmployee(null)
         }}
         onSuccess={() => {
-          setSuccessToast('Đã phân bổ / điều chuyển chi nhánh (TC-015) thành công!')
+          setSuccessToast('Đã phân bổ / điều chuyển chi nhánh thành công!')
           fetchEmployees()
         }}
       />
@@ -427,7 +427,7 @@ export const EmployeeManagementPage: React.FC = () => {
           setActiveEmployee(null)
         }}
         onSuccess={() => {
-          setSuccessToast('Đã thiết lập chính sách lương mới theo mốc hiệu lực (TC-013) thành công!')
+          setSuccessToast('Đã thiết lập chính sách lương mới theo mốc hiệu lực thành công!')
           fetchEmployees()
         }}
       />

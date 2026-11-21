@@ -23,7 +23,7 @@ export const ProfitTermsViewerTab: React.FC<Props> = ({
           </div>
           <div className="space-y-1">
             <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-              QUY ĐỊNH PHÂN PHỐI LỢI NHUẬN (G5 SPECIALIST GATE & ADR-007)
+              QUY ĐỊNH PHÂN PHỐI LỢI NHUẬN
             </h4>
             <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-300">
               Trong Phase 0, các tỷ lệ chia lợi nhuận chỉ mang tính <strong>THIẾT LẬP THAM CHIẾU NỘI BỘ (INFORMATIONAL ONLY)</strong>. Tuyệt đối <strong>chưa thực hiện chi trả lợi nhuận bằng tiền mặt</strong> cho đến khi có xác nhận tuân thủ độc lập của chuyên gia kế toán/pháp lý tại Cổng kiểm soát G5.
@@ -37,7 +37,7 @@ export const ProfitTermsViewerTab: React.FC<Props> = ({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
-              Đối chiếu Tỷ lệ Vốn góp vs Tỷ lệ Hưởng Lợi nhuận (CAP-INV-01)
+              Đối chiếu Tỷ lệ Vốn góp vs Tỷ lệ Hưởng Lợi nhuận
             </h3>
             <p className="text-xs text-neutral-500">
               Nguyên tắc nghiệp vụ: Tỷ lệ chia lợi nhuận độc lập với số vốn thực góp theo thỏa thuận cổ đông
@@ -62,7 +62,7 @@ export const ProfitTermsViewerTab: React.FC<Props> = ({
                   <th className="px-4 py-3 text-right">Vốn còn nợ</th>
                   <th className="px-4 py-3 text-center">% Tỷ lệ Vốn thực góp</th>
                   <th className="px-4 py-3 text-center">% Tỷ lệ Chia Lợi nhuận</th>
-                  <th className="px-4 py-3 text-center">Đặc thù Thỏa thuận (CAP-INV-01)</th>
+                  <th className="px-4 py-3 text-center">Đặc thù Thỏa thuận</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-200 dark:divide-neutral-800">

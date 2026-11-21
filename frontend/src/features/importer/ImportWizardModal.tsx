@@ -280,15 +280,9 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                 <h2 className="text-base font-bold text-stone-100">
                   Trình hướng dẫn nhập liệu Excel / CSV
                 </h2>
-                <Badge
-                  variant="outline"
-                  className="border-emerald-500/30 text-emerald-400 bg-emerald-950/50 text-[10px] font-mono"
-                >
-                  BR-SEC-02
-                </Badge>
               </div>
               <p className="text-xs text-stone-400 mt-0.5">
-                Quy trình 3 bước: Tải lên staging → Kiểm tra hợp lệ (TC-045) → Cam kết an toàn (Idempotent Commit)
+                Quy trình 3 bước: Tải lên staging → Kiểm tra hợp lệ → Cam kết an toàn (Idempotent Commit)
               </p>
             </div>
           </div>
@@ -602,7 +596,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                       </p>
                       <div className="pt-2 text-[10px] text-stone-500 flex items-center space-x-1">
                         <ShieldCheck className="h-3 w-3 text-emerald-500/80" />
-                        <span>Bảo vệ chống Formula Injection (=, +, -, @) theo BR-SEC-02</span>
+                        <span>Bảo vệ chống Formula Injection (=, +, -, @)</span>
                       </div>
                     </div>
                   )}
@@ -742,7 +736,7 @@ export const ImportWizardModal: React.FC<ImportWizardModalProps> = ({
                         Toàn bộ dữ liệu hợp lệ (100% Valid)
                       </h4>
                       <p className="mt-0.5 text-xs text-emerald-300/80">
-                        Không phát hiện mã trùng lặp (TC-045) hoặc lỗi định dạng. Dữ liệu đã sẵn sàng để cam kết nhập kho chính thức.
+                        Không phát hiện mã trùng lặp hoặc lỗi định dạng. Dữ liệu đã sẵn sàng để cam kết nhập kho chính thức.
                       </p>
                     </div>
                   </div>

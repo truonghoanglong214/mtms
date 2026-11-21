@@ -118,7 +118,7 @@ export const TransferDetailModal: React.FC<Props> = ({
             </div>
 
             <div className="rounded-xl border border-neutral-200 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-800">
-              <span className="text-xs text-neutral-500">Chênh lệch dở dang (TC-027)</span>
+              <span className="text-xs text-neutral-500">Chênh lệch dở dang</span>
               <div className={`mt-1 text-base font-bold ${transfer.totalTransitVarianceQuantity > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-900 dark:text-neutral-100'}`}>
                 {transfer.totalTransitVarianceQuantity}
               </div>
@@ -151,7 +151,7 @@ export const TransferDetailModal: React.FC<Props> = ({
                     <th className="px-4 py-3 text-right">SL Xuất</th>
                     <th className="px-4 py-3 text-right">Đơn giá WAC</th>
                     <th className="px-4 py-3 text-right">SL Thực nhận</th>
-                    <th className="px-4 py-3 text-right">Hao hụt (TC-027)</th>
+                    <th className="px-4 py-3 text-right">Hao hụt</th>
                     <th className="px-4 py-3">Lý do / Ghi chú nhận</th>
                   </tr>
                 </thead>

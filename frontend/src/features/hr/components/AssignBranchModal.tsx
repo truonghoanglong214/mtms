@@ -146,7 +146,7 @@ export const AssignBranchModal: React.FC<AssignBranchModalProps> = ({
               </div>
               <div>
                 <h2 className="text-base font-bold tracking-tight">
-                  Điều chuyển / Phân bổ chi nhánh (TC-015)
+                  Điều chuyển / Phân bổ chi nhánh
                 </h2>
                 <p className="text-xs text-[#C8CEC4]">
                   Nhân viên: <span className="font-semibold">{employee.fullName}</span> ({employee.staffCode})
@@ -183,7 +183,7 @@ export const AssignBranchModal: React.FC<AssignBranchModalProps> = ({
             <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
               <div className="flex items-center gap-1.5 font-bold text-amber-950">
                 <ShieldAlert className="w-4 h-4 text-amber-700 shrink-0" />
-                <span>Quy tắc phân bổ chi phí lương (TC-015)</span>
+                <span>Quy tắc phân bổ chi phí lương</span>
               </div>
               <p className="text-[11px] leading-relaxed text-amber-800">
                 Tại bất kỳ ngày nào, nhân viên chỉ có tối đa <strong>1 chi nhánh chính</strong>. Khi kích hoạt chi nhánh chính mới, phân bổ cũ sẽ tự động chốt mốc kết thúc. <strong>Chi nhánh chính vào ngày cuối tháng sẽ chịu toàn bộ chi phí lương</strong> trong kỳ tính lương đó.

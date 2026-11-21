@@ -6,7 +6,6 @@ import {
   Plus,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { organizationApi } from '@/features/organization/organizationApi'
 import { openingApi } from '../api/openingApi'
 import { OpeningInventoryStatusBanner } from './OpeningInventoryStatusBanner'
@@ -195,9 +194,6 @@ export const OpeningInventoryTab: React.FC<OpeningInventoryTabProps> = ({
               <h3 className="text-sm font-bold text-slate-900">
                 Sổ Số Dư Tồn Kho & Giá Vốn Moving WAC Hiện Hành
               </h3>
-              <Badge variant="outline" className="border-slate-200 text-slate-600 font-mono text-[10px]">
-                BR-INV-08
-              </Badge>
             </div>
           </div>
 

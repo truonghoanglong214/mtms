@@ -74,7 +74,7 @@ export const CreateStockCountModal: React.FC<CreateStockCountModalProps> = ({
           )}
 
           <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg text-xs text-amber-300 leading-relaxed">
-            <span className="font-semibold text-amber-200">Quy tắc TC-026:</span> Hệ thống sẽ tự động chụp ảnh snapshot toàn bộ số lượng tồn sổ sách và giá vốn Moving WAC hiện tại. Việc lập đợt kiểm kê ở trạng thái Bản nháp sẽ <strong>không làm thay đổi số dư tồn kho</strong> cho đến khi có sự phê duyệt của Chủ sở hữu (Owner).
+            <span className="font-semibold text-amber-200">Nguyên tắc kiểm kê:</span> Hệ thống sẽ tự động chụp ảnh snapshot toàn bộ số lượng tồn sổ sách và giá vốn Moving WAC hiện tại. Việc lập đợt kiểm kê ở trạng thái Bản nháp sẽ <strong>không làm thay đổi số dư tồn kho</strong> cho đến khi có sự phê duyệt của Chủ sở hữu (Owner).
           </div>
 
           <div className="grid grid-cols-2 gap-4">

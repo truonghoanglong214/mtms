@@ -124,7 +124,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
       if (problemType === 'urn:mtms:error:insufficient-stock') {
         setPostError(
           detail ||
-            'Tồn kho hiện tại không đủ để đáp ứng phiếu xuất này. Không thể xuất âm (TC-021).'
+            'Tồn kho hiện tại không đủ để đáp ứng phiếu xuất này. Không thể xuất âm.'
         )
       } else {
         setPostError(detail || message || 'Không thể chốt ghi sổ phiếu xuất kho.')
@@ -218,7 +218,7 @@ export const IssueDetailModal: React.FC<IssueDetailModalProps> = ({
                   {document && renderStatusBadge(document.status)}
                 </h3>
                 <p className="text-xs text-emerald-200/80">
-                  {document?.reason || 'Chi tiết giao dịch xuất kho và định giá vốn Moving WAC (TC-020)'}
+                  {document?.reason || 'Chi tiết giao dịch xuất kho và định giá vốn Moving WAC'}
                 </p>
               </div>
             </div>

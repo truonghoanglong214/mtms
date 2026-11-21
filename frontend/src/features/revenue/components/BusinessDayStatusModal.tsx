@@ -171,7 +171,7 @@ export const BusinessDayStatusModal: React.FC<BusinessDayStatusModalProps> = ({
                       {status === 'CLOSED' && <CheckCircle2 className="w-4 h-4 text-amber-600" />}
                     </div>
                     <span className="text-[11px] text-[#786C60]">
-                      Nghỉ bán có lý do (TC-005), miễn trừ nộp báo cáo doanh thu.
+                      Nghỉ bán có lý do, miễn trừ nộp báo cáo doanh thu.
                     </span>
                   </button>
                 </div>
@@ -206,7 +206,7 @@ export const BusinessDayStatusModal: React.FC<BusinessDayStatusModalProps> = ({
               <div className="p-3 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-start gap-2">
                 <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
                 <p className="text-[11px] text-blue-800 leading-relaxed">
-                  <strong>TC-005 Quy định miễn trừ:</strong> Ngày đóng cửa hợp lệ có lý do sẽ được hệ thống loại trừ khỏi danh sách thiếu báo cáo doanh thu (`missing-dates`), cho phép thực hiện chốt sổ kỳ kế toán mà không bị chặn.
+                  <strong>Quy định miễn trừ:</strong> Ngày đóng cửa hợp lệ có lý do sẽ được hệ thống loại trừ khỏi danh sách thiếu báo cáo doanh thu (`missing-dates`), cho phép thực hiện chốt sổ kỳ kế toán mà không bị chặn.
                 </p>
               </div>
             </div>

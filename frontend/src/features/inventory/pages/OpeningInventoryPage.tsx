@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Building2, ArrowLeft } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
 import { organizationApi } from '@/features/organization/organizationApi'
 import { useAuthStore } from '@/features/auth/authStore'
@@ -55,12 +54,6 @@ export function OpeningInventoryPage() {
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Khởi Tạo Tồn Kho Đầu Kỳ & Giá Vốn WAC
             </h1>
-            <Badge variant="secondary" className="font-mono text-xs">
-              P0-INV-02 / BR-INV-08
-            </Badge>
-            <Badge variant="outline" className="border-emerald-600 text-emerald-800 bg-emerald-50 text-xs font-mono">
-              TC-024
-            </Badge>
           </div>
           <p className="text-sm text-slate-500 mt-1">
             Ghi nhận kiểm kê thực tế mở sổ, thiết lập giá vốn bình quân gia quyền di động (Moving WAC) và khóa sổ chi nhánh.

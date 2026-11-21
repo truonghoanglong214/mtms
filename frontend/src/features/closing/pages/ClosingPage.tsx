@@ -162,7 +162,7 @@ export function ClosingPage() {
             <Badge variant="provisional">TẠM TÍNH / PROVISIONAL</Badge>
           </div>
           <p className="text-muted-foreground text-sm mt-1">
-            Kiểm tra checklist điều kiện tiên quyết (TC-040), chụp snapshot P&amp;L và khóa bất biến số liệu (TC-041).
+            Kiểm tra checklist điều kiện tiên quyết, chụp snapshot P&amp;L và khóa bất biến số liệu.
           </p>
         </div>
 
@@ -245,7 +245,7 @@ export function ClosingPage() {
             </div>
             <p className="text-xs text-muted-foreground mt-1">
               {isCurrentMonthClosed
-                ? `Đã chốt sổ lúc ${new Date(currentClosedRecord?.closedAt || '').toLocaleString('vi-VN')} bởi Chủ quán. Dữ liệu nguồn đã bị KHÓA BẤT BIẾN theo TC-041.`
+                ? `Đã chốt sổ lúc ${new Date(currentClosedRecord?.closedAt || '').toLocaleString('vi-VN')} bởi Chủ quán. Dữ liệu nguồn đã bị KHÓA BẤT BIẾN theo quy định chốt sổ.`
                 : 'Kỳ kinh doanh đang mở. Hãy hoàn tất báo cáo doanh thu và duyệt bảng lương trước khi chốt sổ.'}
             </p>
           </div>
@@ -278,9 +278,9 @@ export function ClosingPage() {
           <div className="flex items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
               <CheckCircle2 className="h-5 w-5 text-primary" />
-              Checklist Điều Kiện Tiên Quyết Chốt Sổ (TC-040)
+              Checklist Điều Kiện Tiên Quyết Chốt Sổ
             </CardTitle>
-            <span className="text-xs text-muted-foreground">BR-CLS-01 &bull; TC-040</span>
+            <span className="text-xs text-muted-foreground">Quy chuẩn chốt sổ</span>
           </div>
         </CardHeader>
         <CardContent className="pt-4 space-y-4">
@@ -301,7 +301,7 @@ export function ClosingPage() {
                     <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
                   )}
                   <div>
-                    <h4 className="font-semibold text-sm">1. Báo cáo Doanh thu Ngày (BR-CLS-01)</h4>
+                    <h4 className="font-semibold text-sm">1. Báo cáo Doanh thu Ngày</h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       100% ngày hoạt động phải có Báo cáo xác nhận (hoặc ngày nghỉ có lý do)
                     </p>
@@ -349,7 +349,7 @@ export function ClosingPage() {
                     <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0" />
                   )}
                   <div>
-                    <h4 className="font-semibold text-sm">2. Bảng Lương Chi Nhánh (TC-017)</h4>
+                    <h4 className="font-semibold text-sm">2. Bảng Lương Chi Nhánh</h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Bảng lương tháng bắt buộc phải được Chủ quán phê duyệt (APPROVED)
                     </p>
@@ -382,7 +382,7 @@ export function ClosingPage() {
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                   <div>
-                    <h4 className="font-semibold text-sm">3. Đối Chiếu Sổ Quỹ &amp; Ngân Hàng (TC-012)</h4>
+                    <h4 className="font-semibold text-sm">3. Đối Chiếu Sổ Quỹ &amp; Ngân Hàng</h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Kiểm tra chốt số dư và biên bản đối soát tài khoản tài chính
                     </p>
@@ -406,7 +406,7 @@ export function ClosingPage() {
                 <div className="flex items-center gap-2.5">
                   <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                   <div>
-                    <h4 className="font-semibold text-sm">4. Xuất Kho &amp; Giá Vốn COGS (TC-020)</h4>
+                    <h4 className="font-semibold text-sm">4. Xuất Kho &amp; Giá Vốn COGS</h4>
                     <p className="text-xs text-muted-foreground mt-0.5">
                       Phiếu xuất kho tiêu hao nguyên vật liệu tính theo Moving WAC
                     </p>
@@ -543,7 +543,7 @@ export function ClosingPage() {
             <div className="p-3.5 rounded-lg bg-amber-50 border border-amber-200 dark:bg-amber-950/40 dark:border-amber-800 text-amber-900 dark:text-amber-200 text-xs space-y-2">
               <div className="font-semibold flex items-center gap-1.5">
                 <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-                Cảnh Báo Khóa Dữ Liệu Bất Biến (TC-041)
+                Cảnh Báo Khóa Dữ Liệu Bất Biến
               </div>
               <p>
                 Sau khi chốt sổ, toàn bộ dữ liệu <strong>Doanh thu ngày</strong>, <strong>Bảng lương</strong> và <strong>Chi phí</strong> của tháng {selectedMonth} sẽ bị khóa vĩnh viễn. Quản lý chi nhánh sẽ <strong>KHÔNG THỂ</strong> sửa đổi hoặc tạo thêm hồi tố.

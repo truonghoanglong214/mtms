@@ -237,12 +237,6 @@ export const PayTaxModal: React.FC<PayTaxModalProps> = ({
               <div>
                 <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
                   <span>Ghi Nhận Nộp Thuế Vào Ngân Sách</span>
-                  <Badge
-                    variant="outline"
-                    className="border-emerald-500/50 text-emerald-300 text-[10px] font-mono"
-                  >
-                    TC-012 / BR-FIN-04
-                  </Badge>
                 </h3>
                 <p className="text-xs text-slate-400">
                   Mã nghĩa vụ: <strong className="text-white font-mono">{obligation.obligationCode}</strong> — {TAX_OBLIGATION_TYPE_LABELS[obligation.obligationType]}

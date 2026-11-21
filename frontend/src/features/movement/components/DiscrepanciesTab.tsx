@@ -25,10 +25,10 @@ export const DiscrepanciesTab: React.FC<Props> = ({
           </div>
           <div className="space-y-1">
             <h4 className="text-sm font-semibold text-amber-900 dark:text-amber-200">
-              ĐỐI SOÁT HAO HỤT TRÊN ĐƯỜNG VẬN CHUYỂN (TC-027 / NO VANISH)
+              ĐỐI SOÁT HAO HỤT TRÊN ĐƯỜNG VẬN CHUYỂN (BẢO LƯU CHÊNH LỆCH)
             </h4>
             <p className="text-xs leading-relaxed text-amber-800 dark:text-amber-300">
-              Các chuyến hàng dưới đây có sự chênh lệch giữa số lượng xuất gửi và số lượng thực nhận. Định lý <strong>TC-027</strong> yêu cầu bảo lưu toàn bộ số lượng thiếu dở dang (<code>transit_variance_qty</code>) trên hệ thống, kèm lý do và chứng từ giải trình, phục vụ cho quy trình giải quyết tranh chấp hao hụt giữa hai chi nhánh (P1-MOV-03).
+              Các chuyến hàng dưới đây có sự chênh lệch giữa số lượng xuất gửi và số lượng thực nhận. Hệ thống yêu cầu bảo lưu toàn bộ số lượng thiếu dở dang (<code>transit_variance_qty</code>) trên hệ thống, kèm lý do và chứng từ giải trình, phục vụ cho quy trình giải quyết tranh chấp hao hụt giữa hai chi nhánh.
             </p>
           </div>
         </div>

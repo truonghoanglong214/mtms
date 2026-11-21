@@ -13,7 +13,6 @@ import {
   Calendar,
 } from 'lucide-react'
 import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
 import { useAuthStore } from '@/features/auth/authStore'
 import { payrollApi, formatVND } from '../api/payrollApi'
 import type { PayrollPeriod } from '../types/payroll.types'
@@ -66,7 +65,7 @@ export const ApprovePayrollModal: React.FC<ApprovePayrollModalProps> = ({
 
     if (isManagerOnly) {
       setErrorMessage(
-        'Quy tắc an toàn TC-017 & HR-INV-02: Quản lý cửa hàng (Manager) KHÔNG có quyền phê duyệt bảng lương. Thao tác này bắt buộc phải do Chủ quán (Branch Owner) hoặc Quản trị viên thực hiện.'
+        'Quy tắc an toàn: Quản lý cửa hàng (Manager) KHÔNG có quyền phê duyệt bảng lương. Thao tác này bắt buộc phải do Chủ quán (Branch Owner) hoặc Quản trị viên thực hiện.'
       )
       return
     }
@@ -84,7 +83,7 @@ export const ApprovePayrollModal: React.FC<ApprovePayrollModalProps> = ({
 
       if (errResponse?.type === 'urn:mtms:error:self-approval-denied') {
         setErrorMessage(
-          'Từ chối bảo mật TC-017: Quản lý không thể tự phê duyệt bảng lương của chi nhánh. Bắt buộc Chủ quán ký duyệt.'
+          'Từ chối bảo mật: Quản lý không thể tự phê duyệt bảng lương của chi nhánh. Bắt buộc Chủ quán ký duyệt.'
         )
       } else {
         setErrorMessage(
@@ -119,9 +118,6 @@ export const ApprovePayrollModal: React.FC<ApprovePayrollModalProps> = ({
                   <h3 className="text-base font-bold text-stone-900">
                     Phê duyệt & Khóa bảng lương
                   </h3>
-                  <Badge className="bg-emerald-100 text-emerald-800 border-emerald-300 font-mono text-[10px]">
-                    TC-017
-                  </Badge>
                 </div>
                 <p className="text-xs text-stone-500">
                   Chốt chi phí lương chính thức và tạo bản lưu snapshot bất biến
@@ -144,10 +140,10 @@ export const ApprovePayrollModal: React.FC<ApprovePayrollModalProps> = ({
                 <ShieldAlert className="h-5 w-5 text-rose-600 shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <h5 className="font-bold text-xs uppercase tracking-wide text-rose-800">
-                    Cảnh báo kiểm soát cấm tự duyệt (TC-017)
+                    Cảnh báo kiểm soát cấm tự duyệt
                   </h5>
                   <p className="text-xs text-rose-700 leading-relaxed">
-                    Bạn đang đăng nhập với vai trò <strong>Quản lý cửa hàng (Manager)</strong>. Theo quy tắc kiểm soát nội bộ MTMS (TC-017 / HR-INV-02), Quản lý KHÔNG có thẩm quyền duyệt bảng lương của chính chi nhánh mình điều hành.
+                    Bạn đang đăng nhập với vai trò <strong>Quản lý cửa hàng (Manager)</strong>. Theo quy tắc kiểm soát nội bộ MTMS, Quản lý KHÔNG có thẩm quyền duyệt bảng lương của chính chi nhánh mình điều hành.
                   </p>
                   <p className="text-[11px] text-rose-600 font-semibold">
                     Vui lòng thông báo cho <strong>Chủ quán (Branch Owner)</strong> hoặc <strong>Quản trị viên</strong> đăng nhập để thực hiện phê duyệt.
@@ -161,7 +157,7 @@ export const ApprovePayrollModal: React.FC<ApprovePayrollModalProps> = ({
               <Lock className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
               <div className="space-y-1 text-xs">
                 <h5 className="font-bold text-amber-800">
-                  Cơ chế khóa Snapshot bất biến (BR-HR-05 & TC-015)
+                  Cơ chế khóa Snapshot bất biến
                 </h5>
                 <p className="text-amber-800 leading-relaxed">
                   Khi đã phê duyệt, bảng lương sẽ chuyển sang trạng thái <strong>ĐÃ CHỐT DUYỆT (APPROVED)</strong> và bị khóa vĩnh viễn:
